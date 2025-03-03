@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 const Navigation = () => {
   const links = [
     { name: "Home", icon: Home, href: "/" },
-    { name: "Team", icon: User, href: "/team" },
+    { name: "OurWork", icon: User, href: "/ourwork" },
     { name: "About", icon: Info, href: "/about" },
   ];
 
@@ -17,7 +17,7 @@ const Navigation = () => {
           <Link
             key={link.name}
             to={link.href}
-            className="text-white/70 hover:text-white transition-colors group flex items-center gap-2"
+            className="text-white/100 hover:text-white transition-colors group flex items-center gap-2"
           >
             <link.icon className="w-5 h-5" />
             <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
