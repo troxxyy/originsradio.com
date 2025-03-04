@@ -40,9 +40,10 @@ const TeamSection = () => {
 
   return (
     <section className="w-full max-w-7xl mx-auto">
-      <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-center">Our Team</h2>
+      <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-8">Our Team</h1>
+
       <p className="text-xl text-gray-400 text-center max-w-3xl mx-auto mb-16">
-        Meet the creative minds behind Origins Radio, bringing you the finest in dark wave and ambient music.
+        Meet the creative minds behind Origins Radio, bringing you the finest tech and music in the industry.
       </p>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-12">
         {teamMembers.map((member, i) => (

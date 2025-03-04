@@ -1,14 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
 import LoadingScreen from "./components/LoadingScreen";
-import OurWork from "./pages/OurWork";
 import Navigation from "./components/Navigation";
+
+// Lazy load route components
+const Index = lazy(() => import("./pages/Index"));
+const OurWork = lazy(() => import("./pages/OurWork"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
 
@@ -45,11 +47,13 @@ const App = () => {
         <div style={{ display: isLoading ? "none" : "block" }}>
           <BrowserRouter>
             <Navigation />
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/ourwork" element={<OurWork />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/ourwork" element={<OurWork />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
           </BrowserRouter>
         </div>
       </TooltipProvider>
