@@ -1,8 +1,7 @@
 import PageLayout from "@/components/layout/PageLayout";
 import SocialBubbles from "@/components/social/SocialBubbles";
 import Hero from "@/components/home/Hero";
-import AboutSection from "@/components/home/AboutSection";
-import TeamSection from "@/components/home/TeamSection";
+import AboutSection from "@/components/home/UpNext";
 import MusicPlayer from "@/components/music/MusicPlayer";
 import ThreeMusicPlayer from "../components/music/ThreeMusicPlayer";
 import Navigation from "@/components/Navigation";
@@ -21,7 +20,7 @@ const Index = () => {
       />
       
       {/* Music Player with Three.js Visualization */}
-      <ThreeMusicPlayer />
+      {/*  <ThreeMusicPlayer /> */}
       {/* Music Player */}
       <MusicPlayer />
       {/* About section */}

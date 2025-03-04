@@ -27,8 +27,7 @@ export default defineConfig(({ mode }) => ({
           vendor: [
             'react',
             'react-dom',
-            'react-router-dom',
-            'shader-park-core'
+            'react-router-dom'
           ],
           // Split shader-park into its own chunk since it's causing eval warnings
           shaderPark: ['shader-park-core']
@@ -42,6 +41,11 @@ export default defineConfig(({ mode }) => ({
         drop_console: true,
         drop_debugger: true
       }
-    }
-  }
+    },
+    assetsInlineLimit: 4096, // 4kb - files smaller than this will be inlined
+    sourcemap: true, // Enable source maps for debugging
+  },
+  // Handle static assets
+  publicDir: 'public',
+  base: '/', // Ensure proper base path for assets
 }));
