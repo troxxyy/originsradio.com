@@ -37,6 +37,12 @@ const MusicPlayer = () => {
     path: "/songs/amaya.mp3",
     coverArt: "/album-art/amaya.jpg"
   },
+  {
+    title: " Tomorrow Is Another Day ",
+    artist: "M-High",
+    path: "/songs/tomorow.mp3",
+    coverArt: "/album-art/anot.jpg"
+  },
 
 
 

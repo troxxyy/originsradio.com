@@ -15,14 +15,14 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-     // "shader-park-core": path.resolve(__dirname, "node_modules/shader-park-core/dist/shader-park-core.esm.js")
+      "shader-park-core": path.resolve(__dirname, "node_modules/shader-park-core/dist/shader-park-core.esm.js")
     },
   },
   
   build: {
     chunkSizeWarningLimit: 1e9,
     rollupOptions: {
-    //  treeshake: false,
+      treeshake: false,
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
@@ -42,7 +42,7 @@ export default defineConfig(({ mode }) => ({
   },
   optimizeDeps: {
     include: ['shader-park-core'],
-    //exclude: ['shader-park-core']
+    exclude: ['shader-park-core']
   },
   publicDir: 'public',
   base: '/',
