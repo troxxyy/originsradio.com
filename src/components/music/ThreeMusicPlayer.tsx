@@ -10,6 +10,7 @@ const ThreeMusicPlayer = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [audioStatus, setAudioStatus] = useState("Connect to Audio");
   const [statusColor, setStatusColor] = useState("#333");
+  const [isMobile, setIsMobile] = useState(false);
   
   const analyserRef = useRef<AnalyserNode | null>(null);
   const dataArrayRef = useRef<Uint8Array | null>(null);
@@ -19,6 +20,15 @@ const ThreeMusicPlayer = () => {
   const sceneRef = useRef<Scene | null>(null);
   const meshRef = useRef<any | null>(null);
   const controlsRef = useRef<OrbitControls | null>(null);
+
+  useEffect(() => {
+    // Detect if the device is mobile
+    const checkIfMobile = () => {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    };
+    
+    setIsMobile(checkIfMobile());
+  }, []);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -54,14 +64,25 @@ const ThreeMusicPlayer = () => {
       time: 0.0
     };
 
-    // EVENT LISTENERS
+    // EVENT LISTENERS - Only add on non-mobile devices
     const handlePointerMove = (event: PointerEvent) => {
-      state.currMouse.x = ((event.clientX / window.innerWidth) * 2 - 1) * 0.5;
-      state.currMouse.y = (-(event.clientY / window.innerHeight) * 2 + 1) * 0.5;
+      if (!isMobile) {
+        state.currMouse.x = ((event.clientX / window.innerWidth) * 2 - 1) * 0.5;
+        state.currMouse.y = (-(event.clientY / window.innerHeight) * 2 + 1) * 0.5;
+      }
     };
 
-    const handlePointerDown = () => state.currPointerDown = 1.0;
-    const handlePointerUp = () => state.currPointerDown = 0.0;
+    const handlePointerDown = () => {
+      if (!isMobile) {
+        state.currPointerDown = 1.0;
+      }
+    };
+    
+    const handlePointerUp = () => {
+      if (!isMobile) {
+        state.currPointerDown = 0.0;
+      }
+    };
 
     window.addEventListener('pointermove', handlePointerMove);
     window.addEventListener('pointerdown', handlePointerDown);
@@ -119,8 +140,11 @@ const ThreeMusicPlayer = () => {
         state.audio = 0.2 * state.currAudio + 0.8 * state.audio;
       }
       
-      state.pointerDown = 0.1 * state.currPointerDown + 0.9 * state.pointerDown;
-      state.mouse.lerp(state.currMouse, 0.02);
+      // Only update pointer effects if not on mobile
+      if (!isMobile) {
+        state.pointerDown = 0.1 * state.currPointerDown + 0.9 * state.pointerDown;
+        state.mouse.lerp(state.currMouse, 0.02);
+      }
       
       // Only render if component is still mounted
       if (rendererRef.current && sceneRef.current) {
@@ -192,7 +216,7 @@ const ThreeMusicPlayer = () => {
         sceneRef.current = null;
       }
     };
-  }, []);
+  }, [isMobile]);
 
   // CONNECT TO AUDIO
   const connectToAudio = async () => {
