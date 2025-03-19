@@ -45,7 +45,7 @@ const SocialBubbles = () => {
   return (
     <div className="fixed z-20 flex hidden md:block">
       <motion.a 
-        href="https://youtube.com" 
+        href="https://www.youtube.com/@originsradiotr" 
         target="_blank" 
         rel="noopener noreferrer"
         className="w-28 h-28 rounded-full glass-social flex items-center justify-center text-white/90 hover:text-white transition-all duration-300 hover:scale-110 hover:shadow-glow fixed"
@@ -68,7 +68,7 @@ const SocialBubbles = () => {
         <FaYoutube size={56} className="text-white" />
       </motion.a>
       <motion.a 
-        href="https://instagram.com" 
+        href="https://www.instagram.com/origins.radio/" 
         target="_blank" 
         rel="noopener noreferrer"
         className="w-28 h-28 rounded-full glass-social flex items-center justify-center text-white/90 hover:text-white transition-all duration-300 hover:scale-110 hover:shadow-glow fixed"
@@ -91,7 +91,7 @@ const SocialBubbles = () => {
         <FaInstagram size={56} className="text-white" />
       </motion.a>
       <motion.a 
-        href="https://soundcloud.com" 
+        href="https://on.soundcloud.com/RAQQfrZ27sD539NXA" 
         target="_blank" 
         rel="noopener noreferrer"
         className="w-28 h-28 rounded-full glass-social flex items-center justify-center text-white/90 hover:text-white transition-all duration-300 hover:scale-110 hover:shadow-glow fixed"

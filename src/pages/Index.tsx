@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import PageLayout from "@/components/layout/PageLayout";
 import SocialBubbles from "@/components/social/SocialBubbles";
 import Hero from "@/components/home/Hero";
@@ -7,6 +8,20 @@ import ThreeMusicPlayer from "../components/music/ThreeMusicPlayer";
 import Navigation from "@/components/Navigation";
 
 const Index = () => {
+  const [showThreePlayer, setShowThreePlayer] = useState(false);
+
+  // Delay loading the ThreeMusicPlayer to improve initial page load performance
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowThreePlayer(true);
+    }, 500);
+
+    return () => {
+      clearTimeout(timer);
+      setShowThreePlayer(false);
+    };
+  }, []);
+
   return (
     <PageLayout>
       {/* Social Media Floating Bubbles */}
@@ -20,7 +35,9 @@ const Index = () => {
       />
       
       {/* Music Player with Three.js Visualization */}
-      {/*  <ThreeMusicPlayer /> */}
+      
+      
+       {showThreePlayer && <ThreeMusicPlayer />} 
       {/* Music Player */}
       <MusicPlayer />
       {/* About section */}

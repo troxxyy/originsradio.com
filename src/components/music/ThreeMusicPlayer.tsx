@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { Clock } from 'three';
 import { Scene, SphereGeometry, Vector3, PerspectiveCamera, WebGLRenderer, Color } from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { createSculptureWithGeometry } from 'shader-park-core';
 import { spCode } from '../sp-code';
-
+//it is the shader i made for the music player
 const ThreeMusicPlayer = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -13,12 +13,20 @@ const ThreeMusicPlayer = () => {
   
   const analyserRef = useRef<AnalyserNode | null>(null);
   const dataArrayRef = useRef<Uint8Array | null>(null);
+  // Add refs for cleanup
+  const rendererRef = useRef<WebGLRenderer | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const sceneRef = useRef<Scene | null>(null);
+  const meshRef = useRef<any | null>(null);
+  const controlsRef = useRef<OrbitControls | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
     // THREE.JS SETUP
     let scene = new Scene();
+    sceneRef.current = scene;
+    
     let camera = new PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
     camera.position.z = 0.1;
 
@@ -26,6 +34,8 @@ const ThreeMusicPlayer = () => {
       antialias: true,
       alpha: true
     });
+    rendererRef.current = renderer;
+    
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setClearColor(new Color(1, 1, 1), 0);
@@ -58,7 +68,7 @@ const ThreeMusicPlayer = () => {
     window.addEventListener('pointerup', handlePointerUp);
 
     // GEOMETRY AND MESH SETUP
-    let geometry = new SphereGeometry(2, 45, 45);
+    let geometry = new SphereGeometry(2, 32, 32);
 
     let mesh = createSculptureWithGeometry(geometry, spCode(), () => ({
       time: state.time,
@@ -67,11 +77,13 @@ const ThreeMusicPlayer = () => {
       mouse: state.mouse,
       _scale: .5
     }));
+    meshRef.current = mesh;
 
     scene.add(mesh);
 
     // CONTROLS
     let controls = new OrbitControls(camera, renderer.domElement);
+    controlsRef.current = controls;
     controls.enableDamping = true;
     controls.dampingFactor = 0.25;
     controls.zoomSpeed = 0.5;
@@ -79,17 +91,20 @@ const ThreeMusicPlayer = () => {
 
     // RESIZE HANDLER
     const handleResize = () => {
-      if (!containerRef.current) return;
+      if (!containerRef.current || !rendererRef.current) return;
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      rendererRef.current.setSize(window.innerWidth, window.innerHeight);
     };
 
     window.addEventListener('resize', handleResize);
 
     // RENDER LOOP
     const render = () => {
-      requestAnimationFrame(render);
+      // Only request animation frame if component is still mounted
+      if (!rendererRef.current) return;
+      
+      animationFrameRef.current = requestAnimationFrame(render);
       state.time += clock.getDelta();
       controls.update();
       
@@ -100,24 +115,82 @@ const ThreeMusicPlayer = () => {
         // Use bass frequencies for better visualization
         const bassValue = dataArrayRef.current[2] / 255; // Bass frequency
         
-        state.currAudio += Math.pow(bassValue * 0.81, 4) + clock.getDelta() * 0.3;
+        state.currAudio += Math.pow(bassValue * 0.81, 9) + clock.getDelta() * 0.3;
         state.audio = 0.2 * state.currAudio + 0.8 * state.audio;
       }
       
       state.pointerDown = 0.1 * state.currPointerDown + 0.9 * state.pointerDown;
       state.mouse.lerp(state.currMouse, 0.02);
-      renderer.render(scene, camera);
+      
+      // Only render if component is still mounted
+      if (rendererRef.current && sceneRef.current) {
+        rendererRef.current.render(sceneRef.current, camera);
+      }
     };
 
-    render();
+    animationFrameRef.current = requestAnimationFrame(render);
 
     // CLEANUP
     return () => {
+      console.log("Cleaning up ThreeMusicPlayer");
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('pointerdown', handlePointerDown);
       window.removeEventListener('pointerup', handlePointerUp);
       window.removeEventListener('resize', handleResize);
-      renderer.dispose();
+      
+      // Cancel animation frame
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+      
+      // Dispose of Three.js objects
+      if (meshRef.current) {
+        if (sceneRef.current) {
+          sceneRef.current.remove(meshRef.current);
+        }
+        if (meshRef.current.geometry) {
+          meshRef.current.geometry.dispose();
+        }
+        if (meshRef.current.material) {
+          if (Array.isArray(meshRef.current.material)) {
+            meshRef.current.material.forEach((material: any) => material.dispose());
+          } else {
+            meshRef.current.material.dispose();
+          }
+        }
+        meshRef.current = null;
+      }
+      
+      // Dispose of controls
+      if (controlsRef.current) {
+        controlsRef.current.dispose();
+        controlsRef.current = null;
+      }
+      
+      // Dispose of renderer
+      if (rendererRef.current) {
+        rendererRef.current.dispose();
+        if (containerRef.current && containerRef.current.contains(rendererRef.current.domElement)) {
+          containerRef.current.removeChild(rendererRef.current.domElement);
+        }
+        rendererRef.current = null;
+      }
+      
+      // Clean up audio connections
+      if (analyserRef.current) {
+        analyserRef.current.disconnect();
+        analyserRef.current = null;
+      }
+      
+      // Clear scene
+      if (sceneRef.current) {
+        while(sceneRef.current.children.length > 0) { 
+          const object = sceneRef.current.children[0];
+          sceneRef.current.remove(object);
+        }
+        sceneRef.current = null;
+      }
     };
   }, []);
 

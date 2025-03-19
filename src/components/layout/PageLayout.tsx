@@ -9,7 +9,7 @@ interface PageLayoutProps {
 
 const PageLayout = ({ children, backgroundImage = "/backgr.jpg" }: PageLayoutProps) => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-start sm:justify-center relative overflow-hidden">
   
       
       {/* Background image with effects */}
@@ -24,12 +24,12 @@ const PageLayout = ({ children, backgroundImage = "/backgr.jpg" }: PageLayoutPro
       </div>
       
       {/* Navigation */}
-      <div className="relative z-40">
+      <div className="relative z-40 w-full">
         <Navigation />
       </div>
       
       {/* Page content - Highest layer */}
-      <div className="relative z-40">
+      <div className="relative z-40 w-full flex-1 flex flex-col items-center justify-start sm:justify-center py-8 sm:py-0">
         {children}
       </div>
     </div>

@@ -3,7 +3,6 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 
-// https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
@@ -11,30 +10,26 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
-    mode === 'development' &&
-    componentTagger(),
+    mode === 'development' && componentTagger(),
   ].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+     // "shader-park-core": path.resolve(__dirname, "node_modules/shader-park-core/dist/shader-park-core.esm.js")
     },
   },
+  
   build: {
-    chunkSizeWarningLimit: 1000, // Increase warning limit to 1000kb
+    chunkSizeWarningLimit: 1e9,
     rollupOptions: {
+    //  treeshake: false,
       output: {
         manualChunks: {
-          vendor: [
-            'react',
-            'react-dom',
-            'react-router-dom'
-          ],
-          // Split shader-park into its own chunk since it's causing eval warnings
+          vendor: ['react', 'react-dom', 'react-router-dom'],
           shaderPark: ['shader-park-core']
         }
       }
     },
-    // Additional build optimizations
     minify: 'terser',
     terserOptions: {
       compress: {
@@ -42,10 +37,13 @@ export default defineConfig(({ mode }) => ({
         drop_debugger: true
       }
     },
-    assetsInlineLimit: 4096, // 4kb - files smaller than this will be inlined
-    sourcemap: true, // Enable source maps for debugging
+    assetsInlineLimit: 4096,
+    sourcemap: true,
   },
-  // Handle static assets
+  optimizeDeps: {
+    include: ['shader-park-core'],
+    //exclude: ['shader-park-core']
+  },
   publicDir: 'public',
-  base: '/', // Ensure proper base path for assets
+  base: '/',
 }));

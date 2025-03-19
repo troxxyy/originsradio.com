@@ -67,7 +67,8 @@
 }
 
 .text-gradient {
-  @apply text-white;
+  @apply text-transparent bg-clip-text;
+  background-image: linear-gradient(135deg, #d1d1d1, #636363, #2c2c2c);
 }
 
 .glass-logo {
@@ -76,6 +77,10 @@
 
 .shadow-glow {
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+}
+
+.text-shadow-glow {
+  text-shadow: 0 0 10px rgba(200, 200, 200, 0.7);
 }
 
 .glass-social {
