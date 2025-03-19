@@ -40,7 +40,7 @@ const Navigation = () => {
       </div>
 
       {/* Other navigation links in a separate bubble */}
-      <div className={cn(navItemClass, "flex items-center gap-4 sm:gap-8 px-3 sm:px-6")}>
+      <div className={cn(navItemClass, "flex items-center gap-14 sm:gap-8 px-6 sm:px-6")}>
         {links.slice(1).map((link) => (
           <Link
             key={link.name}
