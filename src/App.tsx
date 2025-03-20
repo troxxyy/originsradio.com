@@ -11,7 +11,7 @@ import About from "./pages/About";
 // Lazy load route components
 const Index = lazy(() => import("./pages/Index"));
 const OurWork = lazy(() => import("./pages/OurWork"));
-const NotFound = lazy(() => import("./pages/NotFound"));
+const NotFound = lazy(() => import("./pages/404"));
 const GoCrazy = lazy(() => import("./pages/3dvs"));
 
 const queryClient = new QueryClient();
