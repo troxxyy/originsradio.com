@@ -14,7 +14,7 @@ const Index = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowThreePlayer(true);
-    }, 500);
+    }, 5);
 
     return () => {
       clearTimeout(timer);

@@ -14,7 +14,10 @@ const MusicPlayer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentSongIndex, setCurrentSongIndex] = useState(0);
   const [hasSkipped, setHasSkipped] = useState(false);
+  const [isClickLoading, setIsClickLoading] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
   const skipTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [isFirstSong, setIsFirstSong] = useState(true);
   const [songs] = useState<Song[]>
   ([  
 
@@ -51,7 +54,7 @@ const MusicPlayer = () => {
       title: "3210 (Ross from Friends Remix)",
       artist: "Jeshi",
       path: "/songs/Jeshi - 3210 (Ross from Friends Remix).mp3",
-      coverArt: "/album-covers/3210.jpg"
+      coverArt: "/album-art/super.jpg"
     },
 
 
@@ -71,9 +74,31 @@ const MusicPlayer = () => {
     }
   };
 
+  const handleGoCrazyClick = () => {
+    setIsClickLoading(true);
+    setTimeout(() => {
+      navigate('/gocrazy');
+      setIsClickLoading(false);
+    }, 1000);
+  };
+
+  const getRandomSongIndex = (currentIndex: number, maxIndex: number) => {
+    const randomIndex = Math.floor(Math.random() * maxIndex);
+    // Make sure we don't select the same song
+    return randomIndex === currentIndex ? (randomIndex + 1) % maxIndex : randomIndex;
+  };
+
   const playNextSong = () => {
     if (!hasSkipped) {
-      setCurrentSongIndex((prevIndex) => (prevIndex + 1) % songs.length);
+      if (isFirstSong) {
+        // After first song, use random selection
+        setIsFirstSong(false);
+        setCurrentSongIndex(getRandomSongIndex(currentSongIndex, songs.length));
+      } else {
+        // Continue with random selection
+        setCurrentSongIndex(getRandomSongIndex(currentSongIndex, songs.length));
+      }
+      
       setHasSkipped(true);
       
       // Clear any existing timer
@@ -100,7 +125,15 @@ const MusicPlayer = () => {
 
   useEffect(() => {
     const handleEnded = () => {
-      setCurrentSongIndex((prevIndex) => (prevIndex + 1) % songs.length);
+      if (isFirstSong) {
+        // After first song, use random selection
+        setIsFirstSong(false);
+        setCurrentSongIndex(getRandomSongIndex(currentSongIndex, songs.length));
+      } else {
+        // Continue with random selection
+        setCurrentSongIndex(getRandomSongIndex(currentSongIndex, songs.length));
+      }
+      
       // Reset skip state when song naturally ends
       setHasSkipped(false);
     };
@@ -114,7 +147,7 @@ const MusicPlayer = () => {
         audioRef.current.removeEventListener('ended', handleEnded);
       }
     };
-  }, []);
+  }, [currentSongIndex, isFirstSong, songs.length]);
 
   // Clean up timer on component unmount
   useEffect(() => {
@@ -181,8 +214,11 @@ const MusicPlayer = () => {
             </button>
             
             <button
-              onClick={() => navigate('/gocrazy')}
-              className="hidden sm:flex p-2 sm:p-3 rounded-full bg-gradient-to-r from-purple-600 via-purple-500 to-pink-500 text-white items-center justify-center hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-purple-500/25 hover:scale-200 group sm:absolute sm:bottom-0 sm:right-0"
+              onClick={handleGoCrazyClick}
+              disabled={isClickLoading}
+              onMouseEnter={() => setShowTooltip(true)}
+              onMouseLeave={() => setShowTooltip(false)}
+              className="hidden sm:flex p-2 sm:p-3 rounded-full bg-gradient-to-r from-purple-600 via-purple-500 to-pink-500 text-white items-center justify-center hover:opacity-90 transition-all duration-10 shadow-lg hover:shadow-purple-500/25 hover:scale-200 group sm:absolute sm:bottom-0 sm:right-0 relative"
               aria-label="Go Crazy visualization"
             >
               <img 
@@ -190,6 +226,17 @@ const MusicPlayer = () => {
                 alt="Go Crazy" 
                 className="w-8 h-8 sm:w-16 sm:h-16 object-contain opacity-90 group-hover:opacity-100 transition-opacity" 
               />
+              {isClickLoading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              )}
+              {showTooltip && (
+                <div className="absolute -top-14 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs p-2 rounded-md whitespace-nowrap z-50">
+                  This feature is currently in beta and only a few capabilities are online.
+                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-black/80 rotate-45"></div>
+                </div>
+              )}
             </button>
           </div>
         </div>

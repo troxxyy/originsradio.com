@@ -6,13 +6,7 @@ interface LoadingScreenProps {
   minLoadTime?: number;
 }
 
-// Define the song list to preload
-const songList = [
-  "/songs/Cesco - Superstealth.mp3",
-  "/songs/Nia Archives - Off Wiv Ya Headz.mp3",
-  "/songs/Odd Mob - LEFT TO RIGHT (33 Below Remix).mp3",
-  "/songs/Skin On Skin - Burn Dem Bridges (Nia Archives Edit).mp3"
-];
+
 
 const LoadingScreen = ({ 
   onLoadingComplete, 

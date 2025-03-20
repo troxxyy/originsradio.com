@@ -12,7 +12,7 @@ import About from "./pages/About";
 const Index = lazy(() => import("./pages/Index"));
 const OurWork = lazy(() => import("./pages/OurWork"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-const GoCrazy = lazy(() => import("./pages/GoCrazy"));
+const GoCrazy = lazy(() => import("./pages/3dvs"));
 
 const queryClient = new QueryClient();
 
