@@ -42,7 +42,7 @@ export default defineConfig(({ mode }) => ({
   },
   optimizeDeps: {
     include: ['shader-park-core'],
-    //exclude: ['shader-park-core']
+    exclude: ['shader-park-core']
   },
   publicDir: 'public',
   base: '/',
