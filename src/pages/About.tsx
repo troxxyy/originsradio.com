@@ -4,68 +4,23 @@ import Navigation from "@/components/Navigation";
 import SocialBubbles from "@/components/social/SocialBubbles";
 import TeamSection from "@/components/home/TeamSection";
 import { Rocket, Users, Radio, Globe, Music, Star, ChevronDown } from 'lucide-react';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 const About = () => {
   const [isRoadmapOpen, setIsRoadmapOpen] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    setMousePosition({ x: e.clientX, y: e.clientY });
-  }, []);
-
+  // Scroll to top when component mounts
   useEffect(() => {
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-    };
-  }, [handleMouseMove]);
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <PageLayout backgroundImage="/about-background.jpg">
-      {/* Animated background elements - reduced z-index */}
-      <div className="fixed inset-0 z-0 opacity-40 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/30 via-transparent to-blue-900/30 animate-gradient-slow"></div>
-        <div 
-          className="absolute rounded-full w-[40vw] h-[40vw] bg-gradient-to-r from-indigo-600/20 to-purple-600/20 blur-3xl"
-          style={{ 
-            left: `calc(${mousePosition.x / 20}px - 20vw)`, 
-            top: `calc(${mousePosition.y / 20}px - 20vw)`,
-            transition: 'all 0.8s cubic-bezier(0.22, 1, 0.36, 1)'
-          }}
-        ></div>
-        <div 
-          className="absolute rounded-full w-[30vw] h-[30vw] bg-gradient-to-r from-blue-600/20 to-cyan-600/20 blur-3xl"
-          style={{ 
-            right: `calc(${mousePosition.x / 30}px - 15vw)`, 
-            bottom: `calc(${mousePosition.y / 30}px - 15vw)`,
-            transition: 'all 1s cubic-bezier(0.22, 1, 0.36, 1)'
-          }}
-        ></div>
-      </div>
-
-      {/* Floating particles - reduced z-index */}
+      {/* Simplified static background gradient */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        {[...Array(20)].map((_, i) => (
-          <div 
-            key={i}
-            className="absolute rounded-full bg-white/10 animate-float"
-            style={{
-              width: `${Math.random() * 10 + 2}px`,
-              height: `${Math.random() * 10 + 2}px`,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDuration: `${Math.random() * 10 + 10}s`,
-              animationDelay: `${Math.random() * 5}s`
-            }}
-          ></div>
-        ))}
-      </div>
-      
-      {/* Debug display to show mouse position */}
-      <div className="fixed bottom-4 right-4 text-xs text-white/50 z-50 pointer-events-none">
-        Mouse: {mousePosition.x}, {mousePosition.y}
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/30 via-transparent to-blue-900/30"></div>
+        <div className="absolute right-0 bottom-0 w-1/2 h-1/2 rounded-full bg-gradient-to-r from-blue-600/10 to-cyan-600/10 blur-3xl transform-gpu"></div>
+        <div className="absolute left-0 top-0 w-1/2 h-1/2 rounded-full bg-gradient-to-r from-indigo-600/10 to-purple-600/10 blur-3xl transform-gpu"></div>
       </div>
       
       <SocialBubbles />
@@ -75,24 +30,27 @@ const About = () => {
         className="container mx-auto px-6 py-32 max-w-6xl relative z-10"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
+        transition={{ duration: 0.6 }}
+        style={{ willChange: "opacity" }}
       >
         <motion.h1 
           className="text-6xl md:text-8xl font-bold mb-16 text-center bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent"
-          initial={{ y: -50, opacity: 0 }}
+          initial={{ y: -30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.5 }}
+          style={{ willChange: "transform, opacity" }}
         >
           About Origins Radio
         </motion.h1>
         
         <motion.div 
           className="grid grid-cols-1 md:grid-cols-2 gap-16 mb-12"
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          style={{ willChange: "transform, opacity" }}
         >
-          <div className="bg-gradient-to-br from-zinc-900/80 to-zinc-900/40 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 p-10 hover:border-white/20 transition-colors duration-300 hover:shadow-[0_0_30px_rgba(139,92,246,0.2)] group relative">
+          <div className="bg-gradient-to-br from-zinc-900/80 to-zinc-900/40 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 p-10 hover:border-white/20 transition-colors duration-300 hover:shadow-[0_0_30px_rgba(139,92,246,0.2)] group relative transform-gpu">
             <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
             <h2 className="text-4xl font-bold mb-8 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent relative">Our Mission</h2>
             <p className="text-gray-300 text-lg mb-6 leading-relaxed relative">
@@ -103,7 +61,7 @@ const About = () => {
             </p>
           </div>
           
-          <div className="bg-gradient-to-br from-zinc-900/80 to-zinc-900/40 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 p-10 hover:border-white/20 transition-colors duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.2)] group relative">
+          <div className="bg-gradient-to-br from-zinc-900/80 to-zinc-900/40 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 p-10 hover:border-white/20 transition-colors duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.2)] group relative transform-gpu">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-cyan-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
             <h2 className="text-4xl font-bold mb-8 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent relative">Our Story</h2>
             <p className="text-gray-300 text-lg mb-6 leading-relaxed relative">
@@ -116,10 +74,11 @@ const About = () => {
         </motion.div>
         
         <motion.div 
-          className="bg-gradient-to-br from-zinc-900/80 to-zinc-900/40 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 p-12 mb-24 hover:shadow-[0_0_40px_rgba(124,58,237,0.15)] transition-all duration-500 relative"
-          initial={{ opacity: 0, y: 50 }}
+          className="bg-gradient-to-br from-zinc-900/80 to-zinc-900/40 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 p-12 mb-24 hover:shadow-[0_0_40px_rgba(124,58,237,0.15)] transition-all duration-500 relative transform-gpu"
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          style={{ willChange: "transform, opacity" }}
         >
           <h2 className="text-4xl font-bold mb-12 text-center bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">What Makes Us Different</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
@@ -142,9 +101,10 @@ const About = () => {
         {/* Roadmap Section */}
         <motion.div 
           className="mb-24 relative z-10"
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          style={{ willChange: "transform, opacity" }}
         >
           <motion.button
             onClick={() => setIsRoadmapOpen(!isRoadmapOpen)}
@@ -178,17 +138,18 @@ const About = () => {
                   {/* Vertical line */}
                   <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-purple-400/30 via-blue-400/20 to-cyan-400/10" />
                   
-                  {/* Timeline items */}
+                  {/* Timeline items - using transform-gpu for better performance */}
                   <div className="space-y-16">
                     <motion.div 
                       className="flex items-center justify-center"
-                      initial={{ opacity: 0, x: -50 }}
+                      initial={{ opacity: 0, x: -30 }}
                       whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.6 }}
-                      viewport={{ once: true }}
+                      transition={{ duration: 0.5 }}
+                      viewport={{ once: true, amount: 0.3 }}
+                      style={{ willChange: "transform, opacity" }}
                     >
                       <div className="w-[45%] pr-8 text-right">
-                        <div className="bg-gradient-to-br from-zinc-900/80 to-zinc-900/40 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_20px_rgba(139,92,246,0.3)]">
+                        <div className="bg-gradient-to-br from-zinc-900/80 to-zinc-900/40 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_20px_rgba(139,92,246,0.3)] transform-gpu">
                           <h3 className="text-2xl font-bold mb-2"> April 2025 - Launch</h3>
                           <p className="text-gray-300">Origins Radio begins broadcasting from the new website.</p>
                         </div>
@@ -203,10 +164,11 @@ const About = () => {
 
                     <motion.div 
                       className="flex items-center justify-center"
-                      initial={{ opacity: 0, x: 50 }}
+                      initial={{ opacity: 0, x: 30 }}
                       whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.6 }}
-                      viewport={{ once: true }}
+                      transition={{ duration: 0.5 }}
+                      viewport={{ once: true, amount: 0.3 }}
+                      style={{ willChange: "transform, opacity" }}
                     >
                       <div className="w-[45%] pr-8" />
                       <div className="relative">
@@ -215,7 +177,7 @@ const About = () => {
                         </div>
                       </div>
                       <div className="w-[45%] pl-8">
-                        <div className="bg-gradient-to-br from-zinc-900/80 to-zinc-900/40 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_20px_rgba(99,102,241,0.3)]">
+                        <div className="bg-gradient-to-br from-zinc-900/80 to-zinc-900/40 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_20px_rgba(99,102,241,0.3)] transform-gpu">
                           <h3 className="text-2xl font-bold mb-2">July 2025 - Community Growth</h3>
                           <p className="text-gray-300">Reaching our first 10000 participants with community events</p>
                         </div>
@@ -224,13 +186,14 @@ const About = () => {
 
                     <motion.div 
                       className="flex items-center justify-center"
-                      initial={{ opacity: 0, x: -50 }}
+                      initial={{ opacity: 0, x: -30 }}
                       whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.6 }}
-                      viewport={{ once: true }}
+                      transition={{ duration: 0.5 }}
+                      viewport={{ once: true, amount: 0.3 }}
+                      style={{ willChange: "transform, opacity" }}
                     >
                       <div className="w-[45%] pr-8 text-right">
-                        <div className="bg-gradient-to-br from-zinc-900/80 to-zinc-900/40 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)]">
+                        <div className="bg-gradient-to-br from-zinc-900/80 to-zinc-900/40 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] transform-gpu">
                           <h3 className="text-2xl font-bold mb-2">October 2025 - Digital Evolution🚀 </h3>
                           <p className="text-gray-300">Launching our interactive web platform with Ticket System and Mobile apps</p>
                         </div>
@@ -245,10 +208,11 @@ const About = () => {
 
                     <motion.div 
                       className="flex items-center justify-center"
-                      initial={{ opacity: 0, x: 50 }}
+                      initial={{ opacity: 0, x: 30 }}
                       whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.6 }}
-                      viewport={{ once: true }}
+                      transition={{ duration: 0.5 }}
+                      viewport={{ once: true, amount: 0.3 }}
+                      style={{ willChange: "transform, opacity" }}
                     >
                       <div className="w-[45%] pr-8" />
                       <div className="relative">
@@ -257,7 +221,7 @@ const About = () => {
                         </div>
                       </div>
                       <div className="w-[45%] pl-8">
-                        <div className="bg-gradient-to-br from-zinc-900/80 to-zinc-900/40 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_20px_rgba(20,184,166,0.3)]">
+                        <div className="bg-gradient-to-br from-zinc-900/80 to-zinc-900/40 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_20px_rgba(20,184,166,0.3)] transform-gpu">
                           <h3 className="text-2xl font-bold mb-2">January 2026 - Artist Platform</h3>
                           <p className="text-gray-300">Introducing our artist collaboration platform for all users.</p>
                         </div>
@@ -266,13 +230,14 @@ const About = () => {
 
                     <motion.div 
                       className="flex items-center justify-center"
-                      initial={{ opacity: 0, x: -50 }}
+                      initial={{ opacity: 0, x: -30 }}
                       whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.6 }}
-                      viewport={{ once: true }}
+                      transition={{ duration: 0.5 }}
+                      viewport={{ once: true, amount: 0.3 }}
+                      style={{ willChange: "transform, opacity" }}
                     >
                       <div className="w-[45%] pr-8 text-right">
-                        <div className="bg-gradient-to-br from-zinc-900/80 to-zinc-900/40 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_20px_rgba(236,72,153,0.3)]">
+                        <div className="bg-gradient-to-br from-zinc-900/80 to-zinc-900/40 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_20px_rgba(236,72,153,0.3)] transform-gpu">
                           <h3 className="text-2xl font-bold mb-2">June 2026 - Future Vision</h3>
                           <p className="text-gray-300">Expanding to multiple cities and launching our biggest music festival</p>
                         </div>
@@ -291,13 +256,12 @@ const About = () => {
           </AnimatePresence>
         </motion.div>
 
-        
-
          {/* Team Section */}
          <motion.div
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          style={{ willChange: "transform, opacity" }}
           className="container mx-auto px-6 max-w-7xl relative z-10"
         >
           <TeamSection />
@@ -305,9 +269,10 @@ const About = () => {
 
         <motion.div 
           className="container mx-auto px-6 text-center mb-12 max-w-7xl mt-36 relative z-10"
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          style={{ willChange: "transform, opacity" }}
         >
           <h2 className="text-4xl font-bold mb-8 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">Join Our Community</h2>
           <p className="text-gray-300 text-xl max-w-3xl mx-auto mb-12 leading-relaxed">
@@ -315,16 +280,14 @@ const About = () => {
           </p>
           <motion.button 
             className="px-12 py-5 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-300 shadow-[0_0_15px_rgba(139,92,246,0.3)] hover:shadow-[0_0_25px_rgba(139,92,246,0.5)]"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            style={{ willChange: "transform" }}
           >
             Get Involved
           </motion.button>
         </motion.div>
-
-     
     </PageLayout>
-
   );
 };
 

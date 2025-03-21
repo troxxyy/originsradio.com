@@ -108,6 +108,11 @@ const OurWork = () => {
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<'all' | 'upcoming' | 'past'>('all');
   
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+  
   // Refs for scroll animations
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({

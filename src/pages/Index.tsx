@@ -10,6 +10,11 @@ import Navigation from "@/components/Navigation";
 const Index = () => {
   const [showThreePlayer, setShowThreePlayer] = useState(false);
 
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // Delay loading the ThreeMusicPlayer to improve initial page load performance
   useEffect(() => {
     const timer = setTimeout(() => {
