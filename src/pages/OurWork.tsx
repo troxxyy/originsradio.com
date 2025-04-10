@@ -24,8 +24,7 @@ const projects: Project[] = [
     description: "Experience the powerful sonic journey of ECZODIA, a rising DJ/producer who masterfully blends Trance, Rave, and Hard Techno. Having cut his teeth in the world of Hardmusic, ECZODIA now focuses on the Techno aesthetic with a versatile approach to the genre. Drawing influences from both English and Dutch electronic music cultures, ECZODIA brings an unmistakable energy that has already landed him on the prestigious Boiler Room stage. With a future performance at Tomorrowland on the horizon, this is your chance to witness one of the most exciting rising names in the scene before global dominance.",
     imageUrl: "/ourwork/eczo1.png",
     tags: ["Electronic Music", "Techno", "Live Performance"],
-    upcoming: true,
-    date: "March 28, 2025",
+    date: "March 28, 2024",
   },
   
   {

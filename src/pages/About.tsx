@@ -27,24 +27,24 @@ const About = () => {
       <Navigation />
       
       <motion.div 
-        className="container mx-auto px-6 py-32 max-w-6xl relative z-10"
+        className="container mx-auto px-6 py-32 max-w-6xl relative z-10 "
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6 }}
         style={{ willChange: "opacity" }}
       >
         <motion.h1 
-          className="text-6xl md:text-8xl font-bold mb-16 text-center bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent"
+          className="text-6xl md:text-8xl font-bold mb-16 text-center bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent "
           initial={{ y: -30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5 }}
           style={{ willChange: "transform, opacity" }}
         >
-          About Origins Radio
+          About ORIGINS Radio
         </motion.h1>
         
         <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 gap-16 mb-12"
+          className="grid grid-cols-1 md:grid-cols-2 gap-16 mb-12 mt-12"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}

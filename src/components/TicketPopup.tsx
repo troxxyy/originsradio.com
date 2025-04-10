@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
 const TicketPopup = () => {
+  // Temporarily disabled
+  return null;
+
+  /* Original code preserved for future use
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -51,6 +55,7 @@ const TicketPopup = () => {
       </div>
     </div>
   );
+  */
 };
 
 export default TicketPopup; 
