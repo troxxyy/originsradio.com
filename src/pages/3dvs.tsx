@@ -1,12 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Play, Pause, RefreshCw } from 'lucide-react';
+import { Play, Pause, RefreshCw } from 'lucide-react';
 
 const GoCrazy = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(true);
   const [reloadCount, setReloadCount] = useState(0);
-  const navigate = useNavigate();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const playAttemptRef = useRef(0);
 
@@ -149,15 +147,6 @@ const GoCrazy = () => {
           Loading visualization...
         </div>
       )}
-      
-      {/* Back button */}
-      <button 
-        onClick={() => navigate(-1)}
-        className="fixed top-6 left-6 z-50 bg-black p-3 rounded-full border border-white/20 hover:bg-gray-900 transition-colors"
-        aria-label="Go back"
-      >
-        <ArrowLeft size={24} className="text-white" />
-      </button>
       
       {/* Play/Pause button */}
       <button 
