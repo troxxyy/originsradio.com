@@ -22,7 +22,7 @@ export default defineConfig(({ mode }) => ({
   build: {
     chunkSizeWarningLimit: 1e9,
     rollupOptions: {
-     //treeshake: false,
+     treeshake: false,
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
@@ -42,7 +42,7 @@ export default defineConfig(({ mode }) => ({
   },
   optimizeDeps: {
     include: ['shader-park-core'],
-    //exclude: ['shader-park-core']
+    exclude: ['shader-park-core']
   },
   publicDir: 'public',
   base: '/',
