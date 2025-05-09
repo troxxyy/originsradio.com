@@ -92,12 +92,7 @@ const TeamSection = () => {
       image: "/team/ecem.JPG",
       bio: "Creates the visual language of Origins Radio, designing captivating artwork for all our events and platforms."
     },
-    { 
-      name: "Uğur Kocagöz", 
-      role: "Music Director", 
-      image: "/team/kcgz.jpg",
-      bio: "Curates the sonic identity of Origins Radio, discovering and showcasing the best talent in electronic music."
-    },
+    
   ];
 
   const openMemberDetails = (member: TeamMemberDetail) => {
