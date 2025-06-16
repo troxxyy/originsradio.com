@@ -5,12 +5,23 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { createSculptureWithGeometry } from 'shader-park-core';
 import { spCode } from '../sp-code';
 //it is the shader i made for the music player
+
+// Add keyframes for pulsing animation
+const pulseAnimation = `
+  @keyframes pulse {
+    0% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.1); }
+    100% { transform: translateX(-50%) scale(1); }
+  }
+`;
+
 const ThreeMusicPlayer = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [audioStatus, setAudioStatus] = useState("Connect to Audio");
   const [statusColor, setStatusColor] = useState("#333");
   const [isMobile, setIsMobile] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   
   const analyserRef = useRef<AnalyserNode | null>(null);
   const dataArrayRef = useRef<Uint8Array | null>(null);
@@ -257,7 +268,13 @@ const ThreeMusicPlayer = () => {
             source.connect(analyser);
             analyser.connect(audioContext.destination);
             
+            // Add event listeners for play/pause
+            audioElement.addEventListener('play', () => setIsPlaying(true));
+            audioElement.addEventListener('pause', () => setIsPlaying(false));
+            audioElement.addEventListener('ended', () => setIsPlaying(false));
+            
             connectedToAudio = true;
+            setIsPlaying(true);
             console.log(`Successfully connected to element #${i}`);
             break; // Once connected to one element, we're done
           } else {
@@ -307,6 +324,7 @@ const ThreeMusicPlayer = () => {
 
   return (
     <>
+      <style>{pulseAnimation}</style>
       <div 
         ref={containerRef} 
         style={{ 
@@ -335,7 +353,8 @@ const ThreeMusicPlayer = () => {
           border: 'none',
           borderRadius: '4px',
           cursor: isConnected ? 'default' : 'pointer',
-          zIndex: 10
+          zIndex: 10,
+          animation: !isConnected ? 'pulse 1.5s infinite' : 'none'
         }}
       >
         {audioStatus}

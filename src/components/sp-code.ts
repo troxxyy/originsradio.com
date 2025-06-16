@@ -20,7 +20,7 @@ export function spCode() {
     metal(0.2);
     shine(0.2);
     
-    color(normal * .05 + vec3(0, 0, .3));
+    color(normal * .05 + vec3(0, 0, .1));
     displace(mouse.x * 1, mouse.y * 1, 0);
     boxFrame(vec3(2), abs(n) * .4 + .04);
     mixGeo(pointerDown);

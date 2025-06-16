@@ -218,16 +218,16 @@ const MusicPlayer = () => {
               disabled={isClickLoading}
               onMouseEnter={() => setShowTooltip(true)}
               onMouseLeave={() => setShowTooltip(false)}
-              className="hidden sm:flex p-2 sm:p-3 rounded-full bg-gradient-to-r from-purple-600 via-purple-500 to-pink-500 text-white items-center justify-center hover:opacity-90 transition-all duration-10 shadow-lg hover:shadow-purple-500/25 hover:scale-200 group sm:absolute sm:bottom-0 sm:right-0 relative"
+              className="hidden sm:flex p-2 sm:p-3 rounded-xl glass backdrop-blur-sm text-white/90 font-medium border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] items-center justify-center group sm:absolute sm:bottom-0 sm:right-0 relative"
               aria-label="Go Crazy visualization"
             >
               <img 
                 src="/gocrzazy.png" 
                 alt="Go Crazy" 
-                className="w-8 h-8 sm:w-16 sm:h-16 object-contain opacity-90 group-hover:opacity-100 transition-opacity" 
+                className="w-8 h-8 sm:w-16 sm:h-16 object-contain opacity-80 group-hover:opacity-100 transition-opacity brightness-0 invert" 
               />
               {isClickLoading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-xl">
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 </div>
               )}

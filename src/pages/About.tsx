@@ -119,9 +119,9 @@ const About = () => {
             <motion.div
               animate={{ rotate: isRoadmapOpen ? 180 : 0 }}
               transition={{ duration: 0.3 }}
-              className="p-2 rounded-full bg-gradient-to-r from-white/10 to-white/5 group-hover:from-white/20 group-hover:to-white/10 transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+              className="p-2 rounded-xl glass backdrop-blur-sm text-white/90 font-medium border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,255,255,0.1)]"
             >
-              <ChevronDown className="w-6 h-6 text-white" />
+              <ChevronDown className="w-6 h-6 text-white opacity-80" />
             </motion.div>
           </motion.button>
           
@@ -279,9 +279,9 @@ const About = () => {
             Origins Radio is more than just a radio station—it's a community of music lovers, creators, and innovators. We invite you to be part of our journey.
           </p>
           <motion.button 
-            className="px-12 py-5 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-300 shadow-[0_0_15px_rgba(139,92,246,0.3)] hover:shadow-[0_0_25px_rgba(139,92,246,0.5)]"
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
+            className="px-12 py-5 glass backdrop-blur-sm text-white/90 font-medium border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] rounded-xl"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             style={{ willChange: "transform" }}
           >
             Get Involved
