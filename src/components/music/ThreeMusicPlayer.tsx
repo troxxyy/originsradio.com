@@ -25,6 +25,8 @@ const ThreeMusicPlayer = () => {
   
   const analyserRef = useRef<AnalyserNode | null>(null);
   const dataArrayRef = useRef<Uint8Array | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
   // Add refs for cleanup
   const rendererRef = useRef<WebGLRenderer | null>(null);
   const animationFrameRef = useRef<number | null>(null);
@@ -213,9 +215,23 @@ const ThreeMusicPlayer = () => {
       }
       
       // Clean up audio connections
+      if (sourceRef.current && analyserRef.current) {
+        // Only disconnect the analyser connection, keep the direct source-to-destination connection
+        try {
+          sourceRef.current.disconnect(analyserRef.current);
+        } catch (e) {
+          console.warn('Error disconnecting analyser:', e);
+        }
+        sourceRef.current = null;
+      }
       if (analyserRef.current) {
         analyserRef.current.disconnect();
         analyserRef.current = null;
+      }
+      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+        // Don't close the audio context as it might be used by other audio elements
+        // audioContextRef.current.close();
+        audioContextRef.current = null;
       }
       
       // Clear scene
@@ -237,6 +253,7 @@ const ThreeMusicPlayer = () => {
       
       // Create audio context
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      audioContextRef.current = audioContext;
       
       // Find all audio and video elements on the page
       const audioElements = document.querySelectorAll('audio, video');
@@ -244,9 +261,6 @@ const ThreeMusicPlayer = () => {
       if (audioElements.length === 0) {
         throw new Error('No audio or video elements found on the page');
       }
-      
-      // Log found elements for debugging
-      console.log(`Found ${audioElements.length} audio/video elements`);
       
       // Create analyzer
       const analyser = audioContext.createAnalyser();
@@ -265,8 +279,11 @@ const ThreeMusicPlayer = () => {
             console.log(`Connecting to playing audio element #${i}:`, audioElement);
             
             const source = audioContext.createMediaElementSource(audioElement);
+            sourceRef.current = source;
+            
+            // Connect source to both analyser and destination
             source.connect(analyser);
-            analyser.connect(audioContext.destination);
+            source.connect(audioContext.destination);
             
             // Add event listeners for play/pause
             audioElement.addEventListener('play', () => setIsPlaying(true));
@@ -286,14 +303,7 @@ const ThreeMusicPlayer = () => {
       }
       
       if (!connectedToAudio) {
-        // Try to find any embedded players
-        const embeddedPlayers = document.querySelectorAll('iframe');
-        if (embeddedPlayers.length > 0) {
-          console.log(`Found ${embeddedPlayers.length} iframes that might contain audio`);
-          throw new Error('Audio appears to be in an iframe (YouTube/Spotify?) which cannot be accessed directly');
-        } else {
-          throw new Error('No playing audio elements found');
-        }
+        throw new Error('No playing audio elements found');
       }
       
       // Create data array for frequency data

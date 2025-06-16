@@ -12,12 +12,44 @@ interface UpNextItemProps {
 }
 
 const UpNextItem = ({ title, artist, date, delay, onPlay, onSeek, isPlaying, progress }: UpNextItemProps) => {
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const percentage = (x / rect.width) * 100;
+  const [isDragging, setIsDragging] = useState(false);
+  const progressBarRef = useRef<HTMLDivElement>(null);
+
+  const calculatePercentage = (clientX: number) => {
+    if (!progressBarRef.current) return 0;
+    const rect = progressBarRef.current.getBoundingClientRect();
+    const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
+    return (x / rect.width) * 100;
+  };
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    setIsDragging(true);
+    const percentage = calculatePercentage(e.clientX);
     onSeek(percentage);
   };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (isDragging) {
+      const percentage = calculatePercentage(e.clientX);
+      onSeek(percentage);
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    }
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging]);
 
   return (
     <div 
@@ -35,11 +67,9 @@ const UpNextItem = ({ title, artist, date, delay, onPlay, onSeek, isPlaying, pro
         </div>
       </div>
       <div 
-        className="h-0.5 w-full mx-auto mt-4 bg-[#383838] relative overflow-visible rounded-full cursor-pointer"
-        onClick={(e) => {
-          e.stopPropagation();
-          handleSeek(e);
-        }}
+        ref={progressBarRef}
+        className="h-0.5 w-full mx-auto mt-4 bg-[#383838] relative overflow-visible rounded-full cursor-pointer select-none"
+        onMouseDown={handleMouseDown}
       >
         <div 
           className="absolute top-0 left-0 h-full bg-gradient-to-r from-[#383838] to-[#d1d1d1] transition-all duration-100"
