@@ -5,13 +5,14 @@ interface UpNextItemProps {
   artist: string;
   date: string;
   delay?: string;
+  audioSrc: string;
   onPlay: () => void;
   onSeek: (percentage: number) => void;
   isPlaying: boolean;
   progress: number;
 }
 
-const UpNextItem = ({ title, artist, date, delay, onPlay, onSeek, isPlaying, progress }: UpNextItemProps) => {
+const UpNextItem = ({ title, artist, date, delay, audioSrc, onPlay, onSeek, isPlaying, progress }: UpNextItemProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const progressBarRef = useRef<HTMLDivElement>(null);
 
@@ -91,9 +92,10 @@ const UpNextSection = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [currentTrackIndex, setCurrentTrackIndex] = useState<number | null>(null);
   const lastUpdateRef = useRef(0);
 
-  const handlePlay = () => {
+  const handlePlay = (trackIndex: number) => {
     // Pause any other audio elements on the page
     const allAudioElements = document.querySelectorAll('audio');
     allAudioElements.forEach(audio => {
@@ -104,10 +106,16 @@ const UpNextSection = () => {
 
     // Play the set
     if (audioRef.current) {
-      if (isPlaying) {
+      if (isPlaying && currentTrackIndex === trackIndex) {
         audioRef.current.pause();
         setIsPlaying(false);
+        setCurrentTrackIndex(null);
       } else {
+        // Change audio source if different track
+        if (currentTrackIndex !== trackIndex) {
+          audioRef.current.src = upcomingEvents[trackIndex].audioSrc;
+          setCurrentTrackIndex(trackIndex);
+        }
         audioRef.current.play();
         setIsPlaying(true);
       }
@@ -139,6 +147,7 @@ const UpNextSection = () => {
     const handleEnded = () => {
       setIsPlaying(false);
       setProgress(0);
+      setCurrentTrackIndex(null);
     };
 
     audio.addEventListener('timeupdate', updateProgress);
@@ -152,10 +161,18 @@ const UpNextSection = () => {
 
   const upcomingEvents = [
     {
-      title: 'AL2 OriginsRadio Set',
+      title: 'AL2 OriginsRadio Set - #57',
       artist: 'Ankara',
       date: 'June 17, 2025',
-      delay: '0.001s'
+      delay: '0.001s',
+      audioSrc: '/sets/AL2 Origins Radio.mp3'
+    },
+    {
+      title: 'Lina Palamarchuk - #58',
+      artist: 'Kiev',
+      date: 'June 22, 2025',
+      delay: '0.001s',
+      audioSrc: '/sets/Lina Palamarchuk - #58.mp3'
     }
   ];
 
@@ -179,9 +196,10 @@ const UpNextSection = () => {
             artist={event.artist}
             date={event.date}
             delay={event.delay}
-            onPlay={handlePlay}
+            audioSrc={event.audioSrc}
+            onPlay={() => handlePlay(index)}
             onSeek={handleSeek}
-            isPlaying={isPlaying}
+            isPlaying={isPlaying && currentTrackIndex === index}
             progress={progress}
           />
         ))}
@@ -203,7 +221,6 @@ const UpNextSection = () => {
 
       <audio 
         ref={audioRef} 
-        src="/sets/AL2 Origins Radio.mp3"
         className="hidden"
       />
     </section>
