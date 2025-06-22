@@ -94,6 +94,7 @@ const UpNextSection = () => {
   const [currentTrackIndex, setCurrentTrackIndex] = useState<number | null>(null);
   const [trackProgress, setTrackProgress] = useState<{ [key: number]: number }>({});
   const [audioLoaded, setAudioLoaded] = useState<{ [key: number]: boolean }>({});
+  const [isSeeking, setIsSeeking] = useState(false);
   const lastUpdateRef = useRef(0);
 
   const upcomingEvents = [
@@ -160,9 +161,15 @@ const UpNextSection = () => {
 
   const handleSeek = (percentage: number) => {
     if (audioRef.current && currentTrackIndex !== null) {
+      setIsSeeking(true);
       const newTime = (percentage / 100) * audioRef.current.duration;
       audioRef.current.currentTime = newTime;
       setTrackProgress(prev => ({ ...prev, [currentTrackIndex]: percentage }));
+      
+      // Reset seeking flag after a short delay
+      setTimeout(() => {
+        setIsSeeking(false);
+      }, 100);
     }
   };
 
@@ -171,11 +178,16 @@ const UpNextSection = () => {
     if (!audio) return;
 
     const updateProgress = () => {
+      // Don't update progress if we're currently seeking
+      if (isSeeking || currentTrackIndex === null) return;
+      
       const now = Date.now();
       // Only update every 100ms
-      if (now - lastUpdateRef.current >= 100 && currentTrackIndex !== null) {
-        const currentProgress = (audio.currentTime / audio.duration) * 100;
-        setTrackProgress(prev => ({ ...prev, [currentTrackIndex]: currentProgress }));
+      if (now - lastUpdateRef.current >= 100) {
+        if (audio.duration && !isNaN(audio.duration)) {
+          const currentProgress = (audio.currentTime / audio.duration) * 100;
+          setTrackProgress(prev => ({ ...prev, [currentTrackIndex]: currentProgress }));
+        }
         lastUpdateRef.current = now;
       }
     };
@@ -200,7 +212,7 @@ const UpNextSection = () => {
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('error', handleError);
     };
-  }, [currentTrackIndex]);
+  }, []); // Remove currentTrackIndex from dependencies
 
   return (
     <section className="relative mt-4 sm:mt-4 w-full max-w-4xl mx-auto px-4 sm:px-6 py-16">
