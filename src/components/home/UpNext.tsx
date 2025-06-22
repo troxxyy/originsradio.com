@@ -91,73 +91,10 @@ const UpNextItem = ({ title, artist, date, delay, audioSrc, onPlay, onSeek, isPl
 const UpNextSection = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
   const [currentTrackIndex, setCurrentTrackIndex] = useState<number | null>(null);
+  const [trackProgress, setTrackProgress] = useState<{ [key: number]: number }>({});
+  const [audioLoaded, setAudioLoaded] = useState<{ [key: number]: boolean }>({});
   const lastUpdateRef = useRef(0);
-
-  const handlePlay = (trackIndex: number) => {
-    // Pause any other audio elements on the page
-    const allAudioElements = document.querySelectorAll('audio');
-    allAudioElements.forEach(audio => {
-      if (audio !== audioRef.current) {
-        audio.pause();
-      }
-    });
-
-    // Play the set
-    if (audioRef.current) {
-      if (isPlaying && currentTrackIndex === trackIndex) {
-        audioRef.current.pause();
-        setIsPlaying(false);
-        setCurrentTrackIndex(null);
-      } else {
-        // Change audio source if different track
-        if (currentTrackIndex !== trackIndex) {
-          audioRef.current.src = upcomingEvents[trackIndex].audioSrc;
-          setCurrentTrackIndex(trackIndex);
-        }
-        audioRef.current.play();
-        setIsPlaying(true);
-      }
-    }
-  };
-
-  const handleSeek = (percentage: number) => {
-    if (audioRef.current) {
-      const newTime = (percentage / 100) * audioRef.current.duration;
-      audioRef.current.currentTime = newTime;
-      setProgress(percentage);
-    }
-  };
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const updateProgress = () => {
-      const now = Date.now();
-      // Only update every 100ms
-      if (now - lastUpdateRef.current >= 100) {
-        const currentProgress = (audio.currentTime / audio.duration) * 100;
-        setProgress(currentProgress);
-        lastUpdateRef.current = now;
-      }
-    };
-
-    const handleEnded = () => {
-      setIsPlaying(false);
-      setProgress(0);
-      setCurrentTrackIndex(null);
-    };
-
-    audio.addEventListener('timeupdate', updateProgress);
-    audio.addEventListener('ended', handleEnded);
-
-    return () => {
-      audio.removeEventListener('timeupdate', updateProgress);
-      audio.removeEventListener('ended', handleEnded);
-    };
-  }, []);
 
   const upcomingEvents = [
     {
@@ -176,6 +113,95 @@ const UpNextSection = () => {
     }
   ];
 
+  const handlePlay = async (trackIndex: number) => {
+    // Pause any other audio elements on the page
+    const allAudioElements = document.querySelectorAll('audio');
+    allAudioElements.forEach(audio => {
+      if (audio !== audioRef.current) {
+        audio.pause();
+      }
+    });
+
+    if (audioRef.current) {
+      if (isPlaying && currentTrackIndex === trackIndex) {
+        // Pause current track
+        audioRef.current.pause();
+        setIsPlaying(false);
+        setCurrentTrackIndex(null);
+      } else {
+        // Play new track or resume current track
+        if (currentTrackIndex !== trackIndex) {
+          // Load new track
+          audioRef.current.src = upcomingEvents[trackIndex].audioSrc;
+          setCurrentTrackIndex(trackIndex);
+          
+          // Reset progress for new track
+          setTrackProgress(prev => ({ ...prev, [trackIndex]: 0 }));
+          
+          // Wait for audio to load
+          try {
+            await audioRef.current.load();
+            setAudioLoaded(prev => ({ ...prev, [trackIndex]: true }));
+          } catch (error) {
+            console.error('Error loading audio:', error);
+            return;
+          }
+        }
+        
+        try {
+          await audioRef.current.play();
+          setIsPlaying(true);
+        } catch (error) {
+          console.error('Error playing audio:', error);
+        }
+      }
+    }
+  };
+
+  const handleSeek = (percentage: number) => {
+    if (audioRef.current && currentTrackIndex !== null) {
+      const newTime = (percentage / 100) * audioRef.current.duration;
+      audioRef.current.currentTime = newTime;
+      setTrackProgress(prev => ({ ...prev, [currentTrackIndex]: percentage }));
+    }
+  };
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const updateProgress = () => {
+      const now = Date.now();
+      // Only update every 100ms
+      if (now - lastUpdateRef.current >= 100 && currentTrackIndex !== null) {
+        const currentProgress = (audio.currentTime / audio.duration) * 100;
+        setTrackProgress(prev => ({ ...prev, [currentTrackIndex]: currentProgress }));
+        lastUpdateRef.current = now;
+      }
+    };
+
+    const handleEnded = () => {
+      setIsPlaying(false);
+      setCurrentTrackIndex(null);
+    };
+
+    const handleError = (e: Event) => {
+      console.error('Audio error:', e);
+      setIsPlaying(false);
+      setCurrentTrackIndex(null);
+    };
+
+    audio.addEventListener('timeupdate', updateProgress);
+    audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('error', handleError);
+
+    return () => {
+      audio.removeEventListener('timeupdate', updateProgress);
+      audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener('error', handleError);
+    };
+  }, [currentTrackIndex]);
+
   return (
     <section className="relative mt-4 sm:mt-4 w-full max-w-4xl mx-auto px-4 sm:px-6 py-16">
       <div className="absolute -top-10 -left-20 w-64 h-64 bg-[#363636]/20 rounded-full filter blur-3xl animate-slow-pulse"></div>
@@ -188,7 +214,7 @@ const UpNextSection = () => {
         <div className="h-0.5 w-12 bg-gradient-to-r from-[#787878] to-[#d1d1d1]"></div>
       </div>
       
-      <div className="   ace-y-4">
+      <div className="space-y-6">
         {upcomingEvents.map((event, index) => (
           <UpNextItem 
             key={index}
@@ -200,7 +226,7 @@ const UpNextSection = () => {
             onPlay={() => handlePlay(index)}
             onSeek={handleSeek}
             isPlaying={isPlaying && currentTrackIndex === index}
-            progress={progress}
+            progress={trackProgress[index] || 0}
           />
         ))}
       </div>
@@ -222,6 +248,7 @@ const UpNextSection = () => {
       <audio 
         ref={audioRef} 
         className="hidden"
+        preload="metadata"
       />
     </section>
   );
