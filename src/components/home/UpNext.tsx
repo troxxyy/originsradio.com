@@ -161,18 +161,18 @@ const UpNextSection = () => {
 
   const upcomingEvents = [
     {
-      title: 'AL2 OriginsRadio Set - #57',
-      artist: 'Ankara',
-      date: 'June 17, 2025',
-      delay: '0.001s',
-      audioSrc: '/sets/AL2 Origins Radio.mp3'
-    },
-    {
       title: 'Lina Palamarchuk - #58',
       artist: 'Kiev',
       date: 'June 22, 2025',
       delay: '0.001s',
-      audioSrc: '/sets/Lina Palamarchuk - #58.mp3'
+      audioSrc: '/sets/Lina-Palamarchuk-_58.opus'
+    },
+    {
+      title: 'AL2 OriginsRadio Set - #57',
+      artist: 'Ankara',
+      date: 'June 17, 2025',
+      delay: '0.2s',
+      audioSrc: '/sets/AL2 Origins Radio.mp3'
     }
   ];
 
@@ -188,7 +188,7 @@ const UpNextSection = () => {
         <div className="h-0.5 w-12 bg-gradient-to-r from-[#787878] to-[#d1d1d1]"></div>
       </div>
       
-      <div className="space-y-4">
+      <div className="   ace-y-4">
         {upcomingEvents.map((event, index) => (
           <UpNextItem 
             key={index}
