@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaYoutube, FaInstagram, FaSoundcloud } from "react-icons/fa";
+import { Youtube, Instagram, Cloud } from "lucide-react";
 
 const SocialBubbles = () => {
   // State for random positions
@@ -112,7 +112,7 @@ const SocialBubbles = () => {
             whileHover={{ rotate: 10, scale: 1.1 }}
             onClick={() => handleBubblePop('youtube', 'https://www.youtube.com/@originsradiotr')}
           >
-            <FaYoutube size={56} className="text-white" />
+            <Youtube size={56} className="text-white" />
           </motion.div>
         )}
         {poppingState.youtube && (
@@ -151,7 +151,7 @@ const SocialBubbles = () => {
             whileHover={{ rotate: -10, scale: 1.1 }}
             onClick={() => handleBubblePop('instagram', 'https://www.instagram.com/origins.radio/')}
           >
-            <FaInstagram size={56} className="text-white" />
+            <Instagram size={56} className="text-white" />
           </motion.div>
         )}
         {poppingState.instagram && (
@@ -190,7 +190,7 @@ const SocialBubbles = () => {
             whileHover={{ rotate: 10, scale: 1.1 }}
             onClick={() => handleBubblePop('soundcloud', 'https://on.soundcloud.com/RAQQfrZ27sD539NXA')}
           >
-            <FaSoundcloud size={56} className="text-white" />
+            <Cloud size={56} className="text-white" />
           </motion.div>
         )}
         {poppingState.soundcloud && (
