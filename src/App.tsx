@@ -13,6 +13,10 @@ const Index = lazy(() => import("./pages/Index"));
 const OurWork = lazy(() => import("./pages/OurWork"));
 const NotFound = lazy(() => import("./pages/404"));
 const GoCrazy = lazy(() => import("./pages/3dvs"));
+const Artists = lazy(() => import("./pages/Artists"));
+const ArtistDetail = lazy(() => import("./pages/ArtistDetail"));
+const AdminArtists = lazy(() => import("./pages/AdminArtists"));
+const ArtistManagementGuide = lazy(() => import("./pages/ArtistManagementGuide"));
 
 const queryClient = new QueryClient();
 
@@ -79,6 +83,26 @@ const App = () => {
                 <Route path="/about" element={
                   <RouteTracker>
                     <About />
+                  </RouteTracker>
+                } />
+                <Route path="/artists" element={
+                  <RouteTracker>
+                    <Artists />
+                  </RouteTracker>
+                } />
+                <Route path="/artists/:artistId" element={
+                  <RouteTracker>
+                    <ArtistDetail />
+                  </RouteTracker>
+                } />
+                <Route path="/admin/artists" element={
+                  <RouteTracker>
+                    <AdminArtists />
+                  </RouteTracker>
+                } />
+                <Route path="/guide" element={
+                  <RouteTracker>
+                    <ArtistManagementGuide />
                   </RouteTracker>
                 } />
                 <Route path="*" element={
