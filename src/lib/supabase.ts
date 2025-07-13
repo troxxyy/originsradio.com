@@ -49,6 +49,8 @@ export interface Database {
           genre: string[] | null
           featured: boolean
           social_links: Record<string, any> | null
+          views_count: number | null
+          years_experience: number | null
           created_at: string
           updated_at: string
         }
@@ -61,6 +63,8 @@ export interface Database {
           genre?: string[] | null
           featured?: boolean
           social_links?: Record<string, any> | null
+          views_count?: number | null
+          years_experience?: number | null
           created_at?: string
           updated_at?: string
         }
@@ -73,6 +77,8 @@ export interface Database {
           genre?: string[] | null
           featured?: boolean
           social_links?: Record<string, any> | null
+          views_count?: number | null
+          years_experience?: number | null
           created_at?: string
           updated_at?: string
         }
@@ -86,6 +92,7 @@ export interface Database {
           cover_art_url: string | null
           duration: number | null
           release_date: string | null
+          views_count: number | null
           created_at: string
           updated_at: string
         }
@@ -97,6 +104,7 @@ export interface Database {
           cover_art_url?: string | null
           duration?: number | null
           release_date?: string | null
+          views_count?: number | null
           created_at?: string
           updated_at?: string
         }
@@ -108,6 +116,7 @@ export interface Database {
           cover_art_url?: string | null
           duration?: number | null
           release_date?: string | null
+          views_count?: number | null
           created_at?: string
           updated_at?: string
         }
@@ -120,6 +129,7 @@ export interface Database {
           audio_url: string
           duration: number | null
           release_date: string
+          views_count: number | null
           created_at: string
           updated_at: string
           artists?: {
@@ -136,6 +146,7 @@ export interface Database {
           audio_url: string
           duration?: number | null
           release_date: string
+          views_count?: number | null
           created_at?: string
           updated_at?: string
         }
@@ -146,6 +157,7 @@ export interface Database {
           audio_url?: string
           duration?: number | null
           release_date?: string
+          views_count?: number | null
           created_at?: string
           updated_at?: string
         }
