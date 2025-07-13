@@ -21,7 +21,11 @@ import {
   updateEvent,
   deleteEvent,
   uploadAudioFile,
-  uploadImageFile
+  uploadImageFile,
+  toggleArtistLike,
+  getArtistLikeCount,
+  isArtistLikedByUser,
+  generateUserId
 } from '../lib/supabase-utils'
 import type { Database } from '../lib/supabase'
 
@@ -242,5 +246,48 @@ export const useUploadImage = () => {
   return useMutation({
     mutationFn: ({ file, path }: { file: File; path: string }) =>
       uploadImageFile(file, path),
+  })
+} 
+
+// Artist likes hooks
+export const useArtistLikeCount = (artistId: string) => {
+  return useQuery({
+    queryKey: ['artist-like-count', artistId],
+    queryFn: () => getArtistLikeCount(artistId),
+    enabled: !!artistId,
+    staleTime: 30 * 1000, // 30 seconds
+  })
+}
+
+export const useArtistLikeStatus = (artistId: string) => {
+  const userId = generateUserId()
+  
+  return useQuery({
+    queryKey: ['artist-like-status', artistId, userId],
+    queryFn: () => isArtistLikedByUser(artistId, userId),
+    enabled: !!artistId,
+    staleTime: 30 * 1000, // 30 seconds
+  })
+}
+
+export const useToggleArtistLike = () => {
+  const queryClient = useQueryClient()
+  const userId = generateUserId()
+  
+  return useMutation({
+    mutationFn: ({ artistId }: { artistId: string }) => toggleArtistLike(artistId, userId),
+    onSuccess: (isLiked, { artistId }) => {
+      // Invalidate and refetch like count and status
+      queryClient.invalidateQueries({ queryKey: ['artist-like-count', artistId] })
+      queryClient.invalidateQueries({ queryKey: ['artist-like-status', artistId, userId] })
+      
+      // Optimistically update the like count
+      queryClient.setQueryData(['artist-like-count', artistId], (oldCount: number) => {
+        return isLiked ? (oldCount || 0) + 1 : Math.max(0, (oldCount || 0) - 1)
+      })
+      
+      // Optimistically update the like status
+      queryClient.setQueryData(['artist-like-status', artistId, userId], isLiked)
+    },
   })
 } 
