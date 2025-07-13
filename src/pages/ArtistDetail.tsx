@@ -26,7 +26,7 @@ import {
   Eye
 } from 'lucide-react';
 import PageLayout from '@/components/layout/PageLayout';
-import { useArtistBySlug, useTracksByArtist, useEventsByArtist, useSetsByArtist } from '@/hooks/use-supabase';
+import { useArtistBySlug, useTracksByArtist, useEventsByArtist, useSetsByArtist, useArtistLikeCount, useArtistLikeStatus, useToggleArtistLike } from '@/hooks/use-supabase';
 import ArtistSetItem, { ArtistSetEvent } from '@/components/music/ArtistSetItem';
 import ProgressBar from '@/components/music/ProgressBar';
 import { getSupabaseClient } from '@/lib/supabase';
@@ -37,16 +37,6 @@ const ArtistDetail = () => {
   const [currentTrack, setCurrentTrack] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioRef, setAudioRef] = useState<HTMLAudioElement | null>(null);
-  const [isLiked, setIsLiked] = useState(() => {
-    const likedArtists = JSON.parse(localStorage.getItem('likedArtists') || '[]');
-    return likedArtists.includes(artistSlug);
-  });
-
-  // Like count state
-  const [likeCount, setLikeCount] = useState(() => {
-    const storedLikes = JSON.parse(localStorage.getItem('artistLikes') || '{}');
-    return storedLikes[artistSlug || ''] || Math.floor(Math.random() * 30) + 15;
-  });
 
   // Audio player state for sets
   const [audioRefSet, setAudioRefSet] = useState<HTMLAudioElement | null>(null);
@@ -61,6 +51,11 @@ const ArtistDetail = () => {
   const { data: tracks } = useTracksByArtist(artist?.id || '');
   const { data: events } = useEventsByArtist(artist?.id || '');
   const { data: sets } = useSetsByArtist(artist?.id || '');
+
+  // Like functionality
+  const { data: likeCount = 0 } = useArtistLikeCount(artist?.id || '');
+  const { data: isLiked = false } = useArtistLikeStatus(artist?.id || '');
+  const toggleLikeMutation = useToggleArtistLike();
 
   const setsEvents: ArtistSetEvent[] = (sets || []).map((set, index) => ({
     title: set.title,
@@ -99,8 +94,6 @@ const ArtistDetail = () => {
   const engagementMultiplier = (totalPlays / 100) + (totalEvents * 50) + (totalTracks * 20);
   const calculatedFollowers = Math.max(baseFollowers, Math.floor(engagementMultiplier));
   
-
-
   // DJ-specific data calculated from real metrics
   const djStats = {
     experience: `${artistExperience}+ years`,
@@ -287,6 +280,12 @@ const ArtistDetail = () => {
     }
   };
 
+  const handleToggleLike = () => {
+    if (artist?.id) {
+      toggleLikeMutation.mutate({ artistId: artist.id });
+    }
+  };
+
   if (isLoading) {
     return (
       <PageLayout>
@@ -384,36 +383,11 @@ const ArtistDetail = () => {
                       <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
-                        onClick={() => {
-                          const newLikedState = !isLiked;
-                          setIsLiked(newLikedState);
-                          
-                          // Update like count
-                          const newLikeCount = newLikedState ? likeCount + 1 : likeCount - 1;
-                          setLikeCount(newLikeCount);
-                          
-                          // Store like count in localStorage
-                          const storedLikes = JSON.parse(localStorage.getItem('artistLikes') || '{}');
-                          storedLikes[artistSlug || ''] = newLikeCount;
-                          localStorage.setItem('artistLikes', JSON.stringify(storedLikes));
-                          
-                          // Update liked artists list
-                          const likedArtists = JSON.parse(localStorage.getItem('likedArtists') || '[]');
-                          if (newLikedState) {
-                            if (!likedArtists.includes(artistSlug)) {
-                              likedArtists.push(artistSlug);
-                            }
-                          } else {
-                            const index = likedArtists.indexOf(artistSlug);
-                            if (index > -1) {
-                              likedArtists.splice(index, 1);
-                            }
-                          }
-                          localStorage.setItem('likedArtists', JSON.stringify(likedArtists));
-                        }}
+                        onClick={handleToggleLike}
+                        disabled={toggleLikeMutation.isPending}
                         className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full backdrop-blur-sm border border-white/20 flex items-center justify-center transition-all touch-manipulation ${
                           isLiked ? 'bg-red-500/80 text-white' : 'bg-white/10 text-white hover:bg-white/20'
-                        }`}
+                        } ${toggleLikeMutation.isPending ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
                         <Heart className={`w-4 h-4 sm:w-5 sm:h-5 ${isLiked ? 'fill-current' : ''}`} />
                       </motion.button>

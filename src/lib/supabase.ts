@@ -83,6 +83,26 @@ export interface Database {
           updated_at?: string
         }
       }
+      artist_likes: {
+        Row: {
+          id: string
+          artist_id: string
+          user_id: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          artist_id: string
+          user_id: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          artist_id?: string
+          user_id?: string
+          created_at?: string
+        }
+      }
       tracks: {
         Row: {
           id: string

@@ -532,3 +532,96 @@ export const uploadImageFile = async (file: File, path: string): Promise<string 
   
   return urlData.publicUrl
 } 
+
+// Artist likes functions
+export const toggleArtistLike = async (artistId: string, userId: string): Promise<boolean> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, cannot toggle like')
+    return false
+  }
+  
+  const supabase = getSupabaseClient()
+  const { data, error } = await supabase
+    .rpc('toggle_artist_like', {
+      artist_uuid: artistId,
+      user_identifier: userId
+    })
+  
+  if (error) {
+    console.error('Error toggling artist like:', error)
+    return false
+  }
+  
+  return data
+}
+
+export const getArtistLikeCount = async (artistId: string): Promise<number> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, returning 0 for like count')
+    return 0
+  }
+  
+  const supabase = getSupabaseClient()
+  const { data, error } = await supabase
+    .rpc('get_artist_like_count', {
+      artist_uuid: artistId
+    })
+  
+  if (error) {
+    console.error('Error getting artist like count:', error)
+    return 0
+  }
+  
+  return data || 0
+}
+
+export const isArtistLikedByUser = async (artistId: string, userId: string): Promise<boolean> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, returning false for like status')
+    return false
+  }
+  
+  const supabase = getSupabaseClient()
+  const { data, error } = await supabase
+    .rpc('is_artist_liked_by_user', {
+      artist_uuid: artistId,
+      user_identifier: userId
+    })
+  
+  if (error) {
+    console.error('Error checking artist like status:', error)
+    return false
+  }
+  
+  return data || false
+}
+
+// Generate a unique user identifier for anonymous users
+export const generateUserId = (): string => {
+  // Try to get existing user ID from localStorage
+  let userId = localStorage.getItem('origins_radio_user_id')
+  
+  if (!userId) {
+    // Generate a new user ID based on browser fingerprint
+    const fingerprint = [
+      navigator.userAgent,
+      navigator.language,
+      screen.width,
+      screen.height,
+      new Date().getTimezoneOffset()
+    ].join('|')
+    
+    // Create a hash of the fingerprint
+    let hash = 0
+    for (let i = 0; i < fingerprint.length; i++) {
+      const char = fingerprint.charCodeAt(i)
+      hash = ((hash << 5) - hash) + char
+      hash = hash & hash // Convert to 32-bit integer
+    }
+    
+    userId = `user_${Math.abs(hash)}_${Date.now()}`
+    localStorage.setItem('origins_radio_user_id', userId)
+  }
+  
+  return userId
+} 
