@@ -56,6 +56,26 @@
   body {
     @apply bg-background text-foreground overflow-x-hidden;
   }
+  
+  /* Mobile-specific improvements */
+  @media (max-width: 768px) {
+    /* Prevent zoom on input focus */
+    input, textarea, select {
+      font-size: 16px;
+    }
+    
+    /* Improve touch targets for interactive elements */
+    button:not(.nav-button), 
+    a:not(.nav-link) {
+      min-height: 44px;
+      min-width: 44px;
+    }
+    
+    /* Smooth scrolling for iOS */
+    html {
+      -webkit-overflow-scrolling: touch;
+    }
+  }
 }
 
 .glass {
@@ -157,6 +177,38 @@
 
 .animate-scale-in {
   animation: scale-in 0.4s ease-out forwards;
+}
+
+/* Mobile-specific animations */
+@keyframes slide-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out forwards;
+}
+
+@keyframes tap-feedback {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-tap-feedback {
+  animation: tap-feedback 0.15s ease-out;
 }
 
 @keyframes fade-in {

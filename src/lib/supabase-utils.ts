@@ -1,4 +1,4 @@
-import { supabase } from './supabase'
+import { getSupabaseClient, isSupabaseConfigured } from './supabase'
 import type { Database } from './supabase'
 
 type Artist = Database['public']['Tables']['artists']['Row']
@@ -17,6 +17,12 @@ export const generateSlug = (name: string): string => {
 
 // Artist utilities
 export const getArtists = async (): Promise<Artist[]> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, returning empty artists array')
+    return []
+  }
+  
+  const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('artists')
     .select('*')
@@ -31,6 +37,12 @@ export const getArtists = async (): Promise<Artist[]> => {
 }
 
 export const getArtistById = async (id: string): Promise<Artist | null> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, returning null for artist')
+    return null
+  }
+  
+  const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('artists')
     .select('*')
@@ -47,6 +59,12 @@ export const getArtistById = async (id: string): Promise<Artist | null> => {
 
 // Get artist by slug (name-based)
 export const getArtistBySlug = async (slug: string): Promise<Artist | null> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, returning null for artist by slug')
+    return null
+  }
+  
+  const supabase = getSupabaseClient()
   // Get all artists and find the one that matches the slug
   const { data: allArtists, error } = await supabase
     .from('artists')
@@ -67,6 +85,12 @@ export const getArtistBySlug = async (slug: string): Promise<Artist | null> => {
 }
 
 export const createArtist = async (artist: Database['public']['Tables']['artists']['Insert']): Promise<Artist | null> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, cannot create artist')
+    return null
+  }
+  
+  const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('artists')
     .insert(artist)
@@ -83,6 +107,12 @@ export const createArtist = async (artist: Database['public']['Tables']['artists
 
 // Track utilities
 export const getTracks = async (): Promise<Track[]> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, returning empty tracks array')
+    return []
+  }
+  
+  const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('tracks')
     .select(`
@@ -104,6 +134,12 @@ export const getTracks = async (): Promise<Track[]> => {
 }
 
 export const getTracksByArtist = async (artistId: string): Promise<Track[]> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, returning empty tracks array')
+    return []
+  }
+  
+  const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('tracks')
     .select('*')
@@ -119,6 +155,12 @@ export const getTracksByArtist = async (artistId: string): Promise<Track[]> => {
 }
 
 export const createTrack = async (track: Database['public']['Tables']['tracks']['Insert']): Promise<Track | null> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, cannot create track')
+    return null
+  }
+  
+  const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('tracks')
     .insert(track)
@@ -134,6 +176,12 @@ export const createTrack = async (track: Database['public']['Tables']['tracks'][
 }
 
 export const updateTrack = async (id: string, track: Database['public']['Tables']['tracks']['Update']): Promise<Track | null> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, cannot update track')
+    return null
+  }
+  
+  const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('tracks')
     .update(track)
@@ -150,6 +198,12 @@ export const updateTrack = async (id: string, track: Database['public']['Tables'
 }
 
 export const deleteTrack = async (id: string): Promise<boolean> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, cannot delete track')
+    return false
+  }
+  
+  const supabase = getSupabaseClient()
   const { error } = await supabase
     .from('tracks')
     .delete()
@@ -165,6 +219,12 @@ export const deleteTrack = async (id: string): Promise<boolean> => {
 
 // Set utilities
 export const getSets = async () => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, returning empty sets array')
+    return []
+  }
+  
+  const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('sets')
     .select(`
@@ -187,6 +247,12 @@ export const getSets = async () => {
 }
 
 export const getSetsByArtist = async (artistId: string) => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, returning empty sets array')
+    return []
+  }
+  
+  const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('sets')
     .select(`
@@ -210,6 +276,12 @@ export const getSetsByArtist = async (artistId: string) => {
 }
 
 export const getSetById = async (id: string) => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, returning null for set')
+    return null
+  }
+  
+  const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('sets')
     .select(`
@@ -233,6 +305,12 @@ export const getSetById = async (id: string) => {
 }
 
 export const createSet = async (set: Database['public']['Tables']['sets']['Insert']): Promise<Set | null> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, cannot create set')
+    return null
+  }
+  
+  const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('sets')
     .insert(set)
@@ -248,6 +326,12 @@ export const createSet = async (set: Database['public']['Tables']['sets']['Inser
 }
 
 export const updateSet = async (id: string, set: Database['public']['Tables']['sets']['Update']): Promise<Set | null> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, cannot update set')
+    return null
+  }
+  
+  const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('sets')
     .update(set)
@@ -264,6 +348,12 @@ export const updateSet = async (id: string, set: Database['public']['Tables']['s
 }
 
 export const deleteSet = async (id: string): Promise<boolean> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, cannot delete set')
+    return false
+  }
+  
+  const supabase = getSupabaseClient()
   const { error } = await supabase
     .from('sets')
     .delete()
@@ -279,6 +369,12 @@ export const deleteSet = async (id: string): Promise<boolean> => {
 
 // Event utilities
 export const getEvents = async (): Promise<Event[]> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, returning empty events array')
+    return []
+  }
+  
+  const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('events')
     .select(`
@@ -300,9 +396,22 @@ export const getEvents = async (): Promise<Event[]> => {
 }
 
 export const getEventsByArtist = async (artistId: string): Promise<Event[]> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, returning empty events array')
+    return []
+  }
+  
+  const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('events')
-    .select('*')
+    .select(`
+      *,
+      artists (
+        id,
+        name,
+        photo_url
+      )
+    `)
     .eq('artist_id', artistId)
     .order('date', { ascending: false })
   
@@ -315,6 +424,12 @@ export const getEventsByArtist = async (artistId: string): Promise<Event[]> => {
 }
 
 export const createEvent = async (event: Database['public']['Tables']['events']['Insert']): Promise<Event | null> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, cannot create event')
+    return null
+  }
+  
+  const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('events')
     .insert(event)
@@ -330,6 +445,12 @@ export const createEvent = async (event: Database['public']['Tables']['events'][
 }
 
 export const updateEvent = async (id: string, event: Database['public']['Tables']['events']['Update']): Promise<Event | null> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, cannot update event')
+    return null
+  }
+  
+  const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('events')
     .update(event)
@@ -346,6 +467,12 @@ export const updateEvent = async (id: string, event: Database['public']['Tables'
 }
 
 export const deleteEvent = async (id: string): Promise<boolean> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, cannot delete event')
+    return false
+  }
+  
+  const supabase = getSupabaseClient()
   const { error } = await supabase
     .from('events')
     .delete()
@@ -361,12 +488,15 @@ export const deleteEvent = async (id: string): Promise<boolean> => {
 
 // File upload utilities
 export const uploadAudioFile = async (file: File, path: string): Promise<string | null> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, cannot upload audio file')
+    return null
+  }
+  
+  const supabase = getSupabaseClient()
   const { data, error } = await supabase.storage
     .from('audio')
-    .upload(path, file, {
-      cacheControl: '3600',
-      upsert: false
-    })
+    .upload(path, file)
   
   if (error) {
     console.error('Error uploading audio file:', error)
@@ -381,12 +511,15 @@ export const uploadAudioFile = async (file: File, path: string): Promise<string 
 }
 
 export const uploadImageFile = async (file: File, path: string): Promise<string | null> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, cannot upload image file')
+    return null
+  }
+  
+  const supabase = getSupabaseClient()
   const { data, error } = await supabase.storage
     .from('images')
-    .upload(path, file, {
-      cacheControl: '3600',
-      upsert: false
-    })
+    .upload(path, file)
   
   if (error) {
     console.error('Error uploading image file:', error)

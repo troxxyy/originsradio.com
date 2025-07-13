@@ -30,7 +30,7 @@ const Navigation = () => {
       <div className={cn(navItemClass, "px-4 sm:px-6")}>
         <Link
           to={links[0].href}
-          className="text-white/100 hover:text-white transition-colors group flex items-center "
+          className="text-white/100 hover:text-white transition-colors group flex items-center nav-link"
         >
           {(() => {
             const IconComponent = links[0].icon;
@@ -53,7 +53,7 @@ const Navigation = () => {
           >
             <Link
               to={link.href}
-              className="text-white/100 hover:text-white transition-colors group flex items-center gap-2 px-1"
+              className="text-white/100 hover:text-white transition-colors group flex items-center gap-2 px-1 nav-link"
             >
               {link.icon && <link.icon className="w-5 h-5" />}
               <span className="text-sm font-medium hidden sm:inline-block sm:opacity-0 sm:group-hover:opacity-100 sm:transition-opacity">

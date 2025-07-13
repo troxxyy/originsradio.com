@@ -8,6 +8,7 @@ import { generateSlug } from '@/lib/supabase-utils';
 
 const Artists = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
   const navigate = useNavigate();
 
   // Scroll to top when component mounts
@@ -18,15 +19,22 @@ const Artists = () => {
   // Fetch artists from Supabase
   const { data: artists, isLoading, error } = useArtists();
 
-  // Filter artists based on search
+  // Filter artists based on search and featured filter
   const filteredArtists = useMemo(() => {
     if (!artists) return [];
     
-    return artists.filter(artist => 
+    let filtered = artists.filter(artist => 
       artist.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (artist.bio && artist.bio.toLowerCase().includes(searchTerm.toLowerCase()))
     );
-  }, [artists, searchTerm]);
+    
+    // Apply featured filter
+    if (showFeaturedOnly) {
+      filtered = filtered.filter(artist => artist.featured);
+    }
+    
+    return filtered;
+  }, [artists, searchTerm, showFeaturedOnly]);
 
   const handleArtistClick = (artist: any) => {
     const slug = generateSlug(artist.name);
@@ -70,6 +78,23 @@ const Artists = () => {
                   className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/30 transition-all"
                 />
               </div>
+              
+              {/* Featured Filter Toggle */}
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowFeaturedOnly(!showFeaturedOnly)}
+                className={`flex items-center gap-2 px-4 py-3 rounded-xl border transition-all ${
+                  showFeaturedOnly 
+                    ? 'bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-400 text-black border-yellow-400/50 shadow-lg' 
+                    : 'bg-white/10 text-white border-white/20 hover:bg-white/20'
+                }`}
+              >
+                <Star className={`w-4 h-4 ${showFeaturedOnly ? 'fill-current' : ''}`} />
+                <span className="font-medium text-sm">
+                  {showFeaturedOnly ? 'Featured Only' : 'Show All'}
+                </span>
+              </motion.button>
             </div>
           </div>
         </div>
@@ -128,6 +153,21 @@ const Artists = () => {
                         }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                      
+                      {/* Featured Badge on Photo */}
+                      {artist.featured && (
+                        <motion.div 
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.3, duration: 0.8 }}
+                          className="absolute top-3 left-3 z-10"
+                        >
+                          <div className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-400 text-black px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg border border-white/20">
+                            <Star className="w-3 h-3 fill-current" />
+                            <span>FEATURED</span>
+                          </div>
+                        </motion.div>
+                      )}
                     </div>
 
                     {/* Artist Info */}
@@ -149,12 +189,6 @@ const Artists = () => {
                             <span className="flex items-center gap-1">
                               <MapPin className="w-3 h-3" />
                               {artist.location}
-                            </span>
-                          )}
-                          {artist.featured && (
-                            <span className="flex items-center gap-1 text-yellow-400">
-                              <Star className="w-3 h-3" />
-                              Featured
                             </span>
                           )}
                         </div>

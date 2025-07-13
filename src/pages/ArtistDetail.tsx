@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -20,6 +20,8 @@ import {
 } from 'lucide-react';
 import PageLayout from '@/components/layout/PageLayout';
 import { useArtistBySlug, useTracksByArtist, useEventsByArtist, useSetsByArtist } from '@/hooks/use-supabase';
+import ArtistSetItem, { ArtistSetEvent } from '@/components/music/ArtistSetItem';
+import ProgressBar from '@/components/music/ProgressBar';
 
 const ArtistDetail = () => {
   const { artistSlug } = useParams<{ artistSlug: string }>();
@@ -33,11 +35,152 @@ const ArtistDetail = () => {
     return likedArtists.includes(artistSlug);
   });
 
+  // Add audio player state for sets
+  const [audioRefSet, setAudioRefSet] = useState<HTMLAudioElement | null>(null);
+  const [isPlayingSet, setIsPlayingSet] = useState(false);
+  const [currentSetIndex, setCurrentSetIndex] = useState<number | null>(null);
+  const [trackProgressSet, setTrackProgressSet] = useState<{ [key: number]: number }>({});
+  const [isSeekingSet, setIsSeekingSet] = useState(false);
+  const lastUpdateRefSet = useRef(0);
+
   // Fetch artist from Supabase using slug
   const { data: artist, isLoading, error } = useArtistBySlug(artistSlug || '');
   const { data: tracks } = useTracksByArtist(artist?.id || '');
   const { data: events } = useEventsByArtist(artist?.id || '');
   const { data: sets } = useSetsByArtist(artist?.id || '');
+
+  const setsEvents: ArtistSetEvent[] = (sets || []).map((set, index) => ({
+    title: set.title,
+    artist: artist?.name || 'Unknown Artist',
+    date: set.release_date ? new Date(set.release_date).toLocaleDateString('en-US', {
+      year: 'numeric', month: 'long', day: 'numeric'
+    }) : '',
+    delay: `${index * 0.2}s`,
+    audioSrc: set.audio_url,
+    artistPhoto: artist?.photo_url || undefined,
+    setNumber: set.set_number,
+    artistSlug: artist?.name ? artistSlug : undefined,
+    artistLocation: artist?.location || undefined
+  }));
+
+  const handlePlaySet = async (index: number) => {
+    if (!setsEvents[index]) return;
+    
+    // Pause any other audio elements on the page
+    const allAudioElements = document.querySelectorAll('audio');
+    allAudioElements.forEach(audio => {
+      if (audio !== audioRefSet) {
+        audio.pause();
+      }
+    });
+
+    if (audioRefSet) {
+      if (isPlayingSet && currentSetIndex === index) {
+        // Pause current set, but do not reset currentSetIndex
+        audioRefSet.pause();
+        setIsPlayingSet(false);
+      } else {
+        // Play new set or resume current set
+        if (currentSetIndex !== index) {
+          // Load new set
+          audioRefSet.src = setsEvents[index].audioSrc;
+          setCurrentSetIndex(index);
+          // Reset progress for new set
+          setTrackProgressSet(prev => ({ ...prev, [index]: 0 }));
+          // Wait for audio to load
+          try {
+            await audioRefSet.load();
+          } catch (error) {
+            console.error('Error loading audio:', error);
+            return;
+          }
+        }
+        // Resume playback from current position
+        try {
+          await audioRefSet.play();
+          setIsPlayingSet(true);
+        } catch (error) {
+          console.error('Error playing audio:', error);
+        }
+      }
+    } else {
+      // Create new audio element if none exists
+      const audio = new Audio(setsEvents[index].audioSrc);
+      audio.addEventListener('ended', () => {
+        setIsPlayingSet(false);
+      });
+      audio.addEventListener('error', (e) => {
+        console.error('Audio error:', e);
+        setIsPlayingSet(false);
+      });
+      setAudioRefSet(audio);
+      setCurrentSetIndex(index);
+      setTrackProgressSet(prev => ({ ...prev, [index]: 0 }));
+      try {
+        await audio.play();
+        setIsPlayingSet(true);
+      } catch (error) {
+        console.error('Error playing audio:', error);
+      }
+    }
+  };
+
+  const handleSeekSet = (percentage: number) => {
+    if (
+      audioRefSet &&
+      currentSetIndex !== null &&
+      audioRefSet.duration &&
+      !isNaN(audioRefSet.duration) &&
+      audioRefSet.duration > 0
+    ) {
+      setIsSeekingSet(true);
+      const newTime = (percentage / 100) * audioRefSet.duration;
+      audioRefSet.currentTime = newTime;
+      setTrackProgressSet(prev => ({ ...prev, [currentSetIndex]: percentage }));
+      setTimeout(() => {
+        setIsSeekingSet(false);
+      }, 100);
+    }
+  };
+
+  // Add useEffect for progress updates
+  useEffect(() => {
+    const audio = audioRefSet;
+    if (!audio) return;
+
+    const updateProgress = () => {
+      // Don't update progress if we're currently seeking
+      if (isSeekingSet || currentSetIndex === null) return;
+      const now = Date.now();
+      // Only update every 100ms
+      if (now - lastUpdateRefSet.current >= 100) {
+        if (audio.duration && !isNaN(audio.duration)) {
+          const currentProgress = (audio.currentTime / audio.duration) * 100;
+          setTrackProgressSet(prev => ({ ...prev, [currentSetIndex]: currentProgress }));
+        }
+        lastUpdateRefSet.current = now;
+      }
+    };
+
+    const handleEnded = () => {
+      setIsPlayingSet(false);
+    };
+
+    const handleError = (e: Event) => {
+      console.error('Audio error:', e);
+      setIsPlayingSet(false);
+    };
+
+    audio.addEventListener('timeupdate', updateProgress);
+    audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('error', handleError);
+
+    return () => {
+      audio.removeEventListener('timeupdate', updateProgress);
+      audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener('error', handleError);
+    };
+  }, [audioRefSet, currentSetIndex, isSeekingSet]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -243,15 +386,15 @@ const ArtistDetail = () => {
               {/* Featured Badge */}
               {artist.featured && (
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.5 }}
-                    className="absolute top-6 left-6"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3, duration: 0.8 }}
+                    className="absolute top-4 left-4 z-20"
                   >
-                    <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-6 py-3 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg">
+                    <div className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-400 text-black px-6 py-3 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg border border-white/20 backdrop-blur-sm">
                       <Star className="w-4 h-4 fill-current" />
-                    Featured Artist
-                  </div>
+                      <span>FEATURED ARTIST</span>
+                    </div>
                   </motion.div>
               )}
             </div>
@@ -501,79 +644,18 @@ const ArtistDetail = () => {
                 <h2 className="text-4xl font-bold text-white">Sets</h2>
                 <div className="flex-1 h-px bg-gradient-to-r from-white/20 to-transparent"></div>
               </div>
-              
               <div className="space-y-4">
-                <AnimatePresence>
-                  {sets.map((set, index) => (
-                    <motion.div
-                      key={set.id}
-                      initial={{ opacity: 0, x: -30 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.6, delay: index * 0.1 }}
-                      whileHover={{ scale: 1.02, x: 5 }}
-                      className="glass backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.1)] transform-gpu"
-                    >
-                      <div className="flex items-center gap-6">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            {set.set_number && (
-                              <span className="px-3 py-1 bg-gradient-to-r from-blue-500/20 to-blue-600/20 rounded-full text-sm text-white font-medium border border-blue-500/30">
-                                Set {set.set_number}
-                              </span>
-                            )}
-                            {set.release_date && (
-                              <div className="flex items-center gap-2 text-gray-400">
-                                <Calendar className="w-4 h-4" />
-                                <span className="text-sm">{new Date(set.release_date).toLocaleDateString()}</span>
-                              </div>
-                            )}
-                          </div>
-                          <h3 className="text-xl font-bold text-white mb-2">{set.title}</h3>
-                          <p className="text-gray-400 mb-3 font-medium">{artist?.name}</p>
-                          {set.duration && (
-                            <div className="flex items-center gap-2 text-gray-500">
-                              <Clock className="w-4 h-4" />
-                              <span className="text-sm">{Math.floor(set.duration / 60)}:{(set.duration % 60).toString().padStart(2, '0')}</span>
-                            </div>
-                          )}
-                        </div>
-
-                        <motion.button
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                          onClick={() => {
-                            if (currentTrack === set.id && isPlaying) {
-                              handlePauseTrack();
-                            } else {
-                              if (audioRef) {
-                                audioRef.pause();
-                              }
-                              const audio = new Audio(set.audio_url);
-                              audio.addEventListener('ended', () => {
-                                setIsPlaying(false);
-                                setCurrentTrack(null);
-                              });
-                              audio.play().then(() => {
-                                setIsPlaying(true);
-                                setCurrentTrack(set.id);
-                                setAudioRef(audio);
-                              }).catch(error => {
-                                console.error('Error playing set:', error);
-                              });
-                            }
-                          }}
-                          className="w-14 h-14 rounded-full bg-white/10 border border-white/20 flex items-center justify-center hover:bg-white/20 transition-all shadow-lg"
-                        >
-                          {currentTrack === set.id && isPlaying ? (
-                            <Pause className="w-6 h-6 text-white" />
-                          ) : (
-                            <Play className="w-6 h-6 text-white ml-1" />
-                          )}
-                        </motion.button>
-                    </div>
-                  </motion.div>
+                {setsEvents.map((event, index) => (
+                  <ArtistSetItem
+                    key={index}
+                    event={event}
+                    index={index}
+                    onPlay={handlePlaySet}
+                    onSeek={handleSeekSet}
+                    isPlaying={isPlayingSet && currentSetIndex === index}
+                    progress={trackProgressSet[index] || 0}
+                  />
                 ))}
-                </AnimatePresence>
               </div>
             </motion.div>
           </div>
