@@ -17,6 +17,7 @@ const GoCrazy = lazy(() => import("./pages/3dvs"));
 const Artists = lazy(() => import("./pages/Artists"));
 const ArtistDetail = lazy(() => import("./pages/ArtistDetail"));
 const AdminArtists = lazy(() => import("./pages/AdminArtists"));
+const AdminUploads = lazy(() => import("./pages/AdminUploads"));
 
 const queryClient = new QueryClient();
 
@@ -104,6 +105,11 @@ const App = () => {
                 <Route path="/admin" element={
                   <RouteTracker>
                     <AdminArtists />
+                  </RouteTracker>
+                } />
+                <Route path="/originsradio/adminuploads" element={
+                  <RouteTracker>
+                    <AdminUploads />
                   </RouteTracker>
                 } />
 

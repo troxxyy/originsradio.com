@@ -2,10 +2,16 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabaseServiceKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
 
 // Create Supabase client only if environment variables are available
 export const supabase = supabaseUrl && supabaseAnonKey 
   ? createClient(supabaseUrl, supabaseAnonKey)
+  : null
+
+// Create admin client with service role key for admin operations
+export const supabaseAdmin = supabaseUrl && supabaseServiceKey
+  ? createClient(supabaseUrl, supabaseServiceKey)
   : null
 
 // Helper function to check if Supabase is configured
@@ -19,6 +25,14 @@ export const getSupabaseClient = () => {
     throw new Error('Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY environment variables.')
   }
   return supabase
+}
+
+// Helper function to get Supabase admin client with error handling
+export const getSupabaseAdminClient = () => {
+  if (!supabaseAdmin) {
+    throw new Error('Supabase admin is not configured. Please set VITE_SUPABASE_SERVICE_ROLE_KEY environment variable.')
+  }
+  return supabaseAdmin
 }
 
 // Database types for better TypeScript support
