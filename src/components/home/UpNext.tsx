@@ -459,48 +459,6 @@ const UpNextSection = () => {
       </div>
       
       <audio ref={audioRef} preload="metadata" />
-      
-      {/* Mobile Mini Player */}
-      {isMobile && isPlaying && currentTrackIndex !== null && (
-        <div className="fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-xl border-t border-white/20 z-40 p-3">
-          <div className="flex items-center justify-between max-w-4xl mx-auto">
-            <div className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z"/>
-                </svg>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-white text-sm font-medium truncate">
-                  {upcomingEvents[currentTrackIndex]?.title}
-                </p>
-                <p className="text-white/60 text-xs truncate">
-                  {upcomingEvents[currentTrackIndex]?.artist}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => handlePlayTrack(currentTrackIndex)}
-                className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 active:bg-white/40 transition-colors"
-                aria-label={isPlaying ? "Pause" : "Play"}
-              >
-                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
-                </svg>
-              </button>
-
-            </div>
-          </div>
-          {/* Mini Progress Bar */}
-          <div className="mt-2 h-0.5 bg-white/20 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-gradient-to-r from-white/60 to-white/40 transition-all duration-100"
-              style={{ width: `${trackProgress[currentTrackIndex] || 0}%` }}
-            />
-          </div>
-        </div>
-      )}
     </section>
   );
 };
