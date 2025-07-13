@@ -1,4 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
+import { useSets } from '../../hooks/use-supabase';
+import { generateSlug } from '../../lib/supabase-utils';
 
 // Types
 interface UpNextEvent {
@@ -8,6 +10,9 @@ interface UpNextEvent {
   delay?: string;
   audioSrc: string;
   artistPhoto?: string;
+  setNumber?: number;
+  artistSlug?: string;
+  artistLocation?: string;
 }
 
 interface UpNextItemProps {
@@ -131,6 +136,9 @@ const UpNextItem = ({ event, index, onPlay, onSeek, isPlaying, progress, onOpenM
     onPlay(index);
   };
 
+  // Check if artist has a slug to show the view artist link
+  const hasArtistSlug = event.artistSlug && event.artist !== 'Unknown Artist';
+
   return (
     <div 
       className="glass rounded-xl p-6 animate-scale-in transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_25px_rgba(150,150,150,0.4)] relative group cursor-pointer"
@@ -139,10 +147,39 @@ const UpNextItem = ({ event, index, onPlay, onSeek, isPlaying, progress, onOpenM
     >
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex-1 text-center sm:text-left">
-          <h3 className="text-2xl sm:text-3xl font-bold group-hover:text-shadow-glow transition-all duration-300">
-            {event.title}
-          </h3>
-          <p className="text-lg text-white/80 mt-1">{event.artist}</p>
+          <div className="flex items-center gap-3 mb-2">
+            {event.setNumber && (
+              <span className="inline-flex items-center px-2 py-1 bg-white/10 backdrop-blur-sm border border-white/20 rounded-md text-xs font-mono text-white/80">
+                #{event.setNumber}
+              </span>
+            )}
+            <h3 className="text-2xl sm:text-3xl font-bold group-hover:text-shadow-glow transition-all duration-300">
+              {event.title}
+            </h3>
+          </div>
+          <div className="flex items-center gap-3 mt-1">
+            {event.artistLocation && (
+              <span className="text-sm text-white/60 flex items-center gap-1">
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                {event.artistLocation}
+              </span>
+            )}
+            {hasArtistSlug && (
+              <a
+                href={`/artists/${event.artistSlug}`}
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-400/30 rounded-full text-xs font-medium text-blue-300 hover:text-blue-200 hover:border-blue-300/50 hover:shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all duration-300 group/link"
+              >
+                <span>View Artist</span>
+                <svg className="w-3 h-3 group-hover/link:translate-x-0.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+            )}
+          </div>
         </div>
         <div className="font-mono text-xl sm:text-2xl text-white/60 border-l-2 border-white/10 pl-4">
           {event.date}
@@ -207,8 +244,18 @@ const ExclusiveModal = ({
             <h1 className="text-5xl md:text-7xl font-bold mb-4 text-white">
               {event.title}
             </h1>
-            <h2 className="text-2xl md:text-3xl text-white/90 mb-2">{event.artist}</h2>
-            <p className="text-lg text-white/70 font-mono">{event.date}</p>
+            <div className="flex items-center justify-center gap-4 mb-2">
+              <p className="text-lg text-white/70 font-mono">{event.date}</p>
+              {event.artistLocation && (
+                <span className="text-lg text-white/60 flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  {event.artistLocation}
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Play controls */}
@@ -228,10 +275,25 @@ const ExclusiveModal = ({
 
           {/* Description */}
           <div className="text-center">
-            <p className="text-white/80 text-lg leading-relaxed max-w-2xl mx-auto">
+            <p className="text-white/80 text-lg leading-relaxed max-w-2xl mx-auto mb-6">
               Experience this exclusive set recorded specifically for Origins Radio. 
               Immerse yourself in the unique sound and atmosphere created by {event.artist}.
             </p>
+            
+            {/* Special link for artist profile */}
+            {event.artistSlug && event.artist !== 'Unknown Artist' && (
+              <div className="flex justify-center">
+                <a
+                  href={`/artists/${event.artistSlug}`}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-400/30 rounded-xl text-white hover:from-blue-500/30 hover:to-purple-500/30 hover:border-blue-300/50 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all duration-300 group"
+                >
+                  <span className="font-medium">View Artist Profile</span>
+                  <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </a>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -373,24 +435,25 @@ const UpNextSection = () => {
     handleSeek
   } = useAudioPlayer();
 
-  const upcomingEvents: UpNextEvent[] = [
-    {
-      title: 'Lina Palamarchuk - #58',
-      artist: 'Kiev',
-      date: 'June 22, 2025',
-      delay: '0.001s',
-      audioSrc: '/sets/Lina-Palamarchuk-_58.opus',
-      artistPhoto: '/upnext-photos/upnext1.png'
-    },
-    {
-      title: 'AL2 OriginsRadio Set - #57',
-      artist: 'Ankara',
-      date: 'June 17, 2025',
-      delay: '0.2s',
-      audioSrc: '/sets/AL2 Origins Radio.mp3',
-      artistPhoto: '/upnext-photos/upnext2.png'
-    }
-  ];
+  // Fetch sets from Supabase
+  const { data: sets, isLoading, error } = useSets();
+
+  // Transform Supabase data to match the expected format
+  const upcomingEvents: UpNextEvent[] = sets?.map((set, index) => ({
+    title: set.title,
+    artist: set.artists?.name || 'Unknown Artist',
+    date: new Date(set.release_date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }),
+    delay: `${index * 0.2}s`,
+    audioSrc: set.audio_url,
+    artistPhoto: set.artists?.photo_url || undefined,
+    setNumber: set.set_number,
+    artistSlug: set.artists?.name ? generateSlug(set.artists.name) : undefined,
+    artistLocation: set.artists?.location || undefined
+  })) || [];
 
   const openModal = (trackIndex: number) => {
     setSelectedTrack(trackIndex);
@@ -420,20 +483,36 @@ const UpNextSection = () => {
         <div className="h-0.5 w-12 bg-gradient-to-r from-[#787878] to-[#d1d1d1]"></div>
       </div>
       
-      <div className="space-y-6">
-        {upcomingEvents.map((event, index) => (
-          <UpNextItem 
-            key={index}
-            event={event}
-            index={index}
-            onPlay={handlePlayTrack}
-            onSeek={handleSeek}
-            isPlaying={isPlaying && currentTrackIndex === index}
-            progress={trackProgress[index] || 0}
-            onOpenModal={openModal}
-          />
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="text-center py-12">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+          <p className="text-white/80 mt-4">Loading sets...</p>
+        </div>
+      ) : error ? (
+        <div className="text-center py-12">
+          <p className="text-red-400">Error loading sets: {error.message}</p>
+        </div>
+      ) : upcomingEvents.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-white/80">No sets available at the moment.</p>
+          <p className="text-white/60 text-sm mt-2">Check back soon for new content!</p>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {upcomingEvents.map((event, index) => (
+            <UpNextItem 
+              key={index}
+              event={event}
+              index={index}
+              onPlay={handlePlayTrack}
+              onSeek={handleSeek}
+              isPlaying={isPlaying && currentTrackIndex === index}
+              progress={trackProgress[index] || 0}
+              onOpenModal={openModal}
+            />
+          ))}
+        </div>
+      )}
       
       {/* Exclusive Modal */}
       {modalOpen && selectedTrack !== null && (

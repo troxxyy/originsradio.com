@@ -8,6 +8,7 @@ import LoadingScreen from "./components/LoadingScreen";
 import Navigation from "./components/Navigation";
 import TicketPopup from "./components/TicketPopup";
 import About from "./pages/About";
+
 // Lazy load route components
 const Index = lazy(() => import("./pages/Index"));
 const OurWork = lazy(() => import("./pages/OurWork"));
@@ -16,7 +17,6 @@ const GoCrazy = lazy(() => import("./pages/3dvs"));
 const Artists = lazy(() => import("./pages/Artists"));
 const ArtistDetail = lazy(() => import("./pages/ArtistDetail"));
 const AdminArtists = lazy(() => import("./pages/AdminArtists"));
-const ArtistManagementGuide = lazy(() => import("./pages/ArtistManagementGuide"));
 
 const queryClient = new QueryClient();
 
@@ -90,7 +90,8 @@ const App = () => {
                     <Artists />
                   </RouteTracker>
                 } />
-                <Route path="/artists/:artistId" element={
+
+                <Route path="/artists/:artistSlug" element={
                   <RouteTracker>
                     <ArtistDetail />
                   </RouteTracker>
@@ -100,11 +101,12 @@ const App = () => {
                     <AdminArtists />
                   </RouteTracker>
                 } />
-                <Route path="/guide" element={
+                <Route path="/admin" element={
                   <RouteTracker>
-                    <ArtistManagementGuide />
+                    <AdminArtists />
                   </RouteTracker>
                 } />
+
                 <Route path="*" element={
                   <RouteTracker>
                     <NotFound />

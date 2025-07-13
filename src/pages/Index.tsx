@@ -9,6 +9,7 @@ import Navigation from "@/components/Navigation";
 import { Wand2 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
+
 const Index = () => {
   const isMobile = useIsMobile();
   const [showThreePlayer, setShowThreePlayer] = useState(false);
@@ -42,8 +43,8 @@ const Index = () => {
     setIsVisualizationEnabled(!isVisualizationEnabled);
   };
 
-  return (
-    <PageLayout>
+    return (
+    <PageLayout customBackground="bg-gradient-to-br from-black via-gray-900 to-black">
       {/* Social Media Floating Bubbles */}
       <SocialBubbles />
       <Navigation />
@@ -73,6 +74,8 @@ const Index = () => {
       
       {/* About section */}
       <AboutSection />
+      
+
     </PageLayout>
   );
 };

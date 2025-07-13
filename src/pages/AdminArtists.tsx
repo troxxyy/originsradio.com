@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Search, 
   Filter, 
@@ -27,26 +28,22 @@ import PageLayout from '@/components/layout/PageLayout';
 import { 
   getPaginatedArtists, 
   getArtistStats, 
-  ARTIST_CATEGORIES,
   addArtist,
   updateArtist,
   deleteArtist,
   bulkUpdateArtists,
   bulkDeleteArtists,
   exportArtistsData,
-  type ManagedArtist,
-  type ArtistCategory 
-} from '@/data/artists';
+  type Artist,
+  type ArtistInsert,
+  type ArtistUpdate
+} from '@/data/artists-supabase';
 
 const AdminArtists = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<ArtistCategory | 'all'>('all');
   const [selectedLocation, setSelectedLocation] = useState<string>('all');
   const [selectedGenre, setSelectedGenre] = useState<string>('all');
-  const [selectedStatus, setSelectedStatus] = useState<'all' | 'active' | 'inactive' | 'pending'>('all');
-  const [sortBy, setSortBy] = useState<'name' | 'priority' | 'views' | 'createdAt'>('priority');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [selectedArtists, setSelectedArtists] = useState<string[]>([]);
   const [showStats, setShowStats] = useState(true);
   
@@ -54,50 +51,102 @@ const AdminArtists = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedArtist, setSelectedArtist] = useState<ManagedArtist | null>(null);
+  const [selectedArtist, setSelectedArtist] = useState<Artist | null>(null);
   
   // Form states
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    location: string;
+    bio: string;
+    genre: string[];
+    photo_url: string;
+    featured: boolean;
+    social_links: Record<string, any>;
+  }>({
     name: '',
-    bio: '',
-    photo: '',
-    coverImage: '',
-    genre: [] as string[],
     location: '',
-    category: [] as ArtistCategory[],
-    priority: 5,
-    status: 'active' as 'active' | 'inactive' | 'pending',
+    bio: '',
+    genre: [],
+    photo_url: '',
     featured: false,
-    tracks: [],
-    events: [],
-    socialLinks: {
-      instagram: '',
-      soundcloud: '',
-      spotify: '',
-    }
+    social_links: {},
   });
 
   const itemsPerPage = 12;
+  const queryClient = useQueryClient();
 
   // Get paginated and filtered artists
-  const { artists, total, pages } = useMemo(() => {
-    return getPaginatedArtists(currentPage, itemsPerPage, {
-      category: selectedCategory !== 'all' ? selectedCategory : undefined,
+  const { data: artistsData, isLoading: artistsLoading, error: artistsError } = useQuery({
+    queryKey: ['artists', currentPage, searchTerm, selectedLocation, selectedGenre],
+    queryFn: () => getPaginatedArtists(currentPage, itemsPerPage, {
+      featured: undefined,
       location: selectedLocation !== 'all' ? selectedLocation : undefined,
       genre: selectedGenre !== 'all' ? selectedGenre : undefined,
       search: searchTerm || undefined,
-    });
-  }, [currentPage, searchTerm, selectedCategory, selectedLocation, selectedGenre, itemsPerPage]);
+    }),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 1,
+  });
+
+  const { artists = [], total = 0, pages = 0 } = artistsData || {};
 
   // Get stats
-  const stats = useMemo(() => getArtistStats(), []);
+  const { data: stats, isLoading: statsLoading } = useQuery({
+    queryKey: ['artist-stats'],
+    queryFn: getArtistStats,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Mutations
+  const addArtistMutation = useMutation({
+    mutationFn: addArtist,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['artists'] });
+      queryClient.invalidateQueries({ queryKey: ['artist-stats'] });
+    },
+  });
+
+  const updateArtistMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: ArtistUpdate }) => updateArtist(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['artists'] });
+      queryClient.invalidateQueries({ queryKey: ['artist-stats'] });
+    },
+  });
+
+  const deleteArtistMutation = useMutation({
+    mutationFn: deleteArtist,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['artists'] });
+      queryClient.invalidateQueries({ queryKey: ['artist-stats'] });
+    },
+  });
+
+  const bulkUpdateMutation = useMutation({
+    mutationFn: ({ ids, updates }: { ids: string[]; updates: ArtistUpdate }) => 
+      bulkUpdateArtists(ids, updates),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['artists'] });
+      queryClient.invalidateQueries({ queryKey: ['artist-stats'] });
+    },
+  });
+
+  const bulkDeleteMutation = useMutation({
+    mutationFn: bulkDeleteArtists,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['artists'] });
+      queryClient.invalidateQueries({ queryKey: ['artist-stats'] });
+    },
+  });
 
   // Get unique locations and genres for filters
   const locations = useMemo(() => {
     const locationSet = new Set<string>();
     artists.forEach(artist => {
-      const location = artist.location.split(',')[0].trim();
-      locationSet.add(location);
+      if (artist.location) {
+        const location = artist.location.split(',')[0].trim();
+        locationSet.add(location);
+      }
     });
     return Array.from(locationSet).sort();
   }, [artists]);
@@ -105,7 +154,9 @@ const AdminArtists = () => {
   const genres = useMemo(() => {
     const genreSet = new Set<string>();
     artists.forEach(artist => {
-      artist.genre.forEach(genre => genreSet.add(genre));
+      if (artist.genre) {
+        artist.genre.forEach(genre => genreSet.add(genre));
+      }
     });
     return Array.from(genreSet).sort();
   }, [artists]);
@@ -126,29 +177,21 @@ const AdminArtists = () => {
     }
   };
 
-  const handleBulkAction = (action: 'activate' | 'deactivate' | 'feature' | 'unfeature' | 'delete') => {
+  const handleBulkAction = async (action: 'feature' | 'unfeature' | 'delete') => {
     if (selectedArtists.length === 0) return;
     
     try {
       switch (action) {
-        case 'activate':
-          bulkUpdateArtists(selectedArtists, { status: 'active' });
-          alert(`Activated ${selectedArtists.length} artists`);
-          break;
-        case 'deactivate':
-          bulkUpdateArtists(selectedArtists, { status: 'inactive' });
-          alert(`Deactivated ${selectedArtists.length} artists`);
-          break;
         case 'feature':
-          bulkUpdateArtists(selectedArtists, { featured: true });
+          await bulkUpdateMutation.mutateAsync({ ids: selectedArtists, updates: { featured: true } });
           alert(`Featured ${selectedArtists.length} artists`);
           break;
         case 'unfeature':
-          bulkUpdateArtists(selectedArtists, { featured: false });
+          await bulkUpdateMutation.mutateAsync({ ids: selectedArtists, updates: { featured: false } });
           alert(`Unfeatured ${selectedArtists.length} artists`);
           break;
         case 'delete':
-          const deletedCount = bulkDeleteArtists(selectedArtists);
+          const deletedCount = await bulkDeleteMutation.mutateAsync(selectedArtists);
           alert(`Deleted ${deletedCount} artists`);
           break;
       }
@@ -159,9 +202,9 @@ const AdminArtists = () => {
     }
   };
 
-  const exportArtists = () => {
+  const exportArtists = async () => {
     try {
-      const dataStr = exportArtistsData();
+      const dataStr = await exportArtistsData();
       const dataBlob = new Blob([dataStr], { type: 'application/json' });
       const url = URL.createObjectURL(dataBlob);
       const link = document.createElement('a');
@@ -176,36 +219,26 @@ const AdminArtists = () => {
   };
 
   // Action handlers
-  const handleViewArtist = (artist: ManagedArtist) => {
-    // Navigate to artist detail page
-    window.open(`/artists/${artist.id}`, '_blank');
+  const handleViewArtist = (artist: Artist) => {
+    const slug = artist.name.toLowerCase().replace(/[^a-z0-9\s]+/g, '').replace(/\s+/g, '').trim();
+    window.open(`/artists/${slug}`, '_blank');
   };
 
-  const handleEditArtist = (artist: ManagedArtist) => {
+  const handleEditArtist = (artist: Artist) => {
     setSelectedArtist(artist);
     setFormData({
       name: artist.name,
-      bio: artist.bio,
-      photo: artist.photo,
-      coverImage: artist.coverImage,
-      genre: artist.genre,
-      location: artist.location,
-      category: artist.category,
-      priority: artist.priority,
-      status: artist.status,
+      location: artist.location || '',
+      bio: artist.bio || '',
+      genre: artist.genre || [],
+      photo_url: artist.photo_url || '',
       featured: artist.featured,
-      tracks: artist.tracks,
-      events: artist.events,
-      socialLinks: {
-        instagram: artist.socialLinks.instagram || '',
-        soundcloud: artist.socialLinks.soundcloud || '',
-        spotify: artist.socialLinks.spotify || '',
-      }
+      social_links: artist.social_links || {},
     });
     setShowEditModal(true);
   };
 
-  const handleDeleteArtist = (artist: ManagedArtist) => {
+  const handleDeleteArtist = (artist: Artist) => {
     setSelectedArtist(artist);
     setShowDeleteModal(true);
   };
@@ -213,31 +246,30 @@ const AdminArtists = () => {
   const handleAddArtist = () => {
     setFormData({
       name: '',
-      bio: '',
-      photo: '',
-      coverImage: '',
-      genre: [],
       location: '',
-      category: [],
-      priority: 5,
-      status: 'active',
+      bio: '',
+      genre: [],
+      photo_url: '',
       featured: false,
-      tracks: [],
-      events: [],
-      socialLinks: {
-        instagram: '',
-        soundcloud: '',
-        spotify: '',
-      }
+      social_links: {},
     });
     setShowAddModal(true);
   };
 
-  const handleSaveArtist = (isEdit: boolean) => {
+  const handleSaveArtist = async (isEdit: boolean) => {
     try {
       if (isEdit && selectedArtist) {
-        // Update existing artist
-        const updated = updateArtist(selectedArtist.id, formData);
+        const updateData: ArtistUpdate = {
+          name: formData.name,
+          bio: formData.bio,
+          photo_url: formData.photo_url,
+          location: formData.location,
+          genre: formData.genre,
+          featured: formData.featured,
+          social_links: formData.social_links,
+        };
+        
+        const updated = await updateArtistMutation.mutateAsync({ id: selectedArtist.id, data: updateData });
         if (updated) {
           alert(`Updated artist: ${formData.name}`);
           setShowEditModal(false);
@@ -246,21 +278,35 @@ const AdminArtists = () => {
           alert('Error updating artist');
         }
       } else {
-        // Add new artist
-        const newArtist = addArtist(formData);
-        alert(`Added artist: ${newArtist.name}`);
-        setShowAddModal(false);
+        const artistData: ArtistInsert = {
+          name: formData.name,
+          bio: formData.bio,
+          photo_url: formData.photo_url,
+          location: formData.location,
+          genre: formData.genre,
+          featured: formData.featured,
+          social_links: formData.social_links,
+        };
+        
+        const newArtist = await addArtistMutation.mutateAsync(artistData);
+        if (newArtist) {
+          alert(`Added artist: ${newArtist.name}`);
+          setShowAddModal(false);
+        } else {
+          alert('Error adding artist');
+        }
       }
     } catch (error) {
       console.error('Error saving artist:', error);
-      alert('Error saving artist');
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      alert(`Error saving artist: ${errorMessage}`);
     }
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (selectedArtist) {
       try {
-        const success = deleteArtist(selectedArtist.id);
+        const success = await deleteArtistMutation.mutateAsync(selectedArtist.id);
         if (success) {
           alert(`Deleted artist: ${selectedArtist.name}`);
           setShowDeleteModal(false);
@@ -284,18 +330,10 @@ const AdminArtists = () => {
     }));
   };
 
-  const handleCategoryChange = (category: ArtistCategory) => {
-    setFormData(prev => ({
-      ...prev,
-      category: prev.category.includes(category)
-        ? prev.category.filter(c => c !== category)
-        : [...prev.category, category]
-    }));
-  };
-
   return (
     <PageLayout>
       <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
+        
         {/* Header */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <motion.div
@@ -305,7 +343,12 @@ const AdminArtists = () => {
           >
             <div>
               <h1 className="text-3xl font-bold text-white mb-2">Artist Management</h1>
-              <p className="text-gray-400">Manage {total} artists in your database</p>
+              <p className="text-gray-400">
+                {artistsLoading ? 'Loading artists...' : `Manage ${total} artists in your database`}
+              </p>
+              {artistsError && (
+                <p className="text-red-400 text-sm mt-1">Error loading artists: {artistsError.message}</p>
+              )}
             </div>
             <div className="flex gap-3">
               <button 
@@ -338,7 +381,7 @@ const AdminArtists = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-400 text-sm">Total Artists</p>
-                    <p className="text-2xl font-bold text-white">{stats.total}</p>
+                    <p className="text-2xl font-bold text-white">{stats?.total || 0}</p>
                   </div>
                   <Users className="w-8 h-8 text-blue-400" />
                 </div>
@@ -348,7 +391,7 @@ const AdminArtists = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-400 text-sm">Active Artists</p>
-                    <p className="text-2xl font-bold text-white">{stats.active}</p>
+                    <p className="text-2xl font-bold text-white">{stats?.active || 0}</p>
                   </div>
                   <CheckCircle className="w-8 h-8 text-green-400" />
                 </div>
@@ -358,7 +401,7 @@ const AdminArtists = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-400 text-sm">Featured Artists</p>
-                    <p className="text-2xl font-bold text-white">{stats.featured}</p>
+                    <p className="text-2xl font-bold text-white">{stats?.featured || 0}</p>
                   </div>
                   <Star className="w-8 h-8 text-yellow-400" />
                 </div>
@@ -367,10 +410,10 @@ const AdminArtists = () => {
               <div className="glass backdrop-blur-sm rounded-xl p-6 border border-white/10">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-400 text-sm">Top Viewed</p>
-                    <p className="text-2xl font-bold text-white">{stats.topViewed[0]?.views || 0}</p>
+                    <p className="text-gray-400 text-sm">Inactive</p>
+                    <p className="text-2xl font-bold text-white">{stats?.inactive || 0}</p>
                   </div>
-                  <TrendingUp className="w-8 h-8 text-purple-400" />
+                  <XCircle className="w-8 h-8 text-red-400" />
                 </div>
               </div>
             </motion.div>
@@ -396,23 +439,6 @@ const AdminArtists = () => {
               {/* Category Filter */}
               <div className="relative">
                 <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value as ArtistCategory | 'all')}
-                  className="w-full pl-10 pr-8 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/20 appearance-none"
-                  title="Filter by category"
-                  aria-label="Filter by category"
-                >
-                  <option value="all">All Categories</option>
-                  {Object.entries(ARTIST_CATEGORIES).map(([key, value]) => (
-                    <option key={value} value={value}>{key}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Location Filter */}
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <select
                   value={selectedLocation}
                   onChange={(e) => setSelectedLocation(e.target.value)}
@@ -444,22 +470,7 @@ const AdminArtists = () => {
                 </select>
               </div>
 
-              {/* Status Filter */}
-              <div className="relative">
-                <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <select
-                  value={selectedStatus}
-                  onChange={(e) => setSelectedStatus(e.target.value as 'all' | 'active' | 'inactive' | 'pending')}
-                  className="w-full pl-10 pr-8 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/20 appearance-none"
-                  title="Filter by status"
-                  aria-label="Filter by status"
-                >
-                  <option value="all">All Status</option>
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                  <option value="pending">Pending</option>
-                </select>
-              </div>
+
             </div>
           </div>
         </div>
@@ -474,22 +485,22 @@ const AdminArtists = () => {
                 </span>
                 <div className="flex gap-2">
                   <button
-                    onClick={() => handleBulkAction('activate')}
-                    className="px-3 py-1 bg-green-500/20 text-green-400 rounded-lg text-sm hover:bg-green-500/30 transition-all"
-                  >
-                    Activate
-                  </button>
-                  <button
-                    onClick={() => handleBulkAction('deactivate')}
-                    className="px-3 py-1 bg-red-500/20 text-red-400 rounded-lg text-sm hover:bg-red-500/30 transition-all"
-                  >
-                    Deactivate
-                  </button>
-                  <button
                     onClick={() => handleBulkAction('feature')}
                     className="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-lg text-sm hover:bg-yellow-500/30 transition-all"
                   >
                     Feature
+                  </button>
+                  <button
+                    onClick={() => handleBulkAction('unfeature')}
+                    className="px-3 py-1 bg-red-500/20 text-red-400 rounded-lg text-sm hover:bg-red-500/30 transition-all"
+                  >
+                    Unfeature
+                  </button>
+                  <button
+                    onClick={() => handleBulkAction('delete')}
+                    className="px-3 py-1 bg-red-500/20 text-red-400 rounded-lg text-sm hover:bg-red-500/30 transition-all"
+                  >
+                    Delete
                   </button>
                   <button
                     onClick={() => setSelectedArtists([])}
@@ -516,111 +527,147 @@ const AdminArtists = () => {
                         checked={selectedArtists.length === artists.length && artists.length > 0}
                         onChange={handleSelectAll}
                         className="rounded border-white/20 bg-white/10"
+                        aria-label="Select all artists"
+                        title="Select all artists"
                       />
                     </th>
                     <th className="px-6 py-4 text-left text-white font-semibold">Artist</th>
                     <th className="px-6 py-4 text-left text-white font-semibold">Location</th>
-                    <th className="px-6 py-4 text-left text-white font-semibold">Category</th>
                     <th className="px-6 py-4 text-left text-white font-semibold">Status</th>
-                    <th className="px-6 py-4 text-left text-white font-semibold">Views</th>
-                    <th className="px-6 py-4 text-left text-white font-semibold">Priority</th>
+                    <th className="px-6 py-4 text-left text-white font-semibold">Genres</th>
+                    <th className="px-6 py-4 text-left text-white font-semibold">Created</th>
                     <th className="px-6 py-4 text-left text-white font-semibold">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {artists.map((artist, index) => (
-                    <motion.tr
-                      key={artist.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="border-b border-white/5 hover:bg-white/5 transition-colors"
-                    >
-                      <td className="px-6 py-4">
-                        <input
-                          type="checkbox"
-                          checked={selectedArtists.includes(artist.id)}
-                          onChange={() => handleSelectArtist(artist.id)}
-                          className="rounded border-white/20 bg-white/10"
-                        />
+                  {artistsLoading ? (
+                    <tr>
+                      <td colSpan={7} className="px-6 py-12 text-center">
+                        <div className="flex flex-col items-center gap-4">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                          <p className="text-gray-400">Loading artists...</p>
+                        </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <img
-                            src={artist.photo}
-                            alt={artist.name}
-                            className="w-10 h-10 rounded-full object-cover"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = '/placeholder.svg';
-                            }}
+                    </tr>
+                  ) : artistsError ? (
+                    <tr>
+                      <td colSpan={7} className="px-6 py-12 text-center">
+                        <div className="flex flex-col items-center gap-4">
+                          <Music className="w-12 h-12 text-red-400" />
+                          <p className="text-red-400">Error loading artists: {artistsError.message}</p>
+                          <button 
+                            onClick={() => window.location.reload()}
+                            className="px-4 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-all"
+                          >
+                            Retry
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : artists.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="px-6 py-12 text-center">
+                        <div className="flex flex-col items-center gap-4">
+                          <Music className="w-12 h-12 text-gray-500" />
+                          <p className="text-gray-400">No artists found</p>
+                          <p className="text-gray-500 text-sm">Add your first artist to get started</p>
+                          <button 
+                            onClick={handleAddArtist}
+                            className="px-4 py-2 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 transition-all flex items-center gap-2"
+                          >
+                            <Plus className="w-4 h-4" />
+                            Add First Artist
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    artists.map((artist, index) => (
+                      <motion.tr
+                        key={artist.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                        className="border-b border-white/5 hover:bg-white/5 transition-colors"
+                      >
+                        <td className="px-6 py-4">
+                          <input
+                            type="checkbox"
+                            checked={selectedArtists.includes(artist.id)}
+                            onChange={() => handleSelectArtist(artist.id)}
+                            className="rounded border-white/20 bg-white/10"
+                            aria-label={`Select ${artist.name}`}
+                            title={`Select ${artist.name}`}
                           />
-                          <div>
-                            <div className="font-semibold text-white">{artist.name}</div>
-                            <div className="text-sm text-gray-400">{artist.genre.slice(0, 2).join(', ')}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <img
+                              src={artist.photo_url || '/placeholder.svg'}
+                              alt={artist.name}
+                              className="w-10 h-10 rounded-full object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = '/placeholder.svg';
+                              }}
+                            />
+                            <div>
+                              <div className="font-semibold text-white">{artist.name}</div>
+                              <div className="text-sm text-gray-400">
+                                {artist.genre && artist.genre.length > 0 
+                                  ? artist.genre.slice(0, 2).join(', ') 
+                                  : 'No genres'
+                                }
+                              </div>
+                            </div>
+                            {artist.featured && (
+                              <Star className="w-4 h-4 text-yellow-400" />
+                            )}
                           </div>
-                          {artist.featured && (
-                            <Star className="w-4 h-4 text-yellow-400" />
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-white">{artist.location}</td>
-                      <td className="px-6 py-4">
-                        <div className="flex flex-wrap gap-1">
-                          {artist.category.slice(0, 2).map(cat => (
-                            <span
-                              key={cat}
-                              className="px-2 py-1 bg-white/10 rounded-full text-xs text-white/80 border border-white/20"
+                        </td>
+                        <td className="px-6 py-4 text-white">{artist.location || 'No location'}</td>
+                        <td className="px-6 py-4">
+                          <div className="flex flex-wrap gap-1">
+                            {artist.featured ? (
+                              <span className="px-2 py-1 bg-yellow-500/20 rounded-full text-xs text-yellow-400 border border-yellow-500/20">
+                                Featured
+                              </span>
+                            ) : (
+                              <span className="px-2 py-1 bg-gray-500/10 rounded-full text-xs text-gray-400 border border-gray-500/20">
+                                Regular
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-white">{artist.genre?.length || 0} genres</td>
+                        <td className="px-6 py-4 text-white">{new Date(artist.created_at).toLocaleDateString()}</td>
+                        <td className="px-6 py-4">
+                          <div className="flex gap-2">
+                            <button 
+                              onClick={() => handleViewArtist(artist)}
+                              className="p-1 text-blue-400 hover:text-blue-300 transition-colors"
+                              title="View Artist"
                             >
-                              {cat}
-                            </span>
-                          ))}
-                          {artist.category.length > 2 && (
-                            <span className="px-2 py-1 bg-white/10 rounded-full text-xs text-white/80 border border-white/20">
-                              +{artist.category.length - 2}
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          artist.status === 'active' 
-                            ? 'bg-green-500/20 text-green-400' 
-                            : artist.status === 'pending'
-                            ? 'bg-yellow-500/20 text-yellow-400'
-                            : 'bg-red-500/20 text-red-400'
-                        }`}>
-                          {artist.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-white">{artist.views.toLocaleString()}</td>
-                      <td className="px-6 py-4 text-white">{artist.priority}</td>
-                      <td className="px-6 py-4">
-                        <div className="flex gap-2">
-                          <button 
-                            onClick={() => handleViewArtist(artist)}
-                            className="p-1 text-blue-400 hover:text-blue-300 transition-colors"
-                            title="View Artist"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                          <button 
-                            onClick={() => handleEditArtist(artist)}
-                            className="p-1 text-green-400 hover:text-green-300 transition-colors"
-                            title="Edit Artist"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
-                          <button 
-                            onClick={() => handleDeleteArtist(artist)}
-                            className="p-1 text-red-400 hover:text-red-300 transition-colors"
-                            title="Delete Artist"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </motion.tr>
-                  ))}
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            <button 
+                              onClick={() => handleEditArtist(artist)}
+                              className="p-1 text-green-400 hover:text-green-300 transition-colors"
+                              title="Edit Artist"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteArtist(artist)}
+                              className="p-1 text-red-400 hover:text-red-300 transition-colors"
+                              title="Delete Artist"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </motion.tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -667,7 +714,10 @@ const AdminArtists = () => {
                   {showAddModal ? 'Add New Artist' : 'Edit Artist'}
                 </h2>
                 <button
-                  onClick={() => setShowAddModal(false) || setShowEditModal(false)}
+                  onClick={() => {
+                    setShowAddModal(false);
+                    setShowEditModal(false);
+                  }}
                   className="p-2 text-gray-400 hover:text-white transition-colors"
                   title="Close modal"
                 >
@@ -698,34 +748,27 @@ const AdminArtists = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Bio</label>
+                  <label htmlFor="bio" className="block text-sm font-medium text-gray-300 mb-2">Bio</label>
                   <textarea
+                    id="bio"
                     value={formData.bio}
                     onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
                     rows={3}
+                    placeholder="Enter artist bio..."
                     className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/20"
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Photo URL</label>
-                    <input
-                      type="text"
-                      value={formData.photo}
-                      onChange={(e) => setFormData(prev => ({ ...prev, photo: e.target.value }))}
-                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/20"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Cover Image URL</label>
-                    <input
-                      type="text"
-                      value={formData.coverImage}
-                      onChange={(e) => setFormData(prev => ({ ...prev, coverImage: e.target.value }))}
-                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/20"
-                    />
-                  </div>
+                <div>
+                  <label htmlFor="photo_url" className="block text-sm font-medium text-gray-300 mb-2">Photo URL</label>
+                  <input
+                    id="photo_url"
+                    type="text"
+                    value={formData.photo_url}
+                    onChange={(e) => setFormData(prev => ({ ...prev, photo_url: e.target.value }))}
+                    placeholder="Enter photo URL..."
+                    className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/20"
+                  />
                 </div>
 
                 <div>
@@ -748,85 +791,43 @@ const AdminArtists = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Categories</label>
-                  <div className="flex flex-wrap gap-2">
-                    {Object.entries(ARTIST_CATEGORIES).map(([key, value]) => (
-                      <button
-                        key={value}
-                        onClick={() => handleCategoryChange(value)}
-                        className={`px-3 py-1 rounded-full text-sm border transition-all ${
-                          formData.category.includes(value)
-                            ? 'bg-green-500/20 text-green-400 border-green-400/30'
-                            : 'bg-white/10 text-gray-400 border-white/20 hover:bg-white/20'
-                        }`}
-                      >
-                        {key}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Priority</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Featured Artist</label>
+                  <div className="flex items-center gap-2">
                     <input
-                      type="number"
-                      min="1"
-                      max="10"
-                      value={formData.priority}
-                      onChange={(e) => setFormData(prev => ({ ...prev, priority: parseInt(e.target.value) }))}
-                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/20"
+                      type="checkbox"
+                      id="featured"
+                      checked={formData.featured}
+                      onChange={(e) => setFormData(prev => ({ ...prev, featured: e.target.checked }))}
+                      className="rounded border-white/20 bg-white/10"
                     />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Status</label>
-                    <select
-                      value={formData.status}
-                      onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as 'active' | 'inactive' | 'pending' }))}
-                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/20"
-                    >
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
-                      <option value="pending">Pending</option>
-                    </select>
+                    <label htmlFor="featured" className="text-sm text-gray-300">
+                      Mark as featured artist
+                    </label>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Social Links</label>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <input
-                      type="text"
-                      placeholder="Instagram"
-                      value={formData.socialLinks.instagram}
-                      onChange={(e) => setFormData(prev => ({ 
-                        ...prev, 
-                        socialLinks: { ...prev.socialLinks, instagram: e.target.value }
-                      }))}
-                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/20"
-                    />
-                    <input
-                      type="text"
-                      placeholder="SoundCloud"
-                      value={formData.socialLinks.soundcloud}
-                      onChange={(e) => setFormData(prev => ({ 
-                        ...prev, 
-                        socialLinks: { ...prev.socialLinks, soundcloud: e.target.value }
-                      }))}
-                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/20"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Spotify"
-                      value={formData.socialLinks.spotify}
-                      onChange={(e) => setFormData(prev => ({ 
-                        ...prev, 
-                        socialLinks: { ...prev.socialLinks, spotify: e.target.value }
-                      }))}
-                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/20"
-                    />
-                  </div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Social Links (JSON)</label>
+                  <textarea
+                    placeholder='{"instagram": "https://instagram.com/artist", "soundcloud": "https://soundcloud.com/artist"}'
+                    value={JSON.stringify(formData.social_links, null, 2)}
+                    onChange={(e) => {
+                      try {
+                        const parsed = JSON.parse(e.target.value);
+                        setFormData(prev => ({ ...prev, social_links: parsed }));
+                      } catch (error) {
+                        // Invalid JSON, keep current value
+                      }
+                    }}
+                    rows={6}
+                    className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/20 font-mono text-sm"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Enter valid JSON for social links and additional data
+                  </p>
                 </div>
+
+
               </div>
 
               <div className="flex gap-3 mt-6">
@@ -838,7 +839,10 @@ const AdminArtists = () => {
                   {showEditModal ? 'Update Artist' : 'Add Artist'}
                 </button>
                 <button
-                  onClick={() => setShowAddModal(false) || setShowEditModal(false)}
+                  onClick={() => {
+                    setShowAddModal(false);
+                    setShowEditModal(false);
+                  }}
                   className="px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg hover:bg-white/20 transition-all"
                 >
                   Cancel

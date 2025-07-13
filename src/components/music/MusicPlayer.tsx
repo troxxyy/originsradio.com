@@ -28,12 +28,7 @@ const MusicPlayer = () => {
       path: "/songs/ Stop Talking - Ledi Cannit Remix - Graumann.mp3",
       coverArt: "/album-art/Stop.jpg"
   },
-  {
-    title: "Lost Avenue",
-    artist: "Overhard,Redein",
-    path: "/songs/lostavenue.mp3",
-    coverArt: "/album-art/lost.jpg"
-  },
+  
   {
     title: "Amaya ",
     artist: "The Cet",

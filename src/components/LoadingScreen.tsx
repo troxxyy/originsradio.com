@@ -88,7 +88,7 @@ const LoadingScreen = ({
       </div>
       
       <div className="mt-8 text-center">
-        <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500">
+        <h1 className="text-3xl font-bold bg-clip-text text-white">
           origins<span className="text-white">radio</span>
         </h1>
         <p className="text-muted-foreground text-sm mt-2">Ankara's interactive radio station</p>

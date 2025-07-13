@@ -188,8 +188,8 @@ const OurWork = () => {
 
 
   return (
-    <PageLayout>
-      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
+    <PageLayout customBackground="bg-gradient-to-br from-black via-gray-900 to-black">
+      <div className="min-h-screen">
         {/* Hero Section */}
         <div className="relative py-20 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
@@ -286,7 +286,7 @@ const OurWork = () => {
               <p className="text-gray-400">Try adjusting your search or filters</p>
             </motion.div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8">
               {filteredProjects.map((project, index) => (
                 <motion.div
                   key={project.title}
@@ -298,7 +298,7 @@ const OurWork = () => {
                 >
                   <div className="glass backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.1)] transform-gpu hover:scale-105">
                     {/* Project Image */}
-                    <div className="relative h-64 overflow-hidden">
+                    <div className="relative h-80 overflow-hidden">
                       <img
                         src={project.imageUrl}
                         alt={project.title}
@@ -321,7 +321,7 @@ const OurWork = () => {
                     </div>
 
                     {/* Project Info */}
-                    <div className="p-6">
+                    <div className="p-8">
                       <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-white/90 transition-colors">
                         {project.title}
                       </h3>
