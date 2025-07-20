@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
 import { Search, Filter, Music, MapPin, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import PageLayout from '@/components/layout/PageLayout';
@@ -41,8 +42,58 @@ const Artists = () => {
     navigate(`/artists/${slug}`);
   };
 
+  // SEO Data
+  const seoData = {
+    title: "Artists & DJs - Origins Radio | Ankara's Underground Music Scene",
+    description: "Discover talented DJs and music producers from Ankara's underground music scene. Listen to the latest tracks, sets, and performances from featured artists on Origins Radio.",
+    keywords: "DJs, music producers, Ankara, underground music, techno, house, electronic music, Origins Radio, Turkey, artists, musicians",
+    structuredData: {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "Artists & DJs",
+      "description": "Featured DJs and music producers from Ankara's underground music scene",
+      "url": "https://originsradio.com/artists",
+      "numberOfItems": artists?.length || 0,
+      "itemListElement": artists?.map((artist, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "item": {
+          "@type": "Person",
+          "name": artist.name,
+          "description": artist.bio || `Professional DJ ${artist.name}`,
+          "url": `https://originsradio.com/artists/${generateSlug(artist.name)}`,
+          "image": artist.photo_url || "/placeholder.svg",
+          "jobTitle": "DJ & Music Producer",
+          "worksFor": {
+            "@type": "Organization",
+            "name": "Origins Radio"
+          }
+        }
+      })) || []
+    }
+  };
+
   return (
     <PageLayout customBackground="bg-gradient-to-br from-black via-gray-900 to-black">
+      <Helmet>
+        <title>{seoData.title}</title>
+        <meta name="description" content={seoData.description} />
+        <meta name="keywords" content={seoData.keywords} />
+        <script type="application/ld+json">
+          {JSON.stringify(seoData.structuredData)}
+        </script>
+        <meta property="og:title" content={seoData.title} />
+        <meta property="og:description" content={seoData.description} />
+        <meta property="og:url" content="https://originsradio.com/artists" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="/originslogo.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={seoData.title} />
+        <meta name="twitter:description" content={seoData.description} />
+        <meta name="twitter:image" content="/originslogo.png" />
+        <link rel="canonical" href="https://originsradio.com/artists" />
+      </Helmet>
+
       <div className="min-h-screen">
         {/* Hero Section */}
         <div className="relative py-20 px-4 sm:px-6 lg:px-8">
@@ -66,35 +117,33 @@ const Artists = () => {
         {/* Search Section */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
           <div className="glass backdrop-blur-sm rounded-2xl p-6 border border-white/10">
-            <div className="flex flex-col sm:flex-row gap-4 items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Search Input */}
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <input
                   type="text"
                   placeholder="Search artists..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/30 transition-all"
+                  className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/20"
                 />
               </div>
-              
-              {/* Featured Filter Toggle */}
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setShowFeaturedOnly(!showFeaturedOnly)}
-                className={`flex items-center gap-2 px-4 py-3 rounded-xl border transition-all ${
-                  showFeaturedOnly 
-                    ? 'bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-400 text-black border-yellow-400/50 shadow-lg' 
-                    : 'bg-white/10 text-white border-white/20 hover:bg-white/20'
-                }`}
-              >
-                <Star className={`w-4 h-4 ${showFeaturedOnly ? 'fill-current' : ''}`} />
-                <span className="font-medium text-sm">
-                  {showFeaturedOnly ? 'Featured Only' : 'Show All'}
-                </span>
-              </motion.button>
+
+              {/* Featured Filter */}
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => setShowFeaturedOnly(!showFeaturedOnly)}
+                  className={`px-4 py-3 rounded-lg transition-all flex items-center gap-2 ${
+                    showFeaturedOnly
+                      ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                      : 'bg-white/10 text-white border border-white/20 hover:bg-white/20'
+                  }`}
+                >
+                  <Star className="w-4 h-4" />
+                  Featured Only
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -172,43 +221,45 @@ const Artists = () => {
 
                     {/* Artist Info */}
                     <div className="p-6 flex-1 flex flex-col">
-                      <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-white/90 transition-colors">
+                      <h3 className="text-xl font-bold text-white mb-2 group-hover:text-blue-300 transition-colors">
                         {artist.name}
                       </h3>
                       
+                      {artist.location && (
+                        <div className="flex items-center gap-2 text-gray-400 mb-3">
+                          <MapPin className="w-4 h-4" />
+                          <span className="text-sm">{artist.location}</span>
+                        </div>
+                      )}
+
+                      {artist.genre && artist.genre.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {artist.genre.slice(0, 3).map((genre, index) => (
+                            <span
+                              key={index}
+                              className="px-2 py-1 bg-white/10 rounded-full text-xs text-gray-300 border border-white/20"
+                            >
+                              {genre}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
                       {artist.bio && (
-                        <p className="text-gray-400 text-sm line-clamp-3 mb-4 flex-1">
-                          {artist.bio}
+                        <p className="text-gray-400 text-sm leading-relaxed flex-1">
+                          {artist.bio.length > 100 ? `${artist.bio.slice(0, 100)}...` : artist.bio}
                         </p>
                       )}
 
-                      {/* Artist details */}
-                      <div className="mt-auto pt-4 border-t border-white/10">
-                        <div className="flex items-center gap-2 text-sm text-gray-400">
-                          {artist.location && (
-                            <span className="flex items-center gap-1">
-                              <MapPin className="w-3 h-3" />
-                              {artist.location}
-                            </span>
-                          )}
-                        </div>
-                        {artist.genre && artist.genre.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-2">
-                            {artist.genre.slice(0, 3).map(genre => (
-                              <span
-                                key={genre}
-                                className="px-2 py-1 bg-white/10 rounded-full text-xs text-white/80"
-                              >
-                                {genre}
-                              </span>
-                            ))}
-                            {artist.genre.length > 3 && (
-                              <span className="px-2 py-1 bg-white/10 rounded-full text-xs text-white/80">
-                                +{artist.genre.length - 3} more
-                              </span>
-                            )}
+                      <div className="mt-4 pt-4 border-t border-white/10">
+                        <div className="flex items-center justify-between text-sm text-gray-500">
+                          <span>View Profile</span>
+                          <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-all">
+                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
                           </div>
-                        )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -216,11 +267,6 @@ const Artists = () => {
               ))}
             </div>
           )}
-
-          {/* Results Info */}
-          <div className="text-center mt-8 text-gray-400">
-            Showing {filteredArtists.length} of {artists?.length || 0} artists
-          </div>
         </div>
       </div>
     </PageLayout>

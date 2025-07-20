@@ -728,20 +728,26 @@ const AdminArtists = () => {
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Name</label>
+                    <label htmlFor="artist-name" className="block text-sm font-medium text-gray-300 mb-2">Name</label>
                     <input
+                      id="artist-name"
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                      placeholder="Enter artist name"
+                      title="Artist name"
                       className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/20"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Location</label>
+                    <label htmlFor="artist-location" className="block text-sm font-medium text-gray-300 mb-2">Location</label>
                     <input
+                      id="artist-location"
                       type="text"
                       value={formData.location}
                       onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                      placeholder="Enter artist location"
+                      title="Artist location"
                       className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/20"
                     />
                   </div>
