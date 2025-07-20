@@ -9,6 +9,7 @@ interface UploadStatus {
   status: 'uploading' | 'success' | 'error';
   progress: number;
   error?: string;
+  setNumber?: number; // Add setNumber property
 }
 
 const AdminUploads = () => {
@@ -35,11 +36,17 @@ const AdminUploads = () => {
       });
     }
 
-    const newUploads: UploadStatus[] = audioFiles.map(file => ({
-      file,
-      status: 'uploading',
-      progress: 0
-    }));
+    const newUploads: UploadStatus[] = audioFiles.map(file => {
+      // Try to extract set number from file name (first number found)
+      const match = file.name.match(/(\d+)/);
+      const setNumber = match ? parseInt(match[1], 10) : undefined;
+      return {
+        file,
+        status: 'uploading',
+        progress: 0,
+        setNumber,
+      };
+    });
 
     setUploads(prev => [...prev, ...newUploads]);
     uploadFiles(audioFiles);
@@ -202,7 +209,15 @@ const AdminUploads = () => {
               </div>
 
               <div className="space-y-3">
-                {uploads.map((upload, index) => (
+                {/* Sort uploads by setNumber (ascending, undefined last) */}
+                {uploads
+                  .slice() // copy to avoid mutating state
+                  .sort((a, b) => {
+                    const aNum = a.setNumber ?? Infinity;
+                    const bNum = b.setNumber ?? Infinity;
+                    return aNum - bNum;
+                  })
+                  .map((upload, index) => (
                   <div
                     key={index}
                     className="flex items-center justify-between p-4 bg-gray-700/50 rounded-lg border border-gray-600"
@@ -211,6 +226,10 @@ const AdminUploads = () => {
                       {getStatusIcon(upload.status)}
                       <div className="flex-1">
                         <p className="font-medium text-sm">{upload.file.name}</p>
+                        {/* Show set number if available */}
+                        {upload.setNumber !== undefined && (
+                          <p className="text-xs text-blue-400">Set #{upload.setNumber}</p>
+                        )}
                         <p className="text-xs text-gray-400">
                           {(upload.file.size / 1024 / 1024).toFixed(2)} MB
                         </p>
