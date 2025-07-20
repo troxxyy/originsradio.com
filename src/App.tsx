@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import LoadingScreen from "./components/LoadingScreen";
 import Navigation from "./components/Navigation";
 import TicketPopup from "./components/TicketPopup";
@@ -51,79 +52,81 @@ const App = () => {
   };
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <TicketPopup />
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <TicketPopup />
 
-        {/* Loading Screen - Only show when needed */}
-        {isLoading && <LoadingScreen onLoadingComplete={handleLoadingComplete} />}
+          {/* Loading Screen - Only show when needed */}
+          {isLoading && <LoadingScreen onLoadingComplete={handleLoadingComplete} />}
 
-        {/* Main Content - Only shown when loading is complete */}
-        <div style={{ display: isLoading ? "none" : "block" }}>
-          <BrowserRouter>
-            <Navigation />
-            <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
-              <Routes>
-                <Route path="/" element={
-                  <RouteTracker>
-                    <Index />
-                  </RouteTracker>
-                } />
-                <Route path="/ourwork" element={
-                  <RouteTracker>
-                    <OurWork />
-                  </RouteTracker>
-                } />
-                <Route path="/gocrazy" element={
-                  <RouteTracker>
-                    <GoCrazy />
-                  </RouteTracker>
-                } />
-                <Route path="/about" element={
-                  <RouteTracker>
-                    <About />
-                  </RouteTracker>
-                } />
-                <Route path="/artists" element={
-                  <RouteTracker>
-                    <Artists />
-                  </RouteTracker>
-                } />
+          {/* Main Content - Only shown when loading is complete */}
+          <div style={{ display: isLoading ? "none" : "block" }}>
+            <BrowserRouter>
+              <Navigation />
+              <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+                <Routes>
+                  <Route path="/" element={
+                    <RouteTracker>
+                      <Index />
+                    </RouteTracker>
+                  } />
+                  <Route path="/ourwork" element={
+                    <RouteTracker>
+                      <OurWork />
+                    </RouteTracker>
+                  } />
+                  <Route path="/gocrazy" element={
+                    <RouteTracker>
+                      <GoCrazy />
+                    </RouteTracker>
+                  } />
+                  <Route path="/about" element={
+                    <RouteTracker>
+                      <About />
+                    </RouteTracker>
+                  } />
+                  <Route path="/artists" element={
+                    <RouteTracker>
+                      <Artists />
+                    </RouteTracker>
+                  } />
 
-                <Route path="/artists/:artistSlug" element={
-                  <RouteTracker>
-                    <ArtistDetail />
-                  </RouteTracker>
-                } />
-                <Route path="/admin/artists" element={
-                  <RouteTracker>
-                    <AdminArtists />
-                  </RouteTracker>
-                } />
-                <Route path="/admin" element={
-                  <RouteTracker>
-                    <AdminArtists />
-                  </RouteTracker>
-                } />
-                <Route path="/originsradio/adminuploads" element={
-                  <RouteTracker>
-                    <AdminUploads />
-                  </RouteTracker>
-                } />
+                  <Route path="/artists/:artistSlug" element={
+                    <RouteTracker>
+                      <ArtistDetail />
+                    </RouteTracker>
+                  } />
+                  <Route path="/admin/artists" element={
+                    <RouteTracker>
+                      <AdminArtists />
+                    </RouteTracker>
+                  } />
+                  <Route path="/admin" element={
+                    <RouteTracker>
+                      <AdminArtists />
+                    </RouteTracker>
+                  } />
+                  <Route path="/originsradio/adminuploads" element={
+                    <RouteTracker>
+                      <AdminUploads />
+                    </RouteTracker>
+                  } />
 
-                <Route path="*" element={
-                  <RouteTracker>
-                    <NotFound />
-                  </RouteTracker>
-                } />
-              </Routes>
-            </Suspense>
-          </BrowserRouter>
-        </div>
-      </TooltipProvider>
-    </QueryClientProvider>
+                  <Route path="*" element={
+                    <RouteTracker>
+                      <NotFound />
+                    </RouteTracker>
+                  } />
+                </Routes>
+              </Suspense>
+            </BrowserRouter>
+          </div>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </HelmetProvider>
   );
 };
 

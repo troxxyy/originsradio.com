@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
 import { 
   ArrowLeft, 
   MapPin, 
@@ -106,6 +107,112 @@ const ArtistDetail = () => {
     certifications: ['Ableton Certified', 'Pioneer DJ School'],
     awards: ['Best Underground DJ 2023', 'Local Hero Award']
   };
+
+  // SEO Meta Tags and Structured Data
+  const generateSEOData = () => {
+    if (!artist) return null;
+
+    const artistName = artist.name;
+    const artistBio = artist.bio || `Professional DJ and music producer ${artistName} from ${artist.location || 'Ankara'}.`;
+    const artistGenres = artist.genre?.join(', ') || 'Electronic, House, Techno';
+    const artistLocation = artist.location || 'Ankara, Turkey';
+    const artistPhoto = artist.photo_url || '/placeholder.svg';
+    const currentUrl = `https://originsradio.com/artists/${artistSlug}`;
+    
+    // Generate meta description
+    const metaDescription = `${artistName} - Professional DJ and music producer from ${artistLocation}. Specializing in ${artistGenres}. ${artistBio} Listen to ${artistName}'s latest tracks and sets on Origins Radio.`;
+
+    // Generate keywords
+    const keywords = [
+      artistName,
+      'DJ',
+      'music producer',
+      'electronic music',
+      ...artist.genre || [],
+      artistLocation,
+      'Origins Radio',
+      'Ankara',
+      'Turkey',
+      'underground music',
+      'techno',
+      'house music'
+    ].join(', ');
+
+    // Structured Data for Rich Search Results
+    const structuredData = {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": artistName,
+      "description": artistBio,
+      "image": artistPhoto,
+      "url": currentUrl,
+      "sameAs": artist.social_links ? Object.values(artist.social_links) : [],
+      "jobTitle": "DJ & Music Producer",
+      "worksFor": {
+        "@type": "Organization",
+        "name": "Origins Radio"
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": artistLocation.split(',')[0]?.trim() || "Ankara",
+        "addressCountry": "Turkey"
+      },
+      "knowsAbout": artist.genre || ["Electronic Music", "DJing", "Music Production"],
+      "hasOccupation": {
+        "@type": "Occupation",
+        "name": "DJ",
+        "description": `Professional DJ specializing in ${artistGenres}`
+      },
+      "alumniOf": {
+        "@type": "Organization",
+        "name": "Origins Radio"
+      }
+    };
+
+    // Music Album/Release structured data
+    const musicStructuredData = tracks?.map(track => ({
+      "@context": "https://schema.org",
+      "@type": "MusicRecording",
+      "name": track.title,
+      "byArtist": {
+        "@type": "Person",
+        "name": artistName
+      },
+      "inAlbum": {
+        "@type": "MusicAlbum",
+        "name": `${artistName} - ${track.title}`,
+        "byArtist": {
+          "@type": "Person",
+          "name": artistName
+        }
+      },
+      "duration": track.duration ? `PT${Math.floor(track.duration / 60)}M${track.duration % 60}S` : undefined,
+      "datePublished": track.release_date,
+      "url": currentUrl
+    })) || [];
+
+    return {
+      title: `${artistName} - DJ & Music Producer | Origins Radio`,
+      description: metaDescription,
+      keywords: keywords,
+      structuredData: [structuredData, ...musicStructuredData],
+      ogData: {
+        title: `${artistName} - DJ & Music Producer`,
+        description: metaDescription,
+        image: artistPhoto,
+        url: currentUrl,
+        type: 'profile'
+      },
+      twitterData: {
+        card: 'summary_large_image',
+        title: `${artistName} - DJ & Music Producer`,
+        description: metaDescription,
+        image: artistPhoto
+      }
+    };
+  };
+
+  const seoData = generateSEOData();
 
   const handlePlaySet = async (index: number) => {
     if (!setsEvents[index]) return;
@@ -333,6 +440,32 @@ const ArtistDetail = () => {
 
   return (
     <PageLayout customBackground="bg-gradient-to-br from-black via-gray-900 to-black">
+      <Helmet>
+        {seoData && (
+          <>
+            <title>{seoData.title}</title>
+            <meta name="description" content={seoData.description} />
+            <meta name="keywords" content={seoData.keywords} />
+            {seoData.structuredData && seoData.structuredData.map((data, index) => (
+              <script
+                key={`structured-data-${index}`}
+                type="application/ld+json"
+              >
+                {JSON.stringify(data)}
+              </script>
+            ))}
+            <meta property="og:title" content={seoData.ogData?.title} />
+            <meta property="og:description" content={seoData.ogData?.description} />
+            <meta property="og:image" content={seoData.ogData?.image} />
+            <meta property="og:url" content={seoData.ogData?.url} />
+            <meta property="og:type" content={seoData.ogData?.type} />
+            <meta name="twitter:card" content={seoData.twitterData?.card} />
+            <meta name="twitter:title" content={seoData.twitterData?.title} />
+            <meta name="twitter:description" content={seoData.twitterData?.description} />
+            <meta name="twitter:image" content={seoData.twitterData?.image} />
+          </>
+        )}
+      </Helmet>
       <div className="min-h-screen">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Back Button */}

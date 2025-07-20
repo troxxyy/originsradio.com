@@ -1,5 +1,17 @@
 User-agent: *
 Allow: /
 
+# Disallow admin areas
+Disallow: /admin/
+Disallow: /originsradio/adminuploads
+
+# Allow important pages
+Allow: /artists/
+Allow: /about
+Allow: /ourwork
+
 # Sitemap
-Sitemap: https://originsradio.com/sitemap.xml 
+Sitemap: https://originsradio.com/sitemap.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
