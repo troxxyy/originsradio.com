@@ -381,7 +381,7 @@ const UpNextSection = () => {
   const { data: sets, isLoading, error } = useSets();
 
   // Transform Supabase data to match the expected format
-  const upcomingEvents: UpNextEvent[] = sets?.map((set, index) => ({
+  let upcomingEvents: UpNextEvent[] = sets?.map((set, index) => ({
     title: set.title,
     artist: set.artists?.name || 'Unknown Artist',
     date: new Date(set.release_date).toLocaleDateString('en-US', {
@@ -396,6 +396,13 @@ const UpNextSection = () => {
     artistSlug: set.artists?.name ? generateSlug(set.artists.name) : undefined,
     artistLocation: set.artists?.location || undefined
   })) || [];
+
+  // Sort by setNumber descending (undefined last)
+  upcomingEvents = upcomingEvents.slice().sort((a, b) => {
+    const aNum = a.setNumber ?? -Infinity;
+    const bNum = b.setNumber ?? -Infinity;
+    return bNum - aNum;
+  });
 
   const handlePlayTrack = (trackIndex: number) => {
     handlePlay(trackIndex, upcomingEvents[trackIndex].audioSrc);
