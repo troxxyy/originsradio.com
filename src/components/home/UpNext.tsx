@@ -367,6 +367,7 @@ const useAudioPlayer = () => {
 // Main Component
 const UpNextSection = () => {
   const isMobile = useIsMobile();
+  const [showAll, setShowAll] = useState(false); // State to control how many sets are shown
   
   const {
     audioRef,
@@ -404,6 +405,8 @@ const UpNextSection = () => {
     return bNum - aNum;
   });
 
+  const setsToShow = showAll ? upcomingEvents : upcomingEvents.slice(0, 5);
+
   const handlePlayTrack = (trackIndex: number) => {
     handlePlay(trackIndex, upcomingEvents[trackIndex].audioSrc);
   };
@@ -436,19 +439,31 @@ const UpNextSection = () => {
           <p className="text-white/60 text-xs sm:text-sm mt-2">Check back soon for new content!</p>
         </div>
       ) : (
-        <div className="space-y-4 sm:space-y-6">
-          {upcomingEvents.map((event, index) => (
-            <UpNextItem 
-              key={index}
-              event={event}
-              index={index}
-              onPlay={handlePlayTrack}
-              onSeek={handleSeek}
-              isPlaying={isPlaying && currentTrackIndex === index}
-              progress={trackProgress[index] || 0}
-            />
-          ))}
-        </div>
+        <>
+          <div className="space-y-4 sm:space-y-6">
+            {setsToShow.map((event, index) => (
+              <UpNextItem 
+                key={index}
+                event={event}
+                index={index}
+                onPlay={handlePlayTrack}
+                onSeek={handleSeek}
+                isPlaying={isPlaying && currentTrackIndex === index}
+                progress={trackProgress[index] || 0}
+              />
+            ))}
+          </div>
+          {!showAll && upcomingEvents.length > 5 && (
+            <div className="flex justify-center mt-8">
+              <button
+                onClick={() => setShowAll(true)}
+                className="px-6 py-2 rounded-lg bg-white/10 border border-white/20 text-white/80 font-semibold hover:bg-white/20 transition-all duration-300"
+              >
+                Show More
+              </button>
+            </div>
+          )}
+        </>
       )}
       
       <div className="mt-8 sm:mt-12 text-center">
