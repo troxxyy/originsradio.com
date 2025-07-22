@@ -5,13 +5,16 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
-import LoadingScreen from "./components/LoadingScreen";
-import Navigation from "./components/Navigation";
-import TicketPopup from "./components/TicketPopup";
-import About from "./pages/About";
+import OptimizedLoader from "@/components/OptimizedLoader";
 
-// Lazy load route components
+// Lazy load ALL components for better code splitting
+const LoadingScreen = lazy(() => import("./components/LoadingScreen"));
+const Navigation = lazy(() => import("./components/Navigation"));
+const TicketPopup = lazy(() => import("./components/TicketPopup"));
+
+// Lazy load route components with better loading fallbacks
 const Index = lazy(() => import("./pages/Index"));
+const About = lazy(() => import("./pages/About"));
 const OurWork = lazy(() => import("./pages/OurWork"));
 const NotFound = lazy(() => import("./pages/404"));
 const GoCrazy = lazy(() => import("./pages/3dvs"));
@@ -51,22 +54,33 @@ const App = () => {
     setIsLoading(false);
   };
 
+  // Use the optimized loader component
+  const LoadingFallback = () => <OptimizedLoader />;
+
   return (
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <TicketPopup />
+          <Suspense fallback={<LoadingFallback />}>
+            <TicketPopup />
+          </Suspense>
 
           {/* Loading Screen - Only show when needed */}
-          {isLoading && <LoadingScreen onLoadingComplete={handleLoadingComplete} />}
+          {isLoading && (
+            <Suspense fallback={<LoadingFallback />}>
+              <LoadingScreen onLoadingComplete={handleLoadingComplete} />
+            </Suspense>
+          )}
 
           {/* Main Content - Only shown when loading is complete */}
           <div style={{ display: isLoading ? "none" : "block" }}>
             <BrowserRouter>
-              <Navigation />
-              <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+              <Suspense fallback={<LoadingFallback />}>
+                <Navigation />
+              </Suspense>
+              <Suspense fallback={<LoadingFallback />}>
                 <Routes>
                   <Route path="/" element={
                     <RouteTracker>

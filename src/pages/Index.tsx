@@ -1,13 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense, lazy } from "react";
 import PageLayout from "@/components/layout/PageLayout";
 import SocialBubbles from "@/components/social/SocialBubbles";
 import Hero from "@/components/home/Hero";
 import AboutSection from "@/components/home/UpNext";
 import MusicPlayer from "@/components/music/MusicPlayer";
-import ThreeMusicPlayer from "../components/music/ThreeMusicPlayer";
 import Navigation from "@/components/Navigation";
 import { Wand2 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+
+// Lazy load the heavy ThreeMusicPlayer component
+const ThreeMusicPlayer = lazy(() => import("../components/music/ThreeMusicPlayer"));
 
 
 const Index = () => {
@@ -31,7 +33,7 @@ const Index = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowThreePlayer(true);
-    }, 5);
+    }, 1000); // Increased delay to improve initial load performance
 
     return () => {
       clearTimeout(timer);
@@ -56,7 +58,15 @@ const Index = () => {
       />
       
       {/* Music Player with Three.js Visualization */}
-      {showThreePlayer && isVisualizationEnabled && <ThreeMusicPlayer />}
+      {showThreePlayer && isVisualizationEnabled && (
+        <Suspense fallback={
+          <div className="flex items-center justify-center h-96 bg-black/20 rounded-xl">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+          </div>
+        }>
+          <ThreeMusicPlayer />
+        </Suspense>
+      )}
       
       {/* Music Player */}
       <MusicPlayer />
