@@ -14,6 +14,7 @@ const Navigation = () => {
     { name: "Artists", icon: Users, href: "/artists" },
     { name: "About", icon: Info, href: "/about" },
     { name: "3DVS", icon: Music, href: "/gocrazy", needsTooltip: true },
+    // { name: "Admin", icon: User, href: "/admin" }, // Deactivated admin link
   ];
 
   // Define styles based on current page
