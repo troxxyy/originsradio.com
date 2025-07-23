@@ -83,7 +83,6 @@ const ArtistDetail = () => {
   
   // Use real data from database
   const artistViews = artist?.views_count || 0;
-  const artistExperience = artist?.years_experience || 1;
   
   // Calculate total plays from real track and set views
   const trackViews = tracks?.reduce((acc, track) => acc + (track.views_count || 0), 0) || 0;
@@ -97,7 +96,6 @@ const ArtistDetail = () => {
   
   // DJ-specific data calculated from real metrics
   const djStats = {
-    experience: `${artistExperience}+ years`,
     genres: artist?.genre || ['House', 'Techno', 'Progressive'],
     equipment: ['Pioneer CDJ-3000', 'DJM-900NXS2', 'Serato DJ Pro'],
     mixingStyle: 'Harmonic mixing with smooth transitions',
@@ -607,10 +605,6 @@ const ArtistDetail = () => {
                             <span className="font-medium text-sm sm:text-base">{artist.location}</span>
                           </div>
                         )}
-                        <div className="flex items-center gap-2 text-gray-300 bg-white/5 px-3 sm:px-4 py-2 rounded-full border border-white/10">
-                          <Headphones className="w-3 h-3 sm:w-4 sm:h-4" />
-                          <span className="font-medium text-sm sm:text-base">{djStats.experience}</span>
-                        </div>
                         <div className="flex items-center gap-2 text-gray-300 bg-white/5 px-3 sm:px-4 py-2 rounded-full border border-white/10">
                           <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
                           <span className="font-medium text-sm sm:text-base">{artistViews.toLocaleString()}</span>
