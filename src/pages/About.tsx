@@ -278,14 +278,16 @@ const About = () => {
           <p className="text-gray-300 text-xl max-w-3xl mx-auto mb-12 leading-relaxed">
             Origins Radio is more than just a radio station, it's a community of music lovers, creators, and innovators. We invite you to be part of our journey.
           </p>
-          <motion.button 
-            className="px-12 py-5 glass backdrop-blur-sm text-white/90 font-medium border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] rounded-xl"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            style={{ willChange: "transform" }}
-          >
-            Get Involved
-          </motion.button>
+          <a href="mailto:ben@sinacetinkaya.com">
+            <motion.button 
+              className="px-12 py-5 glass backdrop-blur-sm text-white/90 font-medium border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] rounded-xl"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              style={{ willChange: "transform" }}
+            >
+              Get Involved
+            </motion.button>
+          </a>
         </motion.div>
     </PageLayout>
   );
