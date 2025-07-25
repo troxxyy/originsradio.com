@@ -5,6 +5,7 @@ type Artist = Database['public']['Tables']['artists']['Row']
 type Track = Database['public']['Tables']['tracks']['Row']
 type Set = Database['public']['Tables']['sets']['Row']
 type Event = Database['public']['Tables']['events']['Row']
+type ChatMessage = Database['public']['Tables']['chat_messages']['Row']
 
 // Utility function to generate slug from name
 export const generateSlug = (name: string): string => {
@@ -624,4 +625,71 @@ export const generateUserId = (): string => {
   }
   
   return userId
+} 
+
+// Chat message functions
+export const getChatMessages = async (limit = 50): Promise<ChatMessage[]> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, returning empty chat messages')
+    return []
+  }
+  
+  const supabase = getSupabaseClient()
+  const { data, error } = await supabase
+    .from('chat_messages')
+    .select('*')
+    .order('created_at', { ascending: true })
+    .limit(limit)
+  
+  if (error) {
+    console.error('Error fetching chat messages:', error)
+    return []
+  }
+  
+  return data || []
+}
+
+export const createChatMessage = async (tagName: string, message: string, isEmoji = false): Promise<ChatMessage | null> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, cannot create chat message')
+    return null
+  }
+  
+  const supabase = getSupabaseClient()
+  const { data, error } = await supabase
+    .from('chat_messages')
+    .insert({
+      tag_name: tagName,
+      message: message,
+      is_emoji: isEmoji
+    })
+    .select()
+    .single()
+  
+  if (error) {
+    console.error('Error creating chat message:', error)
+    return null
+  }
+  
+  return data
+}
+
+export const subscribeToChatMessages = (callback: (message: ChatMessage) => void) => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, cannot subscribe to chat messages')
+    return null
+  }
+  
+  const supabase = getSupabaseClient()
+  const subscription = supabase
+    .channel('chat_messages')
+    .on('postgres_changes', 
+      { event: 'INSERT', schema: 'public', table: 'chat_messages' },
+      (payload) => {
+        callback(payload.new as ChatMessage)
+      }
+    )
+    .subscribe()
+  
+  return subscription
 } 

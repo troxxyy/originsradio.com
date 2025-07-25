@@ -19,6 +19,7 @@ const Artists = lazy(() => import("./pages/Artists"));
 const ArtistDetail = lazy(() => import("./pages/ArtistDetail"));
 const AdminArtists = lazy(() => import("./pages/AdminArtists"));
 const AdminUploads = lazy(() => import("./pages/AdminUploads"));
+const Anniversary = lazy(() => import("./pages/Anniversary"));
 
 const queryClient = new QueryClient();
 
@@ -97,6 +98,11 @@ const App = () => {
                   <Route path="/artists/:artistSlug" element={
                     <RouteTracker>
                       <ArtistDetail />
+                    </RouteTracker>
+                  } />
+                  <Route path="/anniversary" element={
+                    <RouteTracker>
+                      <Anniversary />
                     </RouteTracker>
                   } />
                   {/* <Route path="/admin/artists" element={
