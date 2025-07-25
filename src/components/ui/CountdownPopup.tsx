@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import confetti from 'canvas-confetti';
 
 interface CountdownPopupProps {
   targetDate: Date;
@@ -19,8 +20,38 @@ const getTimeRemaining = (target: Date) => {
   return { total, days, hours, minutes, seconds };
 };
 
+const triggerCelebration = () => {
+  // Fire multiple confetti bursts
+  const duration = 3 * 1000;
+  const end = Date.now() + duration;
+
+  const colors = ['#ff0000', '#ffffff', '#000000']; // Origins Radio colors
+
+  (function frame() {
+    confetti({
+      particleCount: 100,
+      angle: 60,
+      spread: 55,
+      origin: { x: 0, y: 0.8 },
+      colors: colors
+    });
+    confetti({
+      particleCount: 100,
+      angle: 120,
+      spread: 55,
+      origin: { x: 1, y: 0.8 },
+      colors: colors
+    });
+
+    if (Date.now() < end) {
+      requestAnimationFrame(frame);
+    }
+  }());
+};
+
 const CountdownPopup: React.FC<CountdownPopupProps> = ({ targetDate, message, open, onClose }) => {
   const [timeLeft, setTimeLeft] = useState(getTimeRemaining(targetDate));
+  const [isEnding, setIsEnding] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,27 +59,39 @@ const CountdownPopup: React.FC<CountdownPopupProps> = ({ targetDate, message, op
     const timer = setInterval(() => {
       const remaining = getTimeRemaining(targetDate);
       setTimeLeft(remaining);
+      
+      // Start celebration effect 3 seconds before end
+      if (remaining.total <= 3000 && !isEnding) {
+        setIsEnding(true);
+        triggerCelebration();
+      }
+      
       if (remaining.total <= 0) {
         clearInterval(timer);
-        // Redirect to anniversary page when countdown ends
-        navigate('/anniversary');
-        onClose();
+        // Short delay before redirect to allow celebration effects to play
+        setTimeout(() => {
+          navigate('/anniversary');
+          onClose();
+        }, 2000);
       }
     }, 1000);
     return () => clearInterval(timer);
-  }, [targetDate, open, onClose, navigate]);
+  }, [targetDate, open, onClose, navigate, isEnding]);
 
   const handleGoLive = () => {
-    navigate('/anniversary');
-    onClose();
+    triggerCelebration();
+    setTimeout(() => {
+      navigate('/anniversary');
+      onClose();
+    }, 1000);
   };
 
   const TimeUnit = ({ value, label }: { value: number; label: string }) => (
-    <div className="flex flex-col items-center mx-4">
-      <div className="text-4xl md:text-5xl font-bold text-white mb-2">
+    <div className={`flex flex-col items-center mx-4 transition-all duration-300 ${isEnding ? 'animate-pulse scale-110' : ''}`}>
+      <div className={`text-4xl md:text-5xl font-bold mb-2 ${isEnding ? 'text-red-500' : 'text-white'}`}>
         {String(value).padStart(2, '0')}
       </div>
-      <div className="text-sm text-gray-400 font-medium uppercase tracking-wide">
+      <div className={`text-sm font-medium uppercase tracking-wide ${isEnding ? 'text-red-400' : 'text-gray-400'}`}>
         {label}
       </div>
     </div>
@@ -56,15 +99,17 @@ const CountdownPopup: React.FC<CountdownPopupProps> = ({ targetDate, message, op
 
   return (
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
-      <DialogContent className="max-w-xl border border-gray-700 bg-black/90 backdrop-blur-sm">
+      <DialogContent className={`max-w-xl border border-gray-700 bg-black/90 backdrop-blur-sm transition-all duration-500 ${isEnding ? 'border-red-500/50 shadow-lg shadow-red-500/20' : ''}`}>
         <div className="flex flex-col items-center text-center p-6">
-          <DialogTitle className="text-2xl md:text-3xl font-bold text-white mb-2">
+          <DialogTitle className={`text-2xl md:text-3xl font-bold mb-2 transition-colors ${isEnding ? 'text-red-500 animate-pulse' : 'text-white'}`}>
             🎉 3 Years of Origins 🎉
           </DialogTitle>
-          <div className="text-gray-300 font-medium mb-6">Origins Radio</div>
+          <div className={`font-medium mb-6 transition-colors ${isEnding ? 'text-red-400' : 'text-gray-300'}`}>
+            Origins Radio
+          </div>
           
           {message && (
-            <DialogDescription className="text-gray-300 mb-8">
+            <DialogDescription className={`mb-8 transition-colors ${isEnding ? 'text-red-400' : 'text-gray-300'}`}>
               {message}
             </DialogDescription>
           )}
@@ -73,23 +118,23 @@ const CountdownPopup: React.FC<CountdownPopupProps> = ({ targetDate, message, op
             {timeLeft.days > 0 && (
               <>
                 <TimeUnit value={timeLeft.days} label="Days" />
-                <div className="text-2xl text-gray-400">:</div>
+                <div className={`text-2xl transition-colors ${isEnding ? 'text-red-400' : 'text-gray-400'}`}>:</div>
               </>
             )}
             {(timeLeft.hours > 0 || timeLeft.days > 0) && (
               <>
                 <TimeUnit value={timeLeft.hours} label="Hours" />
-                <div className="text-2xl text-gray-400">:</div>
+                <div className={`text-2xl transition-colors ${isEnding ? 'text-red-400' : 'text-gray-400'}`}>:</div>
               </>
             )}
             <TimeUnit value={timeLeft.minutes} label="Minutes" />
-            <div className="text-2xl text-gray-400">:</div>
+            <div className={`text-2xl transition-colors ${isEnding ? 'text-red-400' : 'text-gray-400'}`}>:</div>
             <TimeUnit value={timeLeft.seconds} label="Seconds" />
           </div>
 
           <div className="w-full h-0.5 bg-gray-700 rounded-full overflow-hidden mb-6">
             <div 
-              className="h-full bg-white transition-all duration-1000"
+              className={`h-full transition-all duration-1000 ${isEnding ? 'bg-red-500' : 'bg-white'}`}
               style={{
                 width: `${Math.max(0, Math.min(100, ((86400000 - timeLeft.total) / 86400000) * 100))}%`
               }}
@@ -98,13 +143,17 @@ const CountdownPopup: React.FC<CountdownPopupProps> = ({ targetDate, message, op
           
           <Button 
             onClick={handleGoLive}
-            className="w-full bg-white text-black hover:bg-gray-200 font-bold py-3 mb-4"
+            className={`w-full font-bold py-3 mb-4 transition-all duration-300 ${
+              isEnding 
+                ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse'
+                : 'bg-white text-black hover:bg-gray-200'
+            }`}
           >
             🔴 Join Live Event Now
           </Button>
           
-          <div className="text-sm text-gray-500">
-            Until Midnight
+          <div className={`text-sm transition-colors ${isEnding ? 'text-red-400' : 'text-gray-500'}`}>
+            {isEnding ? "It's Starting!" : "Until Midnight"}
           </div>
         </div>
       </DialogContent>

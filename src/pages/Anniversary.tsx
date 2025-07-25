@@ -417,22 +417,22 @@ const Anniversary = () => {
             <div className="relative bg-black/60 backdrop-blur-xl border border-white/10 rounded-xl p-6 shadow-2xl hover:shadow-white/5 transition-all duration-500">
               <div className="flex items-center gap-3 mb-6">
                 <Calendar className="w-6 h-6 text-white" />
-                <h2 className="text-3xl font-bold text-white tracking-tight">24-Hour Schedule</h2>
-                <div className="flex-1 h-px bg-gradient-to-r from-white/20 to-transparent"></div>
+                <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight">24-Hour Schedule</h2>
+                <div className="hidden md:block flex-1 h-px bg-gradient-to-r from-white/20 to-transparent"></div>
               </div>
               
-              <div className="grid gap-2 max-h-96 overflow-y-auto custom-scrollbar">
+              <div className="grid gap-2 max-h-[70vh] md:max-h-96 overflow-y-auto custom-scrollbar">
                 {schedule.map((slot, index) => (
                   <div
                     key={slot.hour}
-                    className={`group/item flex items-center justify-between p-4 rounded-lg border transition-all duration-300 hover:scale-[1.01] ${
+                    className={`group/item flex flex-col md:flex-row md:items-center justify-between p-3 md:p-4 rounded-lg border transition-all duration-300 hover:scale-[1.01] ${
                       slot.hour === currentHour
                         ? 'bg-white/10 border-white/30 shadow-lg shadow-white/5'
                         : 'bg-gray-800/30 border-gray-600/50 hover:bg-gray-700/40 hover:border-gray-500/50'
                     }`}
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center justify-between md:justify-start gap-4 mb-2 md:mb-0">
                       <div className="flex items-center gap-3">
                         <Clock className="w-4 h-4 text-gray-400" />
                         <span className="font-mono text-white font-medium min-w-[60px]">
@@ -440,25 +440,30 @@ const Anniversary = () => {
                         </span>
                       </div>
                       {slot.hour === currentHour && (
-                        <div className="relative">
-                          <div className="w-2 h-2 bg-red-500 rounded-full animate-ping"></div>
-                          <div className="absolute inset-0 w-2 h-2 bg-red-500 rounded-full"></div>
+                        <div className="relative md:hidden">
+                          <span className="text-xs text-red-400 font-medium uppercase tracking-wider flex items-center gap-2">
+                            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                            ON AIR
+                          </span>
                         </div>
                       )}
                     </div>
                     
-                    <div className="flex-1 mx-4 min-w-0">
+                    <div className="flex-1 min-w-0 mb-2 md:mb-0 md:mx-4">
                       <p className="text-white font-semibold truncate">{slot.artist}</p>
                       <p className="text-gray-400 text-sm truncate">{slot.setTitle}</p>
                     </div>
                     
-                    <div className="flex items-center gap-3">
-                      <span className="bg-gray-700/70 text-gray-300 px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm">
+                    <div className="flex items-center justify-between md:justify-end gap-3">
+                      <span className="bg-gray-700/70 text-gray-300 px-2 md:px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm whitespace-nowrap">
                         {slot.genre}
                       </span>
                       {slot.hour === currentHour && (
-                        <div className="text-xs text-red-400 font-medium uppercase tracking-wider">
-                          ON AIR
+                        <div className="hidden md:block text-xs text-red-400 font-medium uppercase tracking-wider">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                            ON AIR
+                          </div>
                         </div>
                       )}
                     </div>
