@@ -8,12 +8,22 @@ import ThreeMusicPlayer from "../components/music/ThreeMusicPlayer";
 import Navigation from "@/components/Navigation";
 import { Wand2 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import CountdownPopup from "@/components/ui/CountdownPopup";
 
 
 const Index = () => {
   const isMobile = useIsMobile();
   const [showThreePlayer, setShowThreePlayer] = useState(false);
   const [isVisualizationEnabled, setIsVisualizationEnabled] = useState(true);
+  const [showCountdown, setShowCountdown] = useState(true);
+  // Set countdown to midnight tonight
+  const getMidnightTonight = () => {
+    const now = new Date();
+    const midnight = new Date(now);
+    midnight.setHours(24, 0, 0, 0); // Next midnight
+    return midnight;
+  };
+  const countdownTarget = getMidnightTonight();
 
   // Update visualization state when mobile detection is complete
   useEffect(() => {
@@ -45,6 +55,13 @@ const Index = () => {
 
     return (
     <PageLayout customBackground="bg-gradient-to-br from-black via-gray-900 to-black">
+      {/* Countdown Timer Popup */}
+      <CountdownPopup
+        open={showCountdown}
+        onClose={() => setShowCountdown(false)}
+        targetDate={countdownTarget}
+        message="Celebrating 3 years of incredible music and community "
+      />
       {/* Social Media Floating Bubbles */}
       <SocialBubbles />
       <Navigation />
