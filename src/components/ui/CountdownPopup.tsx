@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import confetti from 'canvas-confetti';
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface CountdownPopupProps {
   targetDate: Date;
@@ -20,38 +21,49 @@ const getTimeRemaining = (target: Date) => {
   return { total, days, hours, minutes, seconds };
 };
 
-const triggerCelebration = () => {
-  // Fire multiple confetti bursts
-  const duration = 3 * 1000;
+const triggerCelebration = (isMobile: boolean) => {
+  // Shorter duration and fewer particles for mobile
+  const duration = isMobile ? 1500 : 3000;
+  const particleCount = isMobile ? 35 : 100;
   const end = Date.now() + duration;
 
   const colors = ['#ff0000', '#ffffff', '#000000']; // Origins Radio colors
 
-  (function frame() {
+  // Create a more efficient animation frame loop
+  let frame: number;
+  const animate = () => {
     confetti({
-      particleCount: 100,
+      particleCount,
       angle: 60,
-      spread: 55,
+      spread: isMobile ? 45 : 55,
       origin: { x: 0, y: 0.8 },
-      colors: colors
+      colors: colors,
+      disableForReducedMotion: true, // Respect user's reduced motion settings
+      gravity: isMobile ? 2 : 1, // Higher gravity on mobile for shorter particle lifetime
     });
     confetti({
-      particleCount: 100,
+      particleCount,
       angle: 120,
-      spread: 55,
+      spread: isMobile ? 45 : 55,
       origin: { x: 1, y: 0.8 },
-      colors: colors
+      colors: colors,
+      disableForReducedMotion: true,
+      gravity: isMobile ? 2 : 1,
     });
 
     if (Date.now() < end) {
-      requestAnimationFrame(frame);
+      frame = requestAnimationFrame(animate);
     }
-  }());
+  };
+
+  animate();
+  return () => frame && cancelAnimationFrame(frame);
 };
 
 const CountdownPopup: React.FC<CountdownPopupProps> = ({ targetDate, message, open, onClose }) => {
   const [timeLeft, setTimeLeft] = useState(getTimeRemaining(targetDate));
   const [isEnding, setIsEnding] = useState(false);
+  const isMobile = useIsMobile();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -63,7 +75,8 @@ const CountdownPopup: React.FC<CountdownPopupProps> = ({ targetDate, message, op
       // Start celebration effect 3 seconds before end
       if (remaining.total <= 3000 && !isEnding) {
         setIsEnding(true);
-        triggerCelebration();
+        const cleanup = triggerCelebration(isMobile);
+        return () => cleanup();
       }
       
       if (remaining.total <= 0) {
@@ -72,18 +85,19 @@ const CountdownPopup: React.FC<CountdownPopupProps> = ({ targetDate, message, op
         setTimeout(() => {
           navigate('/anniversary');
           onClose();
-        }, 2000);
+        }, isMobile ? 1000 : 2000); // Shorter delay on mobile
       }
     }, 1000);
     return () => clearInterval(timer);
-  }, [targetDate, open, onClose, navigate, isEnding]);
+  }, [targetDate, open, onClose, navigate, isEnding, isMobile]);
 
   const handleGoLive = () => {
-    triggerCelebration();
+    const cleanup = triggerCelebration(isMobile);
     setTimeout(() => {
       navigate('/anniversary');
       onClose();
-    }, 1000);
+      cleanup();
+    }, isMobile ? 800 : 1000); // Shorter delay on mobile
   };
 
   const TimeUnit = ({ value, label }: { value: number; label: string }) => (
