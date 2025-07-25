@@ -25,14 +25,19 @@ import {
   toggleArtistLike,
   getArtistLikeCount,
   isArtistLikedByUser,
-  generateUserId
+  generateUserId,
+  getChatMessages,
+  createChatMessage,
+  subscribeToChatMessages
 } from '../lib/supabase-utils'
 import type { Database } from '../lib/supabase'
+import { useEffect } from 'react'
 
 type Artist = Database['public']['Tables']['artists']['Row']
 type Track = Database['public']['Tables']['tracks']['Row']
 type Set = Database['public']['Tables']['sets']['Row']
 type Event = Database['public']['Tables']['events']['Row']
+type ChatMessage = Database['public']['Tables']['chat_messages']['Row']
 
 // Artist hooks
 export const useArtists = () => {
@@ -290,4 +295,49 @@ export const useToggleArtistLike = () => {
       queryClient.setQueryData(['artist-like-status', artistId, userId], isLiked)
     },
   })
+} 
+
+// Chat message hooks
+export const useChatMessages = () => {
+  return useQuery({
+    queryKey: ['chatMessages'],
+    queryFn: () => getChatMessages(),
+    refetchInterval: 5000, // Refetch every 5 seconds as fallback
+  })
+}
+
+export const useCreateChatMessage = () => {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: ({ tagName, message, isEmoji }: { tagName: string; message: string; isEmoji?: boolean }) =>
+      createChatMessage(tagName, message, isEmoji),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['chatMessages'] })
+    },
+  })
+}
+
+// Custom hook for real-time chat subscription
+export const useChatSubscription = (onNewMessage: (message: ChatMessage) => void) => {
+  const queryClient = useQueryClient()
+  
+  useEffect(() => {
+    const subscription = subscribeToChatMessages((newMessage) => {
+      // Update the cache with the new message
+      queryClient.setQueryData(['chatMessages'], (oldData: ChatMessage[] | undefined) => {
+        if (!oldData) return [newMessage]
+        return [...oldData, newMessage]
+      })
+      
+      // Call the callback
+      onNewMessage(newMessage)
+    })
+    
+    return () => {
+      if (subscription) {
+        subscription.unsubscribe()
+      }
+    }
+  }, [queryClient, onNewMessage])
 } 

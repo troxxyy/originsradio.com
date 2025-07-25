@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 interface CountdownPopupProps {
   targetDate: Date;
@@ -19,6 +21,7 @@ const getTimeRemaining = (target: Date) => {
 
 const CountdownPopup: React.FC<CountdownPopupProps> = ({ targetDate, message, open, onClose }) => {
   const [timeLeft, setTimeLeft] = useState(getTimeRemaining(targetDate));
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!open) return;
@@ -27,11 +30,18 @@ const CountdownPopup: React.FC<CountdownPopupProps> = ({ targetDate, message, op
       setTimeLeft(remaining);
       if (remaining.total <= 0) {
         clearInterval(timer);
+        // Redirect to anniversary page when countdown ends
+        navigate('/anniversary');
         onClose();
       }
     }, 1000);
     return () => clearInterval(timer);
-  }, [targetDate, open, onClose]);
+  }, [targetDate, open, onClose, navigate]);
+
+  const handleGoLive = () => {
+    navigate('/anniversary');
+    onClose();
+  };
 
   const TimeUnit = ({ value, label }: { value: number; label: string }) => (
     <div className="flex flex-col items-center mx-4">
@@ -49,7 +59,7 @@ const CountdownPopup: React.FC<CountdownPopupProps> = ({ targetDate, message, op
       <DialogContent className="max-w-xl border border-gray-700 bg-black/90 backdrop-blur-sm">
         <div className="flex flex-col items-center text-center p-6">
           <DialogTitle className="text-2xl md:text-3xl font-bold text-white mb-2">
-            🎉 3rd Anniversary
+            🎉 3 Years of Origins 🎉
           </DialogTitle>
           <div className="text-gray-300 font-medium mb-6">Origins Radio</div>
           
@@ -77,7 +87,7 @@ const CountdownPopup: React.FC<CountdownPopupProps> = ({ targetDate, message, op
             <TimeUnit value={timeLeft.seconds} label="Seconds" />
           </div>
 
-          <div className="w-full h-0.5 bg-gray-700 rounded-full overflow-hidden">
+          <div className="w-full h-0.5 bg-gray-700 rounded-full overflow-hidden mb-6">
             <div 
               className="h-full bg-white transition-all duration-1000"
               style={{
@@ -86,7 +96,14 @@ const CountdownPopup: React.FC<CountdownPopupProps> = ({ targetDate, message, op
             ></div>
           </div>
           
-          <div className="mt-4 text-sm text-gray-500">
+          <Button 
+            onClick={handleGoLive}
+            className="w-full bg-white text-black hover:bg-gray-200 font-bold py-3 mb-4"
+          >
+            🔴 Join Live Event Now
+          </Button>
+          
+          <div className="text-sm text-gray-500">
             Until Midnight
           </div>
         </div>

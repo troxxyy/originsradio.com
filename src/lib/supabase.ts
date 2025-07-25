@@ -103,6 +103,29 @@ export interface Database {
           created_at?: string
         }
       }
+      chat_messages: {
+        Row: {
+          id: string
+          tag_name: string
+          message: string
+          is_emoji: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          tag_name: string
+          message: string
+          is_emoji?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          tag_name?: string
+          message?: string
+          is_emoji?: boolean
+          created_at?: string
+        }
+      }
       tracks: {
         Row: {
           id: string
