@@ -114,50 +114,50 @@ const Anniversary = () => {
       hour: 12, 
       artist: "CASTOR", 
       setTitle: "Early Afternoon", 
-      genre: "Techno",
-      streamUrl: "" // Paste CASTOR's Google Drive link here (2-hour set: use SAME link for hour 13)
+      genre: "House",
+      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//01%20castor%203rd.m4a" // Paste CASTOR's Google Drive link here (2-hour set: use SAME link for hour 13)
     },
     { 
       hour: 13, 
       artist: "CASTOR", 
       setTitle: "Afternoon Energy", 
-      genre: "Techno",
-      streamUrl: "" // Use SAME link as hour 12 (CASTOR's 2-hour set continues)
+      genre: "House",
+      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//01%20castor%203rd.m4a" // Use SAME link as hour 12 (CASTOR's 2-hour set continues)
     },
     { 
       hour: 14, 
       artist: "MIRAI", 
       setTitle: "Mid-Day Mix", 
-      genre: "Progressive",
-      streamUrl: "" // Paste MIRAI's Google Drive link here (1-hour set)
+      genre: "House",
+      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//B_HAYRI%20HOUSE%20DEEP%20TECH%20SET%20-%20B_HAYRI%20-%20SoundLoadMate.com.mp3" // Paste MIRAI's Google Drive link here (1-hour set)
     },
     { 
       hour: 15, 
       artist: "STEREOCATT", 
       setTitle: "Late Afternoon", 
-      genre: "Melodic Techno",
-      streamUrl: "" // Paste STEREOCATT's Google Drive link here (1-hour set)
+      genre: "House",
+      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//StereoCatt-Origins-01.m4a" // Paste STEREOCATT's Google Drive link here (1-hour set)
     },
     { 
       hour: 16, 
       artist: "Karbo", 
       setTitle: "Evening Warm-up", 
-      genre: "Techno",
+      genre: "House",
       streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//Karbo.m4a" // Paste Karbo's Google Drive link here (1-hour set)
     },
     { 
       hour: 17, 
       artist: "MYK", 
       setTitle: "Sunset Session", 
-      genre: "Deep House",
-      streamUrl: "" // Paste MYK's Google Drive link here (1-hour set)
+      genre: "House",
+      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//MYK!.m4a" // Paste MYK's Google Drive link here (1-hour set)
     },
     { 
       hour: 18, 
       artist: "MYK", 
       setTitle: "Evening Grooves", 
-      genre: "Deep House",
-      streamUrl: "" // Use SAME link as hour 17 (MYK's set continues)
+      genre: "House",
+      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//MYK!.m4a" // Use SAME link as hour 17 (MYK's set continues)
     },
     { 
       hour: 19, 
@@ -185,7 +185,7 @@ const Anniversary = () => {
       artist: "UMUT SEFILOGLU", 
       setTitle: "Deep Night Session", 
       genre: "Techno",
-      streamUrl: "" // Paste UMUT SEFILOGLU's Google Drive link here (1-hour set)
+      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//uut.m4a" // Paste UMUT SEFILOGLU's Google Drive link here (1-hour set)
     },
     { 
       hour: 23, 
