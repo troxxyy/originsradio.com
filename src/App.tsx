@@ -7,7 +7,6 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import LoadingScreen from "./components/LoadingScreen";
 import Navigation from "./components/Navigation";
-import TicketPopup from "./components/TicketPopup";
 import About from "./pages/About";
 
 // Lazy load route components
@@ -58,7 +57,6 @@ const App = () => {
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <TicketPopup />
 
           {/* Loading Screen - Only show when needed */}
           {isLoading && <LoadingScreen onLoadingComplete={handleLoadingComplete} />}
