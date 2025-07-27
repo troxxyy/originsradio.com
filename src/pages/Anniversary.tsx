@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Helmet } from "react-helmet-async";
 import PageLayout from "@/components/layout/PageLayout";
 import Navigation from "@/components/Navigation";
-import LivePlayer from "@/components/music/LivePlayer";
-import LiveChat from "@/components/chat/LiveChat";
-import { Clock, Radio, Calendar, Users, Music, Sparkles } from "lucide-react";
+import LivePlayer, { LivePlayerRef } from "@/components/music/LivePlayer";
+import { Clock, Radio, Calendar, Music, Sparkles, Play } from "lucide-react";
 import ParticlesHeader from "@/components/ui/ParticlesHeader";
 
 interface ArtistSchedule {
@@ -12,25 +11,21 @@ interface ArtistSchedule {
   artist: string;
   setTitle: string;
   genre: string;
-  isLive?: boolean;
-  streamUrl?: string; // Add Google Drive link here
+  streamUrl?: string;
 }
 
 const Anniversary = () => {
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const [currentHour, setCurrentHour] = useState(new Date().getHours());
-  const [isLive, setIsLive] = useState(true);
-  const [listenerCount, setListenerCount] = useState(23);
+  const [currentHour, setCurrentHour] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const playerRef = useRef<LivePlayerRef>(null);
   
-  // Real schedule for 24-hour anniversary event - ADD YOUR GOOGLE DRIVE LINKS HERE
-  // Note: Artists with multi-hour sets use the SAME link for all their hours
+  // Schedule remains the same...
   const schedule: ArtistSchedule[] = [
     { 
       hour: 0, 
       artist: "FURK", 
       setTitle: "Midnight Opening Set", 
       genre: "Electronic", 
-      isLive: true,
       streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//TIDE%20-%20Furk%20-%20SoundLoadMate.com.mp3" // Paste FURK's Google Drive link here (2-hour set: use SAME link for hour 1)
     },
     { 
@@ -196,86 +191,34 @@ const Anniversary = () => {
     },
   ];
 
-  // Update current time every second
-  useEffect(() => {
-    const timer = setInterval(() => {
-      const now = new Date();
-      setCurrentTime(now);
-      setCurrentHour(now.getHours());
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  // Update listener count every minute with small fluctuations
-  useEffect(() => {
-    const initializeListenerCount = () => {
-      const savedCount = localStorage.getItem('origins-listener-count');
-      const now = Date.now();
-      
-      // Start with a base count between 18-28 if no saved count
-      if (!savedCount) {
-        const initialCount = Math.floor(Math.random() * 10) + 18;
-        setListenerCount(initialCount);
-        localStorage.setItem('origins-listener-count', initialCount.toString());
-        localStorage.setItem('origins-listener-last-update', now.toString());
-        return;
-      }
-      
-      setListenerCount(parseInt(savedCount));
-    };
-
-    const updateListeners = () => {
-      setListenerCount(prevCount => {
-        // More dramatic changes: -15% to +20%
-        const changePercent = (Math.random() * 35 - 15) / 100;
-        const change = Math.round(prevCount * changePercent);
-        const newCount = Math.max(15, Math.min(45, prevCount + change));
-        
-        // Save to localStorage
-        localStorage.setItem('origins-listener-count', newCount.toString());
-        localStorage.setItem('origins-listener-last-update', Date.now().toString());
-        
-        return newCount;
-      });
-    };
-
-    // Initialize the count on component mount
-    initializeListenerCount();
-    
-    // Update more frequently - every 5 seconds
-    const listenerTimer = setInterval(updateListeners, 20000);
-
-    return () => clearInterval(listenerTimer);
-  }, []);
-
-  // Get current and next artist
+  // Get current artist
   const currentArtist = schedule.find(s => s.hour === currentHour) || schedule[0];
-  const nextArtist = schedule.find(s => s.hour === (currentHour + 1) % 24) || schedule[0];
 
-  // Calculate time until next artist
-  const getTimeUntilNext = () => {
-    const now = new Date();
-    const nextHour = new Date();
-    nextHour.setHours(currentHour + 1, 0, 0, 0);
-    const diff = nextHour.getTime() - now.getTime();
-    const minutes = Math.floor(diff / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-    return { minutes, seconds };
+  // Handle set selection
+  const handleSetSelect = (hour: number) => {
+    setCurrentHour(hour);
+    // Reset and play the new set
+    if (playerRef.current) {
+      playerRef.current.reset();
+      playerRef.current.play().catch(console.error);
+    }
   };
 
-  const timeUntilNext = getTimeUntilNext();
+  // Handle playback start
+  const handlePlaybackStart = () => {
+    setIsPlaying(true);
+  };
 
+  // Scroll to top when component mounts
   useEffect(() => {
-    // Scroll to top when component mounts
     window.scrollTo(0, 0);
   }, []);
 
   return (
     <>
       <Helmet>
-        <title>3 Years of Origins - Origins Radio</title>
-        <meta name="description" content="Join us for our 24-hour anniversary celebration with live sets from amazing artists every hour!" />
+        <title>3 Years of Origins - Full Recording | Origins Radio</title>
+        <meta name="description" content="Experience our epic 24-hour anniversary celebration featuring amazing sets from our talented artists." />
       </Helmet>
       
       <PageLayout customBackground="bg-gradient-to-br from-blue-950 via-gray-900 to-cyan-950">
@@ -289,16 +232,13 @@ const Anniversary = () => {
           <div className="absolute -bottom-40 right-1/3 w-72 h-72 bg-sky-500/4 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }}></div>
         </div>
         
-        {/* Live Event Header */}
+        {/* Event Header */}
         <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-8 relative z-10">
           <div className="text-center mb-16">
-            {/* Live Status */}
-            <div className="inline-flex items-center gap-2 bg-red-500/20 backdrop-blur-sm border border-red-500/30 rounded-full px-4 py-2 mb-8">
-              <div className="relative">
-                <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                <div className="absolute inset-0 w-3 h-3 bg-red-500/30 rounded-full animate-ping"></div>
-              </div>
-              <span className="text-red-400 font-semibold text-sm uppercase tracking-wide">Live Now</span>
+            {/* Event Status */}
+            <div className="inline-flex items-center gap-2 bg-purple-500/20 backdrop-blur-sm border border-purple-500/30 rounded-full px-4 py-2 mb-8">
+              <Play className="w-4 h-4 text-purple-400" />
+              <span className="text-purple-400 font-semibold text-sm uppercase tracking-wide">Full Recording</span>
             </div>
             
             {/* Main Title */}
@@ -313,7 +253,7 @@ const Anniversary = () => {
             {/* Event Description */}
             <div className="max-w-2xl mx-auto">
               <p className="text-xl text-gray-400 mb-6 leading-relaxed">
-                Join us for 24 hours of non-stop music as we celebrate three incredible years of Origins Radio
+                Experience our epic 24-hour anniversary celebration featuring amazing sets from our talented artists
               </p>
               
               {/* Event Stats */}
@@ -328,23 +268,22 @@ const Anniversary = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <Radio className="w-5 h-5" />
-                  <span className="font-medium">Live Stream</span>
+                  <span className="font-medium">Full Recording</span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Current Artist Section */}
+          {/* Current Set Section */}
           <div className="relative group mb-8">
             <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent rounded-xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
             <div className="relative bg-black/60 backdrop-blur-xl border border-white/10 rounded-xl p-8 shadow-2xl hover:shadow-white/5 transition-all duration-500">
               <div className="flex items-center gap-4 mb-6">
                 <div className="relative">
                   <Radio className="w-8 h-8 text-white" />
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
                 </div>
                 <div>
-                  <h2 className="text-3xl font-bold text-white tracking-tight">Now Playing</h2>
+                  <h2 className="text-3xl font-bold text-white tracking-tight">Currently Playing</h2>
                   <p className="text-gray-400 font-mono">Hour {String(currentHour).padStart(2, '0')}:00 - {String((currentHour + 1) % 24).padStart(2, '0')}:00</p>
                 </div>
               </div>
@@ -358,56 +297,28 @@ const Anniversary = () => {
                     {currentArtist.genre}
                   </div>
                 </div>
-                
-                <div className="flex flex-col justify-center">
-                  <div className="text-right space-y-3">
-                    <p className="text-gray-400 text-sm uppercase tracking-wider">Next up in:</p>
-                    <div className="font-mono text-3xl text-white font-bold tracking-wider">
-                      {String(timeUntilNext.minutes).padStart(2, '0')}:
-                      {String(timeUntilNext.seconds).padStart(2, '0')}
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-white font-medium">{nextArtist.artist}</p>
-                      <p className="text-gray-400 text-sm">{nextArtist.setTitle}</p>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
 
-          {/* Live Player Interface */}
+          {/* Player Interface */}
           <div className="relative group mb-8">
-            <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-orange-500/10 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-            <div className="relative bg-black/60 backdrop-blur-xl border border-white/10 rounded-xl p-6 shadow-2xl hover:shadow-red-500/5 transition-all duration-500">
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+            <div className="relative bg-black/60 backdrop-blur-xl border border-white/10 rounded-xl p-6 shadow-2xl hover:shadow-purple-500/5 transition-all duration-500">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <div className="w-5 h-5 bg-red-500 rounded-full animate-pulse"></div>
-                    <div className="absolute inset-0 w-5 h-5 bg-red-500/30 rounded-full animate-ping"></div>
-                  </div>
-                  <span className="text-white font-semibold text-lg">Origins Radio Live Stream</span>
-                </div>
-                <div className="flex items-center gap-3 text-gray-400">
-                  <Users className="w-4 h-4" />
-                  <span className="font-mono">{listenerCount} listeners</span>
+                  <span className="text-white font-semibold text-lg">Anniversary Recording</span>
                 </div>
               </div>
               
               <LivePlayer
+                ref={playerRef}
                 currentArtist={currentArtist.artist}
                 currentSet={currentArtist.setTitle}
-                isLive={true}
+                isLive={false}
                 streamUrl={currentArtist.streamUrl}
+                onPlaybackStart={handlePlaybackStart}
               />
-            </div>
-          </div>
-
-          {/* Live Chat Section */}
-          <div className="relative group mb-8">
-            <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-purple-500/10 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-            <div className="relative">
-              <LiveChat />
             </div>
           </div>
 
@@ -417,15 +328,16 @@ const Anniversary = () => {
             <div className="relative bg-black/60 backdrop-blur-xl border border-white/10 rounded-xl p-6 shadow-2xl hover:shadow-white/5 transition-all duration-500">
               <div className="flex items-center gap-3 mb-6">
                 <Calendar className="w-6 h-6 text-white" />
-                <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight">24-Hour Schedule</h2>
+                <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Full Event Schedule</h2>
                 <div className="hidden md:block flex-1 h-px bg-gradient-to-r from-white/20 to-transparent"></div>
               </div>
               
               <div className="grid gap-2 max-h-[70vh] md:max-h-96 overflow-y-auto custom-scrollbar">
                 {schedule.map((slot, index) => (
-                  <div
+                  <button
                     key={slot.hour}
-                    className={`group/item flex flex-col md:flex-row md:items-center justify-between p-3 md:p-4 rounded-lg border transition-all duration-300 hover:scale-[1.01] ${
+                    onClick={() => handleSetSelect(slot.hour)}
+                    className={`w-full text-left group/item flex flex-col md:flex-row md:items-center justify-between p-3 md:p-4 rounded-lg border transition-all duration-300 hover:scale-[1.01] ${
                       slot.hour === currentHour
                         ? 'bg-white/10 border-white/30 shadow-lg shadow-white/5'
                         : 'bg-gray-800/30 border-gray-600/50 hover:bg-gray-700/40 hover:border-gray-500/50'
@@ -441,9 +353,9 @@ const Anniversary = () => {
                       </div>
                       {slot.hour === currentHour && (
                         <div className="relative md:hidden">
-                          <span className="text-xs text-red-400 font-medium uppercase tracking-wider flex items-center gap-2">
-                            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-                            ON AIR
+                          <span className="text-xs text-purple-400 font-medium uppercase tracking-wider flex items-center gap-2">
+                            <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+                            Playing
                           </span>
                         </div>
                       )}
@@ -459,15 +371,15 @@ const Anniversary = () => {
                         {slot.genre}
                       </span>
                       {slot.hour === currentHour && (
-                        <div className="hidden md:block text-xs text-red-400 font-medium uppercase tracking-wider">
+                        <div className="hidden md:block text-xs text-purple-400 font-medium uppercase tracking-wider">
                           <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-                            ON AIR
+                            <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+                            Playing
                           </div>
                         </div>
                       )}
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>

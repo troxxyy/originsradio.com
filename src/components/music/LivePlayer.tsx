@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 
 interface LivePlayerProps {
@@ -6,17 +6,22 @@ interface LivePlayerProps {
   currentArtist: string;
   currentSet: string;
   isLive?: boolean;
+  onPlaybackStart?: () => void;
 }
 
-const LivePlayer: React.FC<LivePlayerProps> = ({ 
-  // For Google Drive links, use the direct download format:
-  // https://drive.google.com/uc?export=download&id=YOUR_FILE_ID
-  // Get the FILE_ID from the shareable link: https://drive.google.com/file/d/FILE_ID/view
-  streamUrl = "/sets/AL2 Origins Radio.mp3", // Fallback if no URL provided
+export interface LivePlayerRef {
+  play: () => Promise<void>;
+  pause: () => void;
+  reset: () => void;
+}
+
+const LivePlayer = forwardRef<LivePlayerRef, LivePlayerProps>(({ 
+  streamUrl = "/sets/AL2 Origins Radio.mp3",
   currentArtist,
   currentSet,
-  isLive = true 
-}) => {
+  isLive = true,
+  onPlaybackStart
+}, ref) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [volume, setVolume] = useState(0.8);
   const [isMuted, setIsMuted] = useState(false);
@@ -26,6 +31,27 @@ const LivePlayer: React.FC<LivePlayerProps> = ({
   // Use provided streamUrl or fallback to default
   const audioSrc = streamUrl || "/sets/AL2 Origins Radio.mp3";
 
+  // Expose methods to parent component
+  useImperativeHandle(ref, () => ({
+    play: async () => {
+      if (audioRef.current) {
+        await audioRef.current.play();
+        setIsPlaying(true);
+      }
+    },
+    pause: () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      }
+    },
+    reset: () => {
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+      }
+    }
+  }));
+
   // Calculate the current position within the hour
   const getCurrentPositionInHour = () => {
     const now = new Date();
@@ -34,7 +60,7 @@ const LivePlayer: React.FC<LivePlayerProps> = ({
     return (minutes * 60) + seconds; // Total seconds elapsed in current hour
   };
 
-  // Auto-play when component mounts with correct time position
+  // Auto-play when component mounts or URL changes
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -54,35 +80,30 @@ const LivePlayer: React.FC<LivePlayerProps> = ({
           setTimeout(resolve, 3000);
         });
 
-        // Set the current time based on position within the hour
-        const positionInHour = getCurrentPositionInHour();
-        
-        // For a typical 1-hour set, we want to sync with the hour
-        // If the audio is shorter, we'll loop it within the hour
-        if (audio.duration && !isNaN(audio.duration)) {
-          // If we know the duration, calculate the correct position
-          const loopPosition = positionInHour % audio.duration;
-          audio.currentTime = loopPosition;
+        if (!isLive) {
+          // For recorded sets, always start from beginning
+          audio.currentTime = 0;
         } else {
-          // If duration is unknown, use a reasonable approach
-          // Assume most sets are around 60 minutes (3600 seconds)
-          const estimatedDuration = 3600; // 1 hour
-          const loopPosition = positionInHour % estimatedDuration;
-          audio.currentTime = Math.min(loopPosition, audio.duration || loopPosition);
+          // For live content, sync with current time
+          const positionInHour = getCurrentPositionInHour();
+          if (audio.duration && !isNaN(audio.duration)) {
+            const loopPosition = positionInHour % audio.duration;
+            audio.currentTime = loopPosition;
+          }
         }
 
         await audio.play();
         setIsPlaying(true);
+        onPlaybackStart?.();
       } catch (error) {
         console.error('Auto-play failed:', error);
-        // Auto-play might be blocked by browser, but that's okay
       } finally {
         setIsLoading(false);
       }
     };
 
     startPlayback();
-  }, [streamUrl]); // Re-run when stream URL changes (new artist)
+  }, [streamUrl, isLive, onPlaybackStart]);
 
   // Update position when artist changes (new hour)
   useEffect(() => {
@@ -175,8 +196,7 @@ const LivePlayer: React.FC<LivePlayerProps> = ({
         ref={audioRef}
         src={audioSrc}
         preload="auto"
-        loop={false} // We handle looping manually for proper sync
-        autoPlay
+        loop={false}
       />
       
       {/* Live Indicator */}
@@ -291,6 +311,8 @@ const LivePlayer: React.FC<LivePlayerProps> = ({
       `}</style>
     </div>
   );
-};
+});
+
+LivePlayer.displayName = 'LivePlayer';
 
 export default LivePlayer; 
