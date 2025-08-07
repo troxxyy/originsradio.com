@@ -246,6 +246,41 @@ export interface Database {
           updated_at?: string
         }
       }
+      our_work_projects: {
+        Row: {
+          id: string
+          title: string
+          description: string
+          image_url: string
+          tags: string[]
+          date: string | null
+          upcoming: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          description: string
+          image_url: string
+          tags?: string[]
+          date?: string | null
+          upcoming?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          description?: string
+          image_url?: string
+          tags?: string[]
+          date?: string | null
+          upcoming?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never

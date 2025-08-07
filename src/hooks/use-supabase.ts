@@ -38,6 +38,7 @@ type Track = Database['public']['Tables']['tracks']['Row']
 type Set = Database['public']['Tables']['sets']['Row']
 type Event = Database['public']['Tables']['events']['Row']
 type ChatMessage = Database['public']['Tables']['chat_messages']['Row']
+type OurWorkProject = Database['public']['Tables']['our_work_projects']['Row']
 
 // Artist hooks
 export const useArtists = () => {
@@ -341,3 +342,14 @@ export const useChatSubscription = (onNewMessage: (message: ChatMessage) => void
     }
   }, [queryClient, onNewMessage])
 } 
+
+// Our Work hooks
+import { getOurWorkProjects } from '../lib/supabase-utils'
+
+export const useOurWorkProjects = () => {
+  return useQuery<OurWorkProject[]>({
+    queryKey: ['our_work_projects'],
+    queryFn: getOurWorkProjects,
+    staleTime: 5 * 60 * 1000,
+  })
+}

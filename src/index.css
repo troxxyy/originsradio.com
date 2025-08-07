@@ -224,6 +224,28 @@
   animation: fade-in 1s ease-out forwards;
 }
 
+/* Marquee animation improvements */
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee-very-slow {
+  animation: marquee 40s linear infinite;
+  will-change: transform;
+}
+
+/* Hide marquee when navigating */
+.navigating .animate-marquee-very-slow {
+  animation: none;
+  opacity: 0;
+  transition: opacity 0.1s ease-out;
+}
+
 /* Team member hover effect */
 .team-member-card {
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);

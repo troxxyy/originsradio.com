@@ -12,7 +12,9 @@ import About from "./pages/About";
 
 // Lazy load route components
 const Index = lazy(() => import("./pages/Index"));
-const OurWork = lazy(() => import("./pages/OurWork"));
+const Events = lazy(() => import("./pages/Events"));
+const EventDetail = lazy(() => import("./pages/EventDetail"));
+const InviteForm = lazy(() => import("./pages/InviteForm"));
 const NotFound = lazy(() => import("./pages/404"));
 const GoCrazy = lazy(() => import("./pages/3dvs"));
 const Artists = lazy(() => import("./pages/Artists"));
@@ -74,9 +76,19 @@ const App = () => {
                       <Index />
                     </RouteTracker>
                   } />
-                  <Route path="/ourwork" element={
+                  <Route path="/events" element={
                     <RouteTracker>
-                      <OurWork />
+                      <Events />
+                    </RouteTracker>
+                  } />
+                  <Route path="/events/:eventSlug" element={
+                    <RouteTracker>
+                      <EventDetail />
+                    </RouteTracker>
+                  } />
+                  <Route path="/invite/:eventSlug" element={
+                    <RouteTracker>
+                      <InviteForm />
                     </RouteTracker>
                   } />
                   <Route path="/gocrazy" element={

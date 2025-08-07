@@ -47,7 +47,7 @@ const generateSitemap = async () => {
         priority: 0.7
       },
       {
-        url: 'https://originsradio.com/ourwork',
+        url: 'https://originsradio.com/events',
         lastmod: new Date().toISOString(),
         changefreq: 'weekly',
         priority: 0.8
@@ -120,7 +120,7 @@ Disallow: /api/
 # Allow important pages
 Allow: /artists/
 Allow: /about
-Allow: /ourwork
+Allow: /events
 Allow: /gocrazy
 
 # Sitemap location

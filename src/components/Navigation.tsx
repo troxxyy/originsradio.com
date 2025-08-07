@@ -1,4 +1,4 @@
-import { Home, User, Info, Music, Users, Calendar } from "lucide-react";
+import { Home, User, Info, Music, Users, Ticket } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -10,7 +10,7 @@ const Navigation = () => {
   
   const links = [
     { name: "", icon: Home, href: "/" },
-    { name: "OurWork", icon: Calendar, href: "/ourwork" },
+    { name: "Events", icon: Ticket, href: "/events" },
     { name: "Artists", icon: Users, href: "/artists" },
     { name: "About", icon: Info, href: "/about" },
     { name: "3DVS", icon: Music, href: "/gocrazy", needsTooltip: true },
