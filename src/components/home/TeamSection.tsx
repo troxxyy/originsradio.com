@@ -65,14 +65,22 @@ const TeamSection = () => {
     { 
       name: "Kaan Şimşir", 
       role: "CEO", 
-      image: "/team/castor.JPG",
+      image: "/team/castor.jpeg",
+
+      
       bio: "Founder and visionary behind Origins Radio, bringing together technology and music to create unique experiences."
     },
     { 
       name: "Sina Çetinkaya", 
       role: "CTO", 
-      image: "/team/sina.JPG",
+      image: "/team/sina.jpeg",
       bio: "Drives technological innovation at Origins Radio, developing cutting-edge solutions for immersive experiences."
+    },
+    { 
+      name: "Rahmi Mert Üner", 
+      role: "Creative Director", 
+      image: "/team/rahmi.jpeg",
+      bio: "Creative visionary behind Origins Radio's visual identity and artistic direction, bringing innovative design concepts to life."
     }
   ];
 

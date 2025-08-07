@@ -84,8 +84,8 @@ export default {
           "100%": { transform: "scale(1)", opacity: "1" },
         },
         marquee: {
-          '0%': { transform: 'translateX(100%)' },
-          '100%': { transform: 'translateX(-100%)' },
+          '0%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(-50%)' },
         },
       },
       animation: {
@@ -96,6 +96,8 @@ export default {
         pulse: "pulse 3s ease-in-out infinite",
         "scale-in": "scale-in 0.2s ease-out",
         marquee: "marquee 15s linear infinite",
+        "marquee-slow": "marquee 28s linear infinite",
+        "marquee-very-slow": "marquee 40s linear infinite",
       },
     },
   },

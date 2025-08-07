@@ -6,6 +6,7 @@ type Track = Database['public']['Tables']['tracks']['Row']
 type Set = Database['public']['Tables']['sets']['Row']
 type Event = Database['public']['Tables']['events']['Row']
 type ChatMessage = Database['public']['Tables']['chat_messages']['Row']
+type OurWorkProject = Database['public']['Tables']['our_work_projects']['Row']
 
 // Utility function to generate slug from name
 export const generateSlug = (name: string): string => {
@@ -693,3 +694,25 @@ export const subscribeToChatMessages = (callback: (message: ChatMessage) => void
   
   return subscription
 } 
+
+// Our Work utilities
+export const getOurWorkProjects = async (): Promise<OurWorkProject[]> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, returning empty our_work_projects array')
+    return []
+  }
+
+  const supabase = getSupabaseClient()
+  const { data, error } = await supabase
+    .from('our_work_projects')
+    .select('*')
+    .order('upcoming', { ascending: false })
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    console.error('Error fetching our_work_projects:', error)
+    throw error
+  }
+
+  return data || []
+}
