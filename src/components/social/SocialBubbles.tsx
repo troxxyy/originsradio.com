@@ -1,20 +1,22 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Youtube, Instagram, Cloud } from "lucide-react";
+import { Youtube, Instagram, Cloud, Heart } from "lucide-react";
 
 const SocialBubbles = () => {
   // State for random positions
   const [positions, setPositions] = useState({
     youtube: { top: "15%", left: "8%" },
     instagram: { top: "65%", right: "12%" },
-    soundcloud: { top: "30%", right: "20%" }
+    soundcloud: { top: "30%", right: "20%" },
+    coffee: { top: "80%", left: "6%" }
   });
 
   // State to track popping animations
   const [poppingState, setPoppingState] = useState({
     youtube: false,
     instagram: false,
-    soundcloud: false
+    soundcloud: false,
+    coffee: false
   });
 
   // Generate random positions on component mount
@@ -39,10 +41,17 @@ const SocialBubbles = () => {
       const soundcloudTop = soundcloudTopOptions[Math.floor(Math.random() * soundcloudTopOptions.length)];
       const soundcloudRight = soundcloudRightOptions[Math.floor(Math.random() * soundcloudRightOptions.length)];
       
+      // Donation heart - bottom left area (better spacing)
+      const coffeeTopOptions = ["75%", "80%", "85%"];
+      const coffeeLeftOptions = ["3%", "6%", "9%"];
+      const coffeeTop = coffeeTopOptions[Math.floor(Math.random() * coffeeTopOptions.length)];
+      const coffeeLeft = coffeeLeftOptions[Math.floor(Math.random() * coffeeLeftOptions.length)];
+      
       setPositions({
         youtube: { top: youtubeTop, left: youtubeLeft },
         instagram: { top: instagramTop, right: instagramRight },
-        soundcloud: { top: soundcloudTop, right: soundcloudRight }
+        soundcloud: { top: soundcloudTop, right: soundcloudRight },
+        coffee: { top: coffeeTop, left: coffeeLeft }
       });
     };
     
@@ -204,6 +213,45 @@ const SocialBubbles = () => {
             }}
           >
             <RadiatingLines color="orange" />
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      <AnimatePresence>
+        {!poppingState.coffee && (
+          <motion.div 
+            className="w-28 h-28 rounded-full glass-social flex items-center justify-center text-white/90 hover:text-white transition-all duration-300 hover:scale-110 hover:shadow-glow fixed cursor-pointer overflow-hidden"
+            style={{ top: positions.coffee.top, left: positions.coffee.left }}
+            initial={{ x: -50, opacity: 0 }}
+            animate={{ 
+              x: 0, 
+              opacity: 1,
+              y: [0, -35, 0, 35, 0],
+              rotate: [0, 3, 0, -3, 0],
+              transition: { 
+                x: { duration: 0.5 },
+                opacity: { duration: 0.5 },
+                y: { repeat: Infinity, duration: 7, ease: "easeInOut" },
+                rotate: { repeat: Infinity, duration: 7, ease: "easeInOut" }
+              }
+            }}
+            whileHover={{ rotate: -8, scale: 1.1 }}
+            onClick={() => handleBubblePop('coffee', 'https://nowpayments.io/payment/?iid=5015396769&source=button')}
+          >
+            <Heart size={56} className="text-white" />
+          </motion.div>
+        )}
+        {poppingState.coffee && (
+          <motion.div
+            className="w-28 h-28 rounded-full fixed"
+            style={{ top: positions.coffee.top, left: positions.coffee.left }}
+            initial={{ scale: 1 }}
+            animate={{ 
+              scale: [1, 1.2, 0], 
+              transition: { duration: 0.5, times: [0, 0.2, 1] }
+            }}
+          >
+            <RadiatingLines color="red" />
           </motion.div>
         )}
       </AnimatePresence>
