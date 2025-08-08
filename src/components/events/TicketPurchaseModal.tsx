@@ -34,6 +34,7 @@ const TicketPurchaseModal = ({
   const [selectedTierId, setSelectedTierId] = useState<string>(tiers[0]?.id ?? "");
   const [quantity, setQuantity] = useState<number>(1);
   const [email, setEmail] = useState<string>("");
+  const isEmailValid = useMemo(() => /[^\s@]+@[^\s@]+\.[^\s@]+/.test(email), [email]);
   const [isIssuing, setIsIssuing] = useState<boolean>(false);
   const [issueError, setIssueError] = useState<string | null>(null);
   const [issuedTickets, setIssuedTickets] = useState<
@@ -68,7 +69,10 @@ const TicketPurchaseModal = ({
       const accessToken = sessionRes?.session?.access_token || (import.meta as any).env?.VITE_SUPABASE_ANON_KEY;
 
       const { data, error } = await supabase.functions.invoke("issue-ticket", {
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          apikey: (import.meta as any).env?.VITE_SUPABASE_ANON_KEY,
+        },
         body: {
           email: email || undefined,
           eventTitle,
@@ -79,6 +83,7 @@ const TicketPurchaseModal = ({
           quantity: Math.max(1, quantity),
           price: selectedTier?.price ?? 0,
           currency,
+          verifyBaseUrl: window.location.origin,
         },
       });
 
@@ -230,7 +235,7 @@ const TicketPurchaseModal = ({
                 )}
 
                 <button
-                  disabled={total > 0 && !ticketUrl || isIssuing}
+                  disabled={(total === 0 && !isEmailValid) || (total > 0 && !ticketUrl) || isIssuing}
                   onClick={() => {
                     if (total === 0) {
                       issueFreeTickets();
@@ -239,10 +244,10 @@ const TicketPurchaseModal = ({
                     }
                   }}
                   className={`w-full rounded-xl px-5 py-3 font-medium transition ${
-                    (total === 0 || ticketUrl) ? "bg-white text-black hover:bg-white/90" : "bg-white/10 text-white/50 cursor-not-allowed"
+                    (total === 0 ? (isEmailValid ? "bg-white text-black hover:bg-white/90" : "bg-white/10 text-white/50 cursor-not-allowed") : (ticketUrl ? "bg-white text-black hover:bg-white/90" : "bg-white/10 text-white/50 cursor-not-allowed"))
                   }`}
                 >
-                  {isIssuing ? "Issuing..." : "Continue to checkout"}
+                  {isIssuing ? "Issuing..." : total === 0 ? (isEmailValid ? "Get Free Ticket" : "Enter email to get ticket") : "Continue to checkout"}
                 </button>
 
                 <details className="rounded-xl border border-white/10 bg-white/5 p-4 text-white">
