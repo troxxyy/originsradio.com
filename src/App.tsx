@@ -14,6 +14,7 @@ import About from "./pages/About";
 const Index = lazy(() => import("./pages/Index"));
 const Events = lazy(() => import("./pages/Events"));
 const EventDetail = lazy(() => import("./pages/EventDetail"));
+const TicketVerify = lazy(() => import("./pages/TicketVerify"));
 const InviteForm = lazy(() => import("./pages/InviteForm"));
 const NotFound = lazy(() => import("./pages/404"));
 const GoCrazy = lazy(() => import("./pages/3dvs"));
@@ -89,6 +90,11 @@ const App = () => {
                   <Route path="/invite/:eventSlug" element={
                     <RouteTracker>
                       <InviteForm />
+                    </RouteTracker>
+                  } />
+                  <Route path="/ticket/:code" element={
+                    <RouteTracker>
+                      <TicketVerify />
                     </RouteTracker>
                   } />
                   <Route path="/gocrazy" element={

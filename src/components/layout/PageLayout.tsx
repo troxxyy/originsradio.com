@@ -1,4 +1,4 @@
-import { ReactNode, useContext } from "react";
+import { ReactNode, CSSProperties } from "react";
 import Navigation from "@/components/Navigation";
 
 
@@ -6,17 +6,26 @@ interface PageLayoutProps {
   children: ReactNode;
   backgroundImage?: string;
   customBackground?: string;
+  customBackgroundStyle?: CSSProperties;
 }
 
-const PageLayout = ({ children, backgroundImage = "/backgr.jpg", customBackground }: PageLayoutProps) => {
+const PageLayout = ({
+  children,
+  backgroundImage = "/backgr.jpg",
+  customBackground,
+  customBackgroundStyle,
+}: PageLayoutProps) => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-start sm:justify-center relative overflow-hidden">
   
       
       {/* Background image with effects */}
       <div className="absolute inset-0 z-10">
-        {customBackground ? (
-          <div className={`absolute inset-0 ${customBackground}`}></div>
+        {customBackground || customBackgroundStyle ? (
+          <div
+            className={`absolute inset-0 ${customBackground ?? ""}`}
+            style={customBackgroundStyle}
+          ></div>
         ) : (
           <>
             <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-20"></div>
