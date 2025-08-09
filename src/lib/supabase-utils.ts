@@ -8,13 +8,23 @@ type Event = Database['public']['Tables']['events']['Row']
 type ChatMessage = Database['public']['Tables']['chat_messages']['Row']
 type OurWorkProject = Database['public']['Tables']['our_work_projects']['Row']
 
-// Utility function to generate slug from name
+// Utility function to generate slug from name (kept for backward compatibility)
 export const generateSlug = (name: string): string => {
   return name
     .toLowerCase()
     .replace(/[^a-z0-9\s]+/g, '') // Remove special characters but keep spaces
     .replace(/\s+/g, '') // Remove all spaces
     .trim()
+}
+
+// Utility function to generate random slug for events
+export const generateRandomSlug = (): string => {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
+  let result = ''
+  for (let i = 0; i < 8; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  return result
 }
 
 // Artist utilities
@@ -715,4 +725,26 @@ export const getOurWorkProjects = async (): Promise<OurWorkProject[]> => {
   }
 
   return data || []
+}
+
+// Get our work project by slug
+export const getOurWorkProjectBySlug = async (slug: string): Promise<OurWorkProject | null> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, returning null for our_work_project by slug')
+    return null
+  }
+
+  const supabase = getSupabaseClient()
+  const { data, error } = await supabase
+    .from('our_work_projects')
+    .select('*')
+    .eq('slug', slug)
+    .maybeSingle()
+
+  if (error) {
+    console.error('Error fetching our_work_project by slug:', error)
+    return null
+  }
+
+  return data
 }

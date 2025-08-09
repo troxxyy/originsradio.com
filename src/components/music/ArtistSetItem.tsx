@@ -1,5 +1,5 @@
 import { useIsMobile } from '../../hooks/use-mobile';
-import ProgressBar from './ProgressBar';
+import WaveformPreview from './WaveformPreview';
 
 export interface ArtistSetEvent {
   title: string;
@@ -7,6 +7,7 @@ export interface ArtistSetEvent {
   date: string;
   delay?: string;
   audioSrc: string;
+  peaksUrl?: string;
   artistPhoto?: string;
   setNumber?: number;
   artistSlug?: string;
@@ -71,7 +72,16 @@ const ArtistSetItem = ({ event, index, onPlay, onSeek, isPlaying, progress }: Ar
         </div>
       </div>
       
-      <ProgressBar progress={progress} onSeek={onSeek} />
+      <div className="mt-3">
+        <WaveformPreview 
+          audioUrl={event.audioSrc} 
+          peaksUrl={event.peaksUrl} 
+          height={72}
+          progress={progress}
+          onSeek={onSeek}
+          interactive={true}
+        />
+      </div>
       
       {/* Consolidated playing indicator */}
       {isPlaying && (
@@ -82,3 +92,4 @@ const ArtistSetItem = ({ event, index, onPlay, onSeek, isPlaying, progress }: Ar
 };
 
 export default ArtistSetItem; 
+

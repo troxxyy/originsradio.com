@@ -1,4 +1,4 @@
-import { Home, User, Info, Music, Users, Ticket } from "lucide-react";
+import { Home, Info, Music, Users, Ticket } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -14,7 +14,6 @@ const Navigation = () => {
     { name: "Artists", icon: Users, href: "/artists" },
     { name: "About", icon: Info, href: "/about" },
     { name: "3DVS", icon: Music, href: "/gocrazy", needsTooltip: true },
-    // { name: "Admin", icon: User, href: "/admin" }, // Deactivated admin link
   ];
 
   // Define styles based on current page

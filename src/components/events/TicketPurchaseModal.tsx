@@ -107,23 +107,23 @@ const TicketPurchaseModal = ({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-md p-4"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-md p-2 sm:p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
         >
           <motion.div
-            className="w-full max-w-2xl rounded-2xl border border-white/10 bg-black/70 text-white shadow-2xl"
+            className="w-full max-w-2xl max-h-[95vh] overflow-y-auto rounded-2xl border border-white/10 bg-black/70 text-white shadow-2xl"
             initial={{ scale: 0.96, y: 20, opacity: 0 }}
             animate={{ scale: 1, y: 0, opacity: 1 }}
             exit={{ scale: 0.98, y: 8, opacity: 0 }}
             transition={{ type: "spring", damping: 26, stiffness: 300 }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-start justify-between gap-4 border-b border-white/10 p-6">
+            <div className="flex items-start justify-between gap-4 border-b border-white/10 p-4 sm:p-6">
               <div>
-                <h3 className="text-xl font-semibold">{eventTitle}</h3>
+                <h3 className="text-lg sm:text-xl font-semibold">{eventTitle}</h3>
                 {(eventDate || eventLocation) && (
                   <p className="mt-1 text-sm text-gray-300">
                     {eventDate ? `${eventDate}` : ""}
@@ -132,31 +132,31 @@ const TicketPurchaseModal = ({
                   </p>
                 )}
               </div>
-              <button aria-label="Close" onClick={onClose} className="rounded-full p-2 text-white/80 hover:bg-white/10">
+              <button aria-label="Close" onClick={onClose} className="rounded-full p-2 text-white/80 hover:bg-white/10 min-h-[44px] min-w-[44px] flex items-center justify-center">
                 <X size={20} />
               </button>
             </div>
 
-            <div className="grid grid-cols-1 gap-6 p-6 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-6 p-4 sm:p-6 md:grid-cols-2">
               <div className="space-y-4">
-                <label className="block text-sm text-gray-300">Ticket type</label>
+                <label className="block text-sm sm:text-base text-gray-300">Ticket type</label>
                 <div className="space-y-3">
                   {tiers.map((tier) => (
                     <button
                       key={tier.id}
                       onClick={() => setSelectedTierId(tier.id)}
-                      className={`w-full rounded-xl border p-4 text-left transition ${
+                      className={`w-full rounded-xl border p-4 text-left transition min-h-[56px] ${
                         (selectedTier?.id ?? "") === tier.id ? "border-white/60 bg-white/10" : "border-white/10 hover:border-white/20"
                       }`}
                     >
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="font-medium">{tier.name}</div>
+                          <div className="font-medium text-sm sm:text-base">{tier.name}</div>
                           {typeof tier.available === "number" && (
                             <div className="text-xs text-gray-400">{tier.available} left</div>
                           )}
                         </div>
-                        <div className="text-right text-sm text-gray-200">
+                        <div className="text-right text-sm sm:text-base text-gray-200">
                           {tier.price === 0 ? "0 Turkish Lira" : new Intl.NumberFormat(undefined, { style: "currency", currency }).format(tier.price)}
                         </div>
                       </div>
@@ -167,10 +167,10 @@ const TicketPurchaseModal = ({
 
               <div className="space-y-5">
                 <div>
-                  <label htmlFor="ticket-quantity" className="mb-2 block text-sm text-gray-300">Quantity</label>
+                  <label htmlFor="ticket-quantity" className="mb-2 block text-sm sm:text-base text-gray-300">Quantity</label>
                   <div className="flex items-center gap-3">
                     <button
-                      className="rounded-lg border border-white/10 px-3 py-2 text-lg hover:border-white/20"
+                      className="rounded-lg border border-white/10 px-4 py-3 text-lg hover:border-white/20 min-h-[44px] min-w-[44px] flex items-center justify-center"
                       onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                     >
                       −
@@ -182,10 +182,10 @@ const TicketPurchaseModal = ({
                       aria-label="Ticket quantity"
                       value={quantity}
                       onChange={(e) => setQuantity(Math.max(1, Number(e.target.value) || 1))}
-                      className="w-20 rounded-lg border border-white/10 bg-transparent p-2 text-center outline-none focus:border-white/20"
+                      className="w-20 sm:w-24 rounded-lg border border-white/10 bg-transparent p-3 text-center outline-none focus:border-white/20 min-h-[44px] text-sm sm:text-base"
                     />
                     <button
-                      className="rounded-lg border border-white/10 px-3 py-2 text-lg hover:border-white/20"
+                      className="rounded-lg border border-white/10 px-4 py-3 text-lg hover:border-white/20 min-h-[44px] min-w-[44px] flex items-center justify-center"
                       onClick={() => setQuantity((q) => q + 1)}
                     >
                       +
@@ -194,22 +194,22 @@ const TicketPurchaseModal = ({
                 </div>
 
                 <div>
-                  <label htmlFor="ticket-email" className="mb-2 block text-sm text-gray-300">Email (for receipt)</label>
+                  <label htmlFor="ticket-email" className="mb-2 block text-sm sm:text-base text-gray-300">Email (for receipt)</label>
                   <input
                     type="email"
                     id="ticket-email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
-                    className="w-full rounded-lg border border-white/10 bg-transparent p-3 outline-none placeholder:text-white/40 focus:border-white/20"
+                    className="w-full rounded-lg border border-white/10 bg-transparent p-3 outline-none placeholder:text-white/40 focus:border-white/20 min-h-[44px] text-sm sm:text-base"
                   />
                 </div>
 
                 <div className="flex items-center justify-between border-t border-white/10 pt-4">
-                  <div className="text-sm text-gray-300">
+                  <div className="text-sm sm:text-base text-gray-300">
                     Total
                   </div>
-                  <div className="text-lg font-semibold">
+                  <div className="text-lg sm:text-xl font-semibold">
                     {total === 0 ? "0 Turkish Lira" : new Intl.NumberFormat(undefined, { style: "currency", currency }).format(total)}
                   </div>
                 </div>
@@ -243,7 +243,7 @@ const TicketPurchaseModal = ({
                       handleCheckout();
                     }
                   }}
-                  className={`w-full rounded-xl px-5 py-3 font-medium transition ${
+                  className={`w-full rounded-xl px-5 py-4 font-medium transition min-h-[52px] text-sm sm:text-base ${
                     (total === 0 ? (isEmailValid ? "bg-white text-black hover:bg-white/90" : "bg-white/10 text-white/50 cursor-not-allowed") : (ticketUrl ? "bg-white text-black hover:bg-white/90" : "bg-white/10 text-white/50 cursor-not-allowed"))
                   }`}
                 >

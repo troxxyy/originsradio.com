@@ -170,6 +170,7 @@ export interface Database {
           title: string
           artist_id: string
           audio_url: string
+          peaks_url?: string | null
           duration: number | null
           release_date: string
           views_count: number | null
@@ -187,6 +188,7 @@ export interface Database {
           title: string
           artist_id: string
           audio_url: string
+          peaks_url?: string | null
           duration?: number | null
           release_date: string
           views_count?: number | null
@@ -198,6 +200,7 @@ export interface Database {
           title?: string
           artist_id?: string
           audio_url?: string
+          peaks_url?: string | null
           duration?: number | null
           release_date?: string
           views_count?: number | null
@@ -255,6 +258,7 @@ export interface Database {
           tags: string[]
           date: string | null
           upcoming: boolean
+          slug: string
           created_at: string
           updated_at: string
         }
@@ -266,6 +270,7 @@ export interface Database {
           tags?: string[]
           date?: string | null
           upcoming?: boolean
+          slug?: string
           created_at?: string
           updated_at?: string
         }
@@ -277,6 +282,7 @@ export interface Database {
           tags?: string[]
           date?: string | null
           upcoming?: boolean
+          slug?: string
           created_at?: string
           updated_at?: string
         }

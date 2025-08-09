@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
 import { Search, Filter, Music, MapPin, Star } from 'lucide-react';
@@ -10,11 +10,25 @@ import { generateSlug } from '@/lib/supabase-utils';
 const Artists = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
   // Scroll to top when component mounts
   useEffect(() => {
     window.scrollTo(0, 0);
+  }, []);
+
+  // Add keyboard shortcut for search (Cmd+K or Ctrl+K)
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+        event.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   // Fetch artists from Supabase
@@ -116,35 +130,59 @@ const Artists = () => {
 
         {/* Search Section */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-          <div className="glass backdrop-blur-sm rounded-2xl p-6 border border-white/10">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="glass backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/10">
+            <div className="flex flex-col sm:flex-row gap-4">
               {/* Search Input */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
+                  ref={searchInputRef}
                   type="text"
                   placeholder="Search artists..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/20"
+                  className="w-full pl-10 pr-20 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/30 transition-all"
                 />
+                {/* Keyboard shortcut hint */}
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 hidden sm:flex items-center gap-1 text-gray-500 text-xs">
+                  <kbd className="px-2 py-1 bg-white/10 rounded border border-white/20 text-xs font-mono">
+                    {navigator.platform.indexOf('Mac') > -1 ? '⌘' : 'Ctrl'}
+                  </kbd>
+                  <span>+</span>
+                  <kbd className="px-2 py-1 bg-white/10 rounded border border-white/20 text-xs font-mono">K</kbd>
+                </div>
               </div>
 
               {/* Featured Filter */}
-              <div className="flex items-center gap-4">
+              <div className="flex items-center justify-center sm:justify-start">
                 <button
                   onClick={() => setShowFeaturedOnly(!showFeaturedOnly)}
-                  className={`px-4 py-3 rounded-lg transition-all flex items-center gap-2 ${
+                  className={`px-4 py-3 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap ${
                     showFeaturedOnly
-                      ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                      ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 hover:bg-yellow-500/30'
                       : 'bg-white/10 text-white border border-white/20 hover:bg-white/20'
                   }`}
                 >
                   <Star className="w-4 h-4" />
-                  Featured Only
+                  <span className="hidden sm:inline">Featured Only</span>
+                  <span className="sm:hidden">Featured</span>
                 </button>
               </div>
             </div>
+            
+            {/* Search results count */}
+            {(searchTerm || showFeaturedOnly) && (
+              <div className="mt-3 pt-3 border-t border-white/10">
+                <p className="text-sm text-gray-400">
+                  {filteredArtists.length === 0 
+                    ? 'No artists found' 
+                    : `${filteredArtists.length} artist${filteredArtists.length !== 1 ? 's' : ''} found`
+                  }
+                  {searchTerm && ` for "${searchTerm}"`}
+                  {showFeaturedOnly && ' (featured only)'}
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
