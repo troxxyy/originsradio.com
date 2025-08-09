@@ -58,6 +58,26 @@ const ArtistDetail = () => {
   const { data: isLiked = false } = useArtistLikeStatus(artist?.id || '');
   const toggleLikeMutation = useToggleArtistLike();
 
+  const computePeaksUrlFromAudio = (audioUrl: string | null | undefined): string | undefined => {
+    if (!audioUrl) return undefined;
+    try {
+      // Supabase public URL format: .../storage/v1/object/public/sets/sets/<filename>
+      // We upload peaks to bucket 'waveforms' with name '<basename>.json'
+      const url = new URL(audioUrl);
+      const parts = url.pathname.split('/');
+      const fileName = parts[parts.length - 1];
+      if (!fileName) return undefined;
+      const base = fileName.replace(/\.[^.]+$/, '');
+      // Replace '/object/public/sets/sets/' with '/object/public/waveforms/' and swap filename
+      const waveUrl = audioUrl
+        .replace('/object/public/sets/sets/', '/object/public/waveforms/')
+        .replace(fileName, `${base}.json`);
+      return waveUrl;
+    } catch {
+      return undefined;
+    }
+  };
+
   const setsEvents: ArtistSetEvent[] = (sets || []).map((set, index) => ({
     title: set.title,
     artist: artist?.name || 'Unknown Artist',
@@ -66,6 +86,7 @@ const ArtistDetail = () => {
     }) : '',
     delay: `${index * 0.2}s`,
     audioSrc: set.audio_url,
+    peaksUrl: set.peaks_url || computePeaksUrlFromAudio(set.audio_url),
     artistPhoto: artist?.photo_url || undefined,
     setNumber: set.set_number,
     artistSlug: artist?.name ? artistSlug : undefined,

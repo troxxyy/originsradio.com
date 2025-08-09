@@ -9,22 +9,22 @@ const EventFooter = ({}: EventFooterProps) => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="mt-20 text-white relative">
-      <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
+    <footer className="mt-12 sm:mt-20 text-white relative">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-12">
         {/* Decorative top border with gradient */}
-        <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent mb-12" />
+        <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent mb-8 sm:mb-12" />
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 py-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-12 py-8 sm:py-12">
           {/* About Section */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-4">
               <Radio className="h-5 w-5 text-white" />
-              <h3 className="text-lg font-semibold text-white">Origins Radio</h3>
+              <h3 className="text-lg sm:text-xl font-semibold text-white">Origins Radio</h3>
             </div>
-            <p className="text-sm text-white/80 leading-relaxed">
+            <p className="text-sm sm:text-base text-white/80 leading-relaxed">
               Ankara's premier interactive radio station bringing you the best in electronic music, live shows, and cultural experiences. We connect artists, music lovers, and the creative community.
             </p>
-            <div className="flex items-center gap-2 text-sm text-white/70">
+            <div className="flex items-center gap-2 text-sm sm:text-base text-white/70">
               <MapPin className="h-4 w-4" />
               <span>Ankara, Turkey</span>
             </div>
@@ -32,21 +32,21 @@ const EventFooter = ({}: EventFooterProps) => {
 
           {/* Quick Links */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-white/90">Explore</h3>
-            <div className="flex flex-col gap-3">
-              <a href="/" className="text-sm text-white/80 hover:text-white transition-colors duration-200 flex items-center gap-2">
-                <Music className="h-3 w-3" />
+            <h3 className="text-sm sm:text-base font-semibold uppercase tracking-wide text-white/90">Explore</h3>
+            <div className="flex flex-col gap-4">
+              <a href="/" className="text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 flex items-center gap-2 py-1">
+                <Music className="h-4 w-4" />
                 Live Radio
               </a>
-              <a href="/events" className="text-sm text-white/80 hover:text-white transition-colors duration-200 flex items-center gap-2">
-                <Calendar className="h-3 w-3" />
+              <a href="/events" className="text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 flex items-center gap-2 py-1">
+                <Calendar className="h-4 w-4" />
                 Events
               </a>
-              <a href="/artists" className="text-sm text-white/80 hover:text-white transition-colors duration-200 flex items-center gap-2">
-                <Radio className="h-3 w-3" />
+              <a href="/artists" className="text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 flex items-center gap-2 py-1">
+                <Radio className="h-4 w-4" />
                 Artists
               </a>
-              <a href="/about" className="text-sm text-white/80 hover:text-white transition-colors duration-200">
+              <a href="/about" className="text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 py-1">
                 About Us
               </a>
             </div>
@@ -54,24 +54,24 @@ const EventFooter = ({}: EventFooterProps) => {
 
           {/* Contact & Social */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-white/90">Connect</h3>
-            <div className="space-y-3">
+            <h3 className="text-sm sm:text-base font-semibold uppercase tracking-wide text-white/90">Connect</h3>
+            <div className="space-y-4">
               <a 
                 href="mailto:info@originsradio.com" 
-                className="inline-flex items-center gap-2 text-sm text-white/80 hover:text-white transition-colors duration-200"
+                className="inline-flex items-center gap-2 text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 py-1 min-h-[44px]"
               >
                 <Mail className="h-4 w-4" /> 
                 info@originsradio.com
               </a>
               
-              <div className="space-y-2">
-                <div className="text-xs uppercase tracking-wide text-white/60 mb-3">Follow Us</div>
-                <div className="flex flex-col gap-2">
+              <div className="space-y-3">
+                <div className="text-xs sm:text-sm uppercase tracking-wide text-white/60 mb-3">Follow Us</div>
+                <div className="flex flex-col gap-3">
                   <a 
                     href="https://www.youtube.com/@originsradiotr" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-sm text-white/80 hover:text-white transition-colors duration-200"
+                    className="inline-flex items-center gap-2 text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 py-1 min-h-[44px]"
                   >
                     <Youtube className="h-4 w-4" />
                     YouTube
@@ -80,7 +80,7 @@ const EventFooter = ({}: EventFooterProps) => {
                     href="https://www.instagram.com/origins.radio/" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-sm text-white/80 hover:text-white transition-colors duration-200"
+                    className="inline-flex items-center gap-2 text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 py-1 min-h-[44px]"
                   >
                     <Instagram className="h-4 w-4" />
                     Instagram
@@ -89,7 +89,7 @@ const EventFooter = ({}: EventFooterProps) => {
                     href="https://on.soundcloud.com/RAQQfrZ27sD539NXA" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-sm text-white/80 hover:text-white transition-colors duration-200"
+                    className="inline-flex items-center gap-2 text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 py-1 min-h-[44px]"
                   >
                     <Cloud className="h-4 w-4" />
                     SoundCloud
@@ -101,22 +101,22 @@ const EventFooter = ({}: EventFooterProps) => {
 
           {/* Legal & Policies */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-white/90">Legal</h3>
-            <div className="flex flex-col gap-3">
+            <h3 className="text-sm sm:text-base font-semibold uppercase tracking-wide text-white/90">Legal</h3>
+            <div className="flex flex-col gap-4">
               <PrivacyPolicyDialog
                 triggerLabel="Privacy Policy"
                 variant="ghost"
                 size="sm"
-                buttonClassName="px-0 h-auto text-sm text-white/80 hover:text-white underline-offset-4 hover:underline justify-start"
+                buttonClassName="px-0 h-auto text-sm sm:text-base text-white/80 hover:text-white underline-offset-4 hover:underline justify-start py-1 min-h-[44px]"
               />
               <ConsumerDisclosureDialog
                 triggerLabel="Consumer Disclosure"
                 variant="ghost"
                 size="sm"
-                buttonClassName="px-0 h-auto text-sm text-white/80 hover:text-white underline-offset-4 hover:underline justify-start"
+                buttonClassName="px-0 h-auto text-sm sm:text-base text-white/80 hover:text-white underline-offset-4 hover:underline justify-start py-1 min-h-[44px]"
               />
               <div className="mt-4 pt-4 border-t border-white/10">
-                <p className="text-xs text-white/60 leading-relaxed">
+                <p className="text-xs sm:text-sm text-white/60 leading-relaxed">
                   Supporting Turkey's electronic music scene since 2023. All content is owned by respective artists and Origins Radio.
                 </p>
               </div>
@@ -125,12 +125,12 @@ const EventFooter = ({}: EventFooterProps) => {
         </div>
 
         {/* Bottom section */}
-        <div className="border-t border-white/10 py-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="text-sm text-white/60">
+        <div className="border-t border-white/10 py-6 sm:py-8">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
+            <div className="text-sm sm:text-base text-white/60">
               © {currentYear} Origins Radio — All rights reserved.
             </div>
-            <div className="text-xs text-white/50">
+            <div className="text-xs sm:text-sm text-white/50">
               Made with ♡ in Ankara
             </div>
           </div>

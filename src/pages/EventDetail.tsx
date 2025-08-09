@@ -7,7 +7,7 @@ import { Calendar, MapPin, Tag, Ticket, ArrowLeft, Share2 } from "lucide-react";
 import TicketPurchaseModal, { TicketTier } from "@/components/events/TicketPurchaseModal";
 import EventRules from "@/components/events/EventRules";
 import EventFooter from "@/components/events/EventFooter";
-import { generateSlug } from "@/lib/supabase-utils";
+import { getOurWorkProjectBySlug } from "@/lib/supabase-utils";
 
 type UiProject = {
   title: string;
@@ -24,27 +24,46 @@ type UiProject = {
 
 const EventDetail = () => {
   const { eventSlug } = useParams();
-  const { data: remoteProjects, isLoading } = useOurWorkProjects();
+  const [project, setProject] = useState<UiProject | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  const project: UiProject | null = useMemo(() => {
-    if (!remoteProjects || remoteProjects.length === 0) return null;
-    const mapped = remoteProjects.map((p) => ({
-      title: p.title,
-      description: p.description,
-      imageUrl: p.image_url,
-      tags: p.tags || [],
-      date: p.date || undefined,
-      upcoming: p.upcoming,
-      location: (p as any).location,
-      ticketUrl: (p as any).ticket_url,
-      tiers: (p as any).tiers,
-      formUrl: (p as any).form_url,
-    }));
-    return (
-      mapped.find((proj) => generateSlug(proj.title) === eventSlug) || null
-    );
-  }, [remoteProjects, eventSlug]);
+  useEffect(() => {
+    const fetchProject = async () => {
+      if (!eventSlug) {
+        setProject(null);
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const projectData = await getOurWorkProjectBySlug(eventSlug);
+        if (projectData) {
+          setProject({
+            title: projectData.title,
+            description: projectData.description,
+            imageUrl: projectData.image_url,
+            tags: projectData.tags || [],
+            date: projectData.date || undefined,
+            upcoming: projectData.upcoming,
+            location: (projectData as any).location,
+            ticketUrl: (projectData as any).ticket_url,
+            tiers: (projectData as any).tiers,
+            formUrl: (projectData as any).form_url,
+          });
+        } else {
+          setProject(null);
+        }
+      } catch (error) {
+        console.error('Error fetching project:', error);
+        setProject(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProject();
+  }, [eventSlug]);
 
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);

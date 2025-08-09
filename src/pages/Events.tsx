@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useState, useEffect, useMemo } from "react";
-import { Search, Filter, Calendar, MapPin } from "lucide-react";
+import { Calendar, MapPin } from "lucide-react";
 import PageLayout from "@/components/layout/PageLayout";
 import { useOurWorkProjects } from "@/hooks/use-supabase";
 import type { TicketTier } from "@/components/events/TicketPurchaseModal";
@@ -18,6 +18,7 @@ interface ProjectUiModel {
   ticketUrl?: string;
   tiers?: TicketTier[];
   formUrl?: string; // invite-only entry form
+  slug?: string; // random identifier for URL
 }
 
 const staticProjects: ProjectUiModel[] = [
@@ -132,7 +133,6 @@ const staticProjects: ProjectUiModel[] = [
 ];
 
 const Events = () => {
-  const [searchTerm, setSearchTerm] = useState('');
   const [isNavigating, setIsNavigating] = useState(false);
   const { data: remoteProjects, isLoading } = useOurWorkProjects();
   
@@ -158,6 +158,7 @@ const Events = () => {
         ticketUrl: (p as any).ticket_url,
         tiers: (p as any).tiers,
         formUrl: (p as any).form_url,
+        slug: p.slug, // Use the random slug from database
       }))
     }
     return staticProjects
@@ -165,34 +166,12 @@ const Events = () => {
 
   // Memoize upcoming and past events to avoid recomputation on every render
   const upcomingEvents = useMemo(() => {
-    let filtered = projects.filter(project => project.upcoming);
-    
-    // Filter by search term if provided
-    if (searchTerm) {
-      filtered = filtered.filter(project =>
-        project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
-      );
-    }
-    
-    return filtered;
-  }, [projects, searchTerm]);
+    return projects.filter(project => project.upcoming);
+  }, [projects]);
   
   const pastEvents = useMemo(() => {
-    let filtered = projects.filter(project => !project.upcoming);
-    
-    // Filter by search term if provided
-    if (searchTerm) {
-      filtered = filtered.filter(project =>
-        project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
-      );
-    }
-    
-    return filtered;
-  }, [projects, searchTerm]);
+    return projects.filter(project => !project.upcoming);
+  }, [projects]);
   
   // Helper function to parse date strings
   const parseDate = (dateStr: string): Date => {
@@ -244,7 +223,7 @@ const Events = () => {
       className="group cursor-pointer h-full"
     >
       <Link 
-        to={`/events/${generateSlug(project.title)}`}
+        to={`/events/${project.slug || generateSlug(project.title)}`}
         onClick={() => setIsNavigating(true)}
       >
         <div className={`glass backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.1)] transform-gpu hover:scale-105 h-full flex flex-col min-h-[28rem] sm:min-h-[30rem] md:min-h-[32rem] lg:min-h-[34rem] ${isPast ? 'opacity-60' : ''}`}>
@@ -337,24 +316,7 @@ const Events = () => {
           </div>
         </div>
 
-        {/* Search Section */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-          <div className="glass backdrop-blur-sm rounded-2xl p-6 border border-white/10">
-            <div className="flex flex-col sm:flex-row gap-4 items-center">
-              {/* Search Input */}
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="text"
-                  placeholder="Search events, descriptions, or tags..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/30 transition-all"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
+
 
         {/* Loading State */}
         {isLoading && (
@@ -420,7 +382,7 @@ const Events = () => {
               >
                 <Calendar className="w-16 h-16 text-gray-500 mx-auto mb-4" />
                 <h3 className="text-2xl font-semibold text-white mb-2">No events found</h3>
-                <p className="text-gray-400">Try adjusting your search</p>
+                <p className="text-gray-400">Check back soon for upcoming events</p>
               </motion.div>
             )}
           </>

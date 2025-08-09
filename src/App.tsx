@@ -123,7 +123,7 @@ const App = () => {
                       <Anniversary />
                     </RouteTracker>
                   } />
-                  {/* <Route path="/admin/artists" element={
+                  <Route path="/admin/artists" element={
                     <RouteTracker>
                       <AdminArtists />
                     </RouteTracker>
@@ -137,7 +137,7 @@ const App = () => {
                     <RouteTracker>
                       <AdminUploads />
                     </RouteTracker>
-                  } /> */}
+                  } />
 
                   <Route path="*" element={
                     <RouteTracker>

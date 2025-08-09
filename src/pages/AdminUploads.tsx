@@ -3,6 +3,8 @@ import { getSupabaseAdminClient } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Upload, FileAudio, Loader2, CheckCircle, XCircle } from 'lucide-react';
+import WaveSurfer from 'wavesurfer.js';
+import WaveformGenerator from '@/components/admin/WaveformGenerator';
 
 interface UploadStatus {
   file: File;
@@ -57,6 +59,12 @@ const AdminUploads = () => {
     
     try {
       const supabase = getSupabaseAdminClient();
+      // Ensure waveforms bucket exists and is public
+      try {
+        await supabase.storage.createBucket('waveforms', { public: true, fileSizeLimit: '5MB', allowedMimeTypes: ['application/json'] });
+      } catch (e) {
+        // ignore if already exists
+      }
 
       for (const file of files) {
         try {
@@ -82,6 +90,15 @@ const AdminUploads = () => {
           const { data: urlData } = supabase.storage
             .from('sets')
             .getPublicUrl(filePath);
+
+          // Compute peaks client-side using WaveSurfer and upload JSON to waveforms bucket
+          const peaks = await computePeaksFromFile(file);
+          const baseName = fileName.replace(/\.[^.]+$/, '');
+          const peaksPath = `${baseName}.json`;
+          const peaksBlob = new Blob([JSON.stringify({ peaks })], { type: 'application/json' });
+          await supabase.storage
+            .from('waveforms')
+            .upload(peaksPath, peaksBlob, { cacheControl: '3600', upsert: true, contentType: 'application/json' });
 
           // Update upload status
           setUploads(prev => prev.map(upload => 
@@ -126,6 +143,50 @@ const AdminUploads = () => {
     setIsUploading(false);
   };
 
+  // Compute PCM peaks via WaveSurfer without rendering
+  const computePeaksFromFile = async (file: File): Promise<number[]> => {
+    const tempContainer = document.createElement('div');
+    tempContainer.style.position = 'fixed';
+    tempContainer.style.left = '-99999px';
+    tempContainer.style.width = '0px';
+    tempContainer.style.height = '0px';
+    document.body.appendChild(tempContainer);
+
+    const objectUrl = URL.createObjectURL(file);
+    const ws = WaveSurfer.create({
+      container: tempContainer,
+      url: objectUrl,
+      interact: false,
+      waveColor: '#000',
+      progressColor: '#000',
+      cursorColor: 'transparent',
+      height: 0,
+      minPxPerSec: 20,
+      autoCenter: false,
+    });
+
+    const peaks = await new Promise<number[]>((resolve, reject) => {
+      const onReady = () => {
+        try {
+          const anyWs = ws as unknown as { exportPCM?: (length?: number, accuracy?: number, noWindow?: boolean) => Float32Array | number[] };
+          const pcm = anyWs.exportPCM?.(2000, 1000, true) as Float32Array | number[] | undefined;
+          const arr = pcm ? Array.from(pcm) : [];
+          resolve(arr);
+        } catch (e) {
+          resolve([]);
+        }
+      };
+      const onError = (e: unknown) => resolve([]);
+      ws.on('ready', onReady);
+      ws.on('error', onError);
+    });
+
+    try { ws.destroy(); } catch {}
+    URL.revokeObjectURL(objectUrl);
+    document.body.removeChild(tempContainer);
+    return peaks;
+  };
+
   const removeUpload = (file: File) => {
     setUploads(prev => prev.filter(upload => upload.file !== file));
   };
@@ -157,8 +218,11 @@ const AdminUploads = () => {
             </p>
           </div>
 
+          {/* Waveform Generator */}
+          <WaveformGenerator />
+
           {/* Upload Area */}
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-8 mb-8 border border-gray-700">
+          <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-8 mb-8 mt-8 border border-gray-700">
             <div className="text-center">
               <div className="mb-6">
                 <FileAudio className="h-16 w-16 mx-auto text-gray-400 mb-4" />

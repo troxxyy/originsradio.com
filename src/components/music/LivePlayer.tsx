@@ -7,6 +7,8 @@ interface LivePlayerProps {
   currentSet: string;
   isLive?: boolean;
   onPlaybackStart?: () => void;
+  // For recorded sets that represent multi-hour blocks, start playback at this offset
+  startOffsetSeconds?: number;
 }
 
 export interface LivePlayerRef {
@@ -20,7 +22,8 @@ const LivePlayer = forwardRef<LivePlayerRef, LivePlayerProps>(({
   currentArtist,
   currentSet,
   isLive = true,
-  onPlaybackStart
+  onPlaybackStart,
+  startOffsetSeconds = 0
 }, ref) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [volume, setVolume] = useState(0.8);
@@ -47,7 +50,7 @@ const LivePlayer = forwardRef<LivePlayerRef, LivePlayerProps>(({
     },
     reset: () => {
       if (audioRef.current) {
-        audioRef.current.currentTime = 0;
+        audioRef.current.currentTime = !isLive ? Math.max(0, startOffsetSeconds) : 0;
       }
     }
   }));
@@ -81,8 +84,13 @@ const LivePlayer = forwardRef<LivePlayerRef, LivePlayerProps>(({
         });
 
         if (!isLive) {
-          // For recorded sets, always start from beginning
-          audio.currentTime = 0;
+          // For recorded sets, start at provided offset (for multi-hour sequences)
+          if (audio.duration && !isNaN(audio.duration)) {
+            const clamped = Math.min(Math.max(0, startOffsetSeconds), Math.max(0, audio.duration - 1));
+            audio.currentTime = clamped;
+          } else {
+            audio.currentTime = Math.max(0, startOffsetSeconds);
+          }
         } else {
           // For live content, sync with current time
           const positionInHour = getCurrentPositionInHour();
@@ -103,12 +111,29 @@ const LivePlayer = forwardRef<LivePlayerRef, LivePlayerProps>(({
     };
 
     startPlayback();
-  }, [streamUrl, isLive, onPlaybackStart]);
+  }, [streamUrl, isLive, onPlaybackStart, startOffsetSeconds]);
 
-  // Update position when artist changes (new hour)
+  // If the offset changes while viewing a recorded set (e.g., selecting the 2nd hour of a multi-hour block), seek to the new offset
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio || !isPlaying) return;
+    if (!audio || isLive) return;
+    try {
+      if (audio.duration && !isNaN(audio.duration)) {
+        const clamped = Math.min(Math.max(0, startOffsetSeconds), Math.max(0, audio.duration - 1));
+        audio.currentTime = clamped;
+      } else {
+        audio.currentTime = Math.max(0, startOffsetSeconds);
+      }
+    } catch (e) {
+      // no-op
+    }
+  }, [startOffsetSeconds, isLive]);
+
+  // Update position when artist changes (new hour)
+  // Only sync to wall-clock when streaming live
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || !isPlaying || !isLive) return;
 
     const updatePosition = async () => {
       try {
@@ -124,7 +149,7 @@ const LivePlayer = forwardRef<LivePlayerRef, LivePlayerProps>(({
     };
 
     updatePosition();
-  }, [currentArtist, currentSet]); // Update when artist/set changes
+  }, [currentArtist, currentSet, isLive, isPlaying]); // Update when artist/set changes
 
   const toggleMute = () => {
     if (audioRef.current) {
@@ -162,10 +187,16 @@ const LivePlayer = forwardRef<LivePlayerRef, LivePlayerProps>(({
 
     // Handle when audio ends - restart with current hour position
     const handleEnded = () => {
-      const positionInHour = getCurrentPositionInHour();
-      if (audio.duration && !isNaN(audio.duration)) {
-        const loopPosition = positionInHour % audio.duration;
-        audio.currentTime = loopPosition;
+      if (isLive) {
+        const positionInHour = getCurrentPositionInHour();
+        if (audio.duration && !isNaN(audio.duration)) {
+          const loopPosition = positionInHour % audio.duration;
+          audio.currentTime = loopPosition;
+          audio.play().catch(console.error);
+        }
+      } else {
+        // For recorded sets, restart from the configured offset to maintain expected timing
+        audio.currentTime = Math.max(0, startOffsetSeconds);
         audio.play().catch(console.error);
       }
     };
