@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import WaveSurfer, { WaveSurferOptions } from 'wavesurfer.js';
 import { getSupabaseClient } from '@/lib/supabase';
 
@@ -12,6 +12,7 @@ export interface WaveformPreviewProps {
   progress?: number; // progress percentage (0-100) for overlay
   onSeek?: (percentage: number) => void; // callback for seeking
   interactive?: boolean; // whether the waveform should be interactive
+  variant?: 'framed' | 'transparent';
 }
 
 // Lightweight, non-interactive SoundCloud-like waveform preview.
@@ -27,10 +28,13 @@ const WaveformPreview = ({
   progress = 0,
   onSeek,
   interactive = false,
+    variant = 'framed',
 }: WaveformPreviewProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const wavesurferRef = useRef<WaveSurfer | null>(null);
   const onSeekRef = useRef(onSeek);
+  const seekTimeoutRef = useRef<NodeJS.Timeout>();
+  const clickCleanupRef = useRef<(() => void) | null>(null);
   
   // Update ref when onSeek changes
   useEffect(() => {
@@ -112,22 +116,26 @@ const WaveformPreview = ({
 
       if (!peaks) setHadPeaks(false);
 
-      // Build options
+      // Build options - fix waveform display and interaction
       const baseOptions = {
         container: containerRef.current,
         url: audioUrl,
         height,
         normalize: true,
         barWidth,
-        barGap: Math.max(1, Math.floor(barWidth / 2)),
+        barGap: 1,
         barRadius,
-        waveColor: '#6b7280', // gray-500
-        progressColor: 'transparent', // We'll use our own progress overlay
-        cursorColor: interactive ? '#ffffff' : 'transparent',
+         waveColor: '#3b3b3b',
+         progressColor: '#e5e7eb',
+        cursorColor: interactive ? 'rgba(255, 255, 255, 0.6)' : 'transparent',
         interact: interactive,
-        autoCenter: true,
-        minPxPerSec: 25, // Optimized for 1-hour sets with 4000-6000 peaks
-        autoScroll: false
+        autoCenter: false,
+        // Remove minPxPerSec to let it auto-fit the container width
+        autoScroll: false,
+        hideScrollbar: true,
+        fillParent: true,
+        // Ensure the waveform fills the entire container width
+        responsive: true,
       };
 
       // Add peaks only if available to avoid type issues
@@ -142,6 +150,12 @@ const WaveformPreview = ({
         if (!isCancelled) {
           setIsReady(true);
           setError(null);
+          
+          // Debug container size
+          if (containerRef.current) {
+            const rect = containerRef.current.getBoundingClientRect();
+            console.log(`📏 WaveformPreview ready: ${rect.width}x${rect.height}px, duration=${ws.getDuration?.()?.toFixed(2)}s`);
+          }
         }
         // If we had to decode client-side (no peaks), cache the computed peaks for next time
         try {
@@ -166,13 +180,48 @@ const WaveformPreview = ({
         }
       });
 
-      // Add click handler for seeking if interactive
+      // Add optimized click handler for seeking if interactive
       if (interactive && onSeekRef.current) {
-        ws.on('click', (relativeX) => {
-          // relativeX is between 0 and 1
-          const percentage = relativeX * 100;
+        const handleSeek = (relativeX: number) => {
+          const percentage = Math.max(0, Math.min(100, relativeX * 100));
+          console.log(`🖱️ WaveformPreview click: relativeX=${relativeX.toFixed(3)}, percentage=${percentage.toFixed(2)}%`);
+          
+          if (seekTimeoutRef.current) {
+            clearTimeout(seekTimeoutRef.current);
+          }
+          
+          // Immediate seeking, no debounce delay for direct clicks
           onSeekRef.current?.(percentage);
-        });
+        };
+        
+        ws.on('click', handleSeek);
+        
+        // Backup manual click handler in case WaveSurfer's click detection fails
+        const manualClickHandler = (e: MouseEvent) => {
+          if (!containerRef.current) return;
+          
+          const rect = containerRef.current.getBoundingClientRect();
+          const clickX = e.clientX - rect.left;
+          const relativeX = Math.max(0, Math.min(1, clickX / rect.width));
+          const percentage = relativeX * 100;
+          
+          console.log(`🖱️ Manual click: x=${clickX.toFixed(1)}px of ${rect.width.toFixed(1)}px, relativeX=${relativeX.toFixed(3)}, percentage=${percentage.toFixed(2)}%`);
+          
+          if (seekTimeoutRef.current) {
+            clearTimeout(seekTimeoutRef.current);
+          }
+          
+          onSeekRef.current?.(percentage);
+        };
+        
+        containerRef.current.addEventListener('click', manualClickHandler);
+        
+        // Store cleanup function
+        clickCleanupRef.current = () => {
+          if (containerRef.current) {
+            containerRef.current.removeEventListener('click', manualClickHandler);
+          }
+        };
       }
       
       ws.on('error', (err) => {
@@ -192,6 +241,18 @@ const WaveformPreview = ({
 
     return () => {
       isCancelled = true;
+      
+      // Clear any pending seek timeout
+      if (seekTimeoutRef.current) {
+        clearTimeout(seekTimeoutRef.current);
+      }
+      
+      // Clean up manual click handler
+      if (clickCleanupRef.current) {
+        clickCleanupRef.current();
+        clickCleanupRef.current = null;
+      }
+      
       if (wavesurferRef.current) {
         try {
           wavesurferRef.current.destroy();
@@ -208,46 +269,35 @@ const WaveformPreview = ({
       <div className="relative">
         <div
           ref={containerRef}
-          className={`w-full rounded-md overflow-hidden border border-white/10 bg-gradient-to-b from-black/40 to-black/20 ${
-            onSeek && isReady ? 'cursor-pointer' : ''
-          }`}
+          className={`w-full rounded-md overflow-hidden ${
+            variant === 'framed' ? 'bg-black/50 border border-white/10' : 'bg-transparent'
+          } ${interactive && isReady ? 'cursor-pointer' : ''}`}
           style={{ height: `${height}px` }}
         />
         
-        {/* Progress overlay */}
-        {isReady && progress > 0 && (
+        {/* Filled progress overlay */}
+        {isReady && (
           <>
-            {/* Progress fill indicator */}
             <div
-              className="absolute top-0 left-0 h-full bg-white/10 transition-all duration-150 rounded-md pointer-events-none z-10"
+              className="absolute inset-y-0 left-0 bg-white/15 pointer-events-none"
               style={{ width: `${Math.max(0, Math.min(100, progress))}%` }}
             />
-            
-            {/* Progress line */}
             <div
-              className="absolute top-0 h-full w-[2px] bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] transition-all duration-150 pointer-events-none z-10"
+              className="absolute top-0 h-full w-0.5 bg-white/80 pointer-events-none"
               style={{ left: `${Math.max(0, Math.min(100, progress))}%` }}
             />
           </>
         )}
       </div>
       
+      {/* Simplified status indicators */}
       {!isReady && !error && (
-        <div
-          className="mt-2 h-2 w-full overflow-hidden rounded-full bg-white/10"
-          aria-hidden="true"
-        >
-          <div className="h-full w-1/3 animate-pulse rounded-full bg-white/30" />
+        <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-white/10">
+          <div className="h-full w-1/3 bg-white/30 rounded-full animate-pulse" />
         </div>
       )}
       {error && (
-        <div className="mt-2 text-xs text-red-400">⚠️ {error}</div>
-      )}
-      {isReady && hadPeaks === false && !error && (
-        <div className="mt-2 text-xs text-yellow-400">⚡ Computing waveform...</div>
-      )}
-      {isReady && hadPeaks === true && !error && (
-        <div className="mt-2 text-xs text-green-400">✓ Precomputed waveform</div>
+        <div className="mt-1 text-xs text-red-400/70">Failed to load</div>
       )}
     </div>
   );

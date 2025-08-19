@@ -297,11 +297,31 @@ const ArtistDetail = () => {
     ) {
       setIsSeekingSet(true);
       const newTime = (percentage / 100) * audioRefSet.duration;
-      audioRefSet.currentTime = newTime;
-      setTrackProgressSet(prev => ({ ...prev, [currentSetIndex]: percentage }));
+      
+      console.log(`🎯 Seeking to ${percentage.toFixed(2)}% (${newTime.toFixed(2)}s of ${audioRefSet.duration.toFixed(2)}s)`);
+      
+      try {
+        // Seek immediately, no async delay
+        audioRefSet.currentTime = newTime;
+        
+        // Verify the seek actually worked
+        setTimeout(() => {
+          const actualTime = audioRefSet.currentTime;
+          const actualPercentage = (actualTime / audioRefSet.duration) * 100;
+          console.log(`✅ Seek result: requested=${newTime.toFixed(2)}s (${percentage.toFixed(2)}%), actual=${actualTime.toFixed(2)}s (${actualPercentage.toFixed(2)}%)`);
+          
+          // Update UI state to match actual seek position
+          setTrackProgressSet(prev => ({ ...prev, [currentSetIndex]: actualPercentage }));
+        }, 10);
+        
+      } catch (error) {
+        console.warn('Seek error:', error);
+      }
+      
+      // Shorter seeking delay for better responsiveness
       setTimeout(() => {
         setIsSeekingSet(false);
-      }, 100);
+      }, 100); // Increased slightly to give audio time to respond
     }
   };
 
@@ -312,10 +332,17 @@ const ArtistDetail = () => {
     const updateProgress = () => {
       if (isSeekingSet || currentSetIndex === null) return;
       const now = Date.now();
+      
+      // Reduced interval back to 100ms for more responsive progress updates
       if (now - lastUpdateRefSet.current >= 100) {
         if (audio.duration && !isNaN(audio.duration)) {
           const currentProgress = (audio.currentTime / audio.duration) * 100;
-          setTrackProgressSet(prev => ({ ...prev, [currentSetIndex]: currentProgress }));
+          
+          // Only update if progress changed significantly (> 0.05% for smoother updates)
+          const lastProgress = trackProgressSet[currentSetIndex] || 0;
+          if (Math.abs(currentProgress - lastProgress) > 0.05) {
+            setTrackProgressSet(prev => ({ ...prev, [currentSetIndex]: currentProgress }));
+          }
         }
         lastUpdateRefSet.current = now;
       }
@@ -787,6 +814,8 @@ const ArtistDetail = () => {
                       onSeek={handleSeekSet}
                       isPlaying={isPlayingSet && currentSetIndex === index}
                       progress={trackProgressSet[index] || 0}
+                      elapsedSeconds={currentSetIndex === index && audioRefSet ? audioRefSet.currentTime : undefined}
+                      durationSeconds={currentSetIndex === index && audioRefSet && audioRefSet.duration && !isNaN(audioRefSet.duration) ? audioRefSet.duration : undefined}
                     />
                   ))}
                 </div>
