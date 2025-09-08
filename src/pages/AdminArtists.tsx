@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
@@ -71,6 +71,11 @@ const AdminArtists = () => {
     featured: false,
     social_links: {},
   });
+
+  // Image upload states
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
 
   const itemsPerPage = 12;
   const queryClient = useQueryClient();
@@ -300,6 +305,50 @@ const AdminArtists = () => {
       console.error('Error saving artist:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       alert(`Error saving artist: ${errorMessage}`);
+    }
+  };
+
+  const handleSelectImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    setImageError(null);
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Enforce 5MB limit
+    const maxBytes = 5 * 1024 * 1024;
+    if (file.size > maxBytes) {
+      setImageError('Image exceeds 5MB limit');
+      event.target.value = '';
+      return;
+    }
+
+    // Validate type
+    if (!file.type.startsWith('image/')) {
+      setImageError('Only image files are allowed');
+      event.target.value = '';
+      return;
+    }
+
+    try {
+      setIsUploadingImage(true);
+      // Generate a path for Supabase Storage
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const path = `artists/${Date.now()}-${safeName}`;
+
+      // Lazy import to avoid circulars
+      const { uploadImageFile } = await import('@/lib/supabase-utils');
+      const publicUrl = await uploadImageFile(file, path);
+      if (!publicUrl) {
+        setImageError('Failed to upload image');
+        return;
+      }
+      setFormData(prev => ({ ...prev, photo_url: publicUrl }));
+    } catch (err) {
+      setImageError('Unexpected error uploading image');
+      // eslint-disable-next-line no-console
+      console.error(err);
+    } finally {
+      setIsUploadingImage(false);
+      event.target.value = '';
     }
   };
 
@@ -766,21 +815,175 @@ const AdminArtists = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="photo_url" className="block text-sm font-medium text-gray-300 mb-2">Photo URL</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Artist Photo</label>
+                  {/* Preview */}
+                  {formData.photo_url && (
+                    <div className="mb-3">
+                      <img
+                        src={formData.photo_url}
+                        alt="Artist preview"
+                        className="w-24 h-24 rounded-lg object-cover border border-white/10"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/placeholder.svg';
+                        }}
+                      />
+                    </div>
+                  )}
+                  {/* Upload controls */}
+                  <input
+                    ref={imageInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleSelectImage}
+                    aria-label="Select artist image to upload"
+                  />
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => imageInputRef.current?.click()}
+                      disabled={isUploadingImage}
+                      className="px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 transition-all disabled:opacity-50"
+                    >
+                      {isUploadingImage ? 'Uploading…' : 'Upload Image (max 5MB)'}
+                    </button>
+                    <span className="text-xs text-gray-500">or paste a URL</span>
+                  </div>
+                  {/* Optional URL input fallback */}
                   <input
                     id="photo_url"
                     type="text"
                     value={formData.photo_url}
                     onChange={(e) => setFormData(prev => ({ ...prev, photo_url: e.target.value }))}
-                    placeholder="Enter photo URL..."
-                    className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/20"
+                    placeholder="https://…"
+                    className="mt-2 w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/20"
                   />
+                  {imageError && (
+                    <p className="text-xs text-red-400 mt-1">{imageError}</p>
+                  )}
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">Genres</label>
                   <div className="flex flex-wrap gap-2">
-                    {['Techno', 'House', 'Electronic', 'Ambient', 'Deep House', 'Progressive', 'Industrial Techno', 'Atmospheric'].map(genre => (
+                    {[
+                      'Abstract',
+                      'Acid House',
+                      'Acid Techno',
+                      'Afrobeat',
+                      'Afrobeats',
+                      'Amapiano',
+                      'Ambient / Drone',
+                      'Atmospheric',
+                      'Baile Funk',
+                      'Balearic',
+                      'Ballroom',
+                      'Bass',
+                      'Batida',
+                      'Big Room',
+                      'Blend',
+                      'Breaks',
+                      'Changa Tuki / Bubbling',
+                      'Chicago House',
+                      'Dancehall / Reggae',
+                      'Dark Disco',
+                      'Dark Wave',
+                      'Deconstructed Club',
+                      'Deep Electro',
+                      'Deep House',
+                      'Deep Techno',
+                      'Detroit House',
+                      'Detroit Techno',
+                      'Disco / Nu-Disco',
+                      'Downtempo',
+                      'Driving',
+                      'Drum & Bass / Jungle',
+                      'Dub',
+                      'Dub Techno',
+                      'Dubstep',
+                      'Easy Listening',
+                      'EBM (Electronic Body Music)',
+                      'Electro',
+                      'Electroclash',
+                      'Electronica',
+                      'Euro Dance',
+                      'Euro House',
+                      'Euro Trance',
+                      'Experimental',
+                      'Footwork',
+                      'Fundraising',
+                      'Funk / Soul',
+                      'G House',
+                      'G Tech',
+                      'Gabber',
+                      'Garage House',
+                      'Glitch',
+                      'Goth',
+                      'Gqom',
+                      'Grime',
+                      'Hard Dance',
+                      'Hard Groove',
+                      'Hard House',
+                      'Hard Techno',
+                      'Hardcore',
+                      'Hi-NRG',
+                      'Hip Hop / R&B',
+                      'Hip House',
+                      'House',
+                      'Hybrid Show',
+                      'Hyperpop',
+                      'Hypnotic',
+                      'IDM (Intelligent Dance Music)',
+                      'Indie Dance',
+                      'Industrial',
+                      'Industrial Techno',
+                      'Italo Body Music',
+                      'Italo Disco',
+                      'Italo House',
+                      'Jackin House',
+                      'Jazz / World',
+                      'Jersey / Baltimore Club',
+                      'Leftfield',
+                      'Liquid House',
+                      'Live Show',
+                      'Metal',
+                      'Middle Eastern',
+                      'Minimal',
+                      'Minimal House',
+                      'Minimal Techno',
+                      'Neo Soul',
+                      'New Beat',
+                      'New Wave',
+                      'Noise',
+                      'Old School',
+                      'Post Punk',
+                      'Power Electronics',
+                      'Power House',
+                      'Psy / Goa Trance',
+                      'Rave',
+                      'Raw',
+                      'Reggaeton',
+                      'Schranz',
+                      'Slow Burners',
+                      'Slow Jamz',
+                      'Soulful House',
+                      'Soundtrack',
+                      'Speed Garage',
+                      'Street Soul',
+                      'Synth Pop',
+                      'Synth Wave',
+                      'Talks',
+                      'Tech House',
+                      'Techno',
+                      'Trance',
+                      'Trap',
+                      'Tribal',
+                      'Trip Hop',
+                      'UK Bass',
+                      'UK Funky',
+                      'UK Garage',
+                      'Zouk',
+                    ].map(genre => (
                       <button
                         key={genre}
                         onClick={() => handleGenreChange(genre)}
@@ -813,24 +1016,40 @@ const AdminArtists = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Social Links (JSON)</label>
-                  <textarea
-                    placeholder='{"instagram": "https://instagram.com/artist", "soundcloud": "https://soundcloud.com/artist"}'
-                    value={JSON.stringify(formData.social_links, null, 2)}
-                    onChange={(e) => {
-                      try {
-                        const parsed = JSON.parse(e.target.value);
-                        setFormData(prev => ({ ...prev, social_links: parsed }));
-                      } catch (error) {
-                        // Invalid JSON, keep current value
-                      }
-                    }}
-                    rows={6}
-                    className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/20 font-mono text-sm"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Enter valid JSON for social links and additional data
-                  </p>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Social Links</label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <label htmlFor="instagram" className="block text-xs text-gray-400 mb-1">Instagram</label>
+                      <input
+                        id="instagram"
+                        type="url"
+                        inputMode="url"
+                        placeholder="https://instagram.com/artist"
+                        value={(formData.social_links as any)?.instagram || ''}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          social_links: { ...(prev.social_links || {}), instagram: e.target.value }
+                        }))}
+                        className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/20"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="soundcloud" className="block text-xs text-gray-400 mb-1">SoundCloud</label>
+                      <input
+                        id="soundcloud"
+                        type="url"
+                        inputMode="url"
+                        placeholder="https://soundcloud.com/artist"
+                        value={(formData.social_links as any)?.soundcloud || ''}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          social_links: { ...(prev.social_links || {}), soundcloud: e.target.value }
+                        }))}
+                        className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/20"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">Paste full profile URLs. Only Instagram and SoundCloud are needed.</p>
                 </div>
 
 
