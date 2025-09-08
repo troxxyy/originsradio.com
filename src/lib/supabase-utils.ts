@@ -506,9 +506,22 @@ export const uploadAudioFile = async (file: File, path: string): Promise<string 
   }
   
   const supabase = getSupabaseClient()
+  // Ensure we have an authenticated session for storage policies
+  try {
+    const { data: sessionData } = await supabase.auth.getSession()
+    if (!sessionData.session) {
+      await supabase.auth.signInAnonymously()
+    }
+  } catch (authErr) {
+    console.error('Auth error before audio upload:', authErr)
+  }
   const { data, error } = await supabase.storage
     .from('audio')
-    .upload(path, file)
+    .upload(path, file, {
+      upsert: true,
+      contentType: file.type || 'application/octet-stream',
+      cacheControl: '3600',
+    })
   
   if (error) {
     console.error('Error uploading audio file:', error)
@@ -529,9 +542,22 @@ export const uploadImageFile = async (file: File, path: string): Promise<string 
   }
   
   const supabase = getSupabaseClient()
+  // Ensure we have an authenticated session for storage policies
+  try {
+    const { data: sessionData } = await supabase.auth.getSession()
+    if (!sessionData.session) {
+      await supabase.auth.signInAnonymously()
+    }
+  } catch (authErr) {
+    console.error('Auth error before image upload:', authErr)
+  }
   const { data, error } = await supabase.storage
     .from('images')
-    .upload(path, file)
+    .upload(path, file, {
+      upsert: true,
+      contentType: file.type || 'application/octet-stream',
+      cacheControl: '3600',
+    })
   
   if (error) {
     console.error('Error uploading image file:', error)
