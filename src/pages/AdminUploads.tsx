@@ -1,8 +1,10 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 import { getSupabaseAdminClient } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Upload, FileAudio, Loader2, CheckCircle, XCircle } from 'lucide-react';
+import { Upload, FileAudio, Loader2, CheckCircle, XCircle, Plus, User } from 'lucide-react';
 import WaveSurfer from 'wavesurfer.js';
 import WaveformGenerator from '@/components/admin/WaveformGenerator';
 
@@ -12,17 +14,39 @@ interface UploadStatus {
   progress: number;
   error?: string;
   setNumber?: number; // Add setNumber property
+  artistId?: string; // Add artistId property
+  artistName?: string; // Add artistName property
 }
 
 const AdminUploads = () => {
   const [uploads, setUploads] = useState<UploadStatus[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [selectedArtistId, setSelectedArtistId] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  // Fetch artists for dropdown
+  const { data: artists = [], isLoading: artistsLoading } = useQuery({
+    queryKey: ['artists'],
+    queryFn: async () => {
+      const { getArtists } = await import('@/lib/supabase-utils');
+      return getArtists();
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
     if (files.length === 0) return;
+
+    if (!selectedArtistId) {
+      toast({
+        title: "No artist selected",
+        description: "Please select an artist before uploading files",
+        variant: "destructive"
+      });
+      return;
+    }
 
     // Filter for audio files
     const audioFiles = files.filter(file => 
@@ -42,11 +66,14 @@ const AdminUploads = () => {
       // Try to extract set number from file name (first number found)
       const match = file.name.match(/(\d+)/);
       const setNumber = match ? parseInt(match[1], 10) : undefined;
+      const selectedArtist = artists.find(a => a.id === selectedArtistId);
       return {
         file,
         status: 'uploading',
         progress: 0,
         setNumber,
+        artistId: selectedArtistId,
+        artistName: selectedArtist?.name,
       };
     });
 
@@ -96,9 +123,40 @@ const AdminUploads = () => {
           const baseName = fileName.replace(/\.[^.]+$/, '');
           const peaksPath = `${baseName}.json`;
           const peaksBlob = new Blob([JSON.stringify({ peaks })], { type: 'application/json' });
-          await supabase.storage
+          const { data: peaksData } = await supabase.storage
             .from('waveforms')
             .upload(peaksPath, peaksBlob, { cacheControl: '3600', upsert: true, contentType: 'application/json' });
+
+          // Get peaks URL
+          const { data: peaksUrlData } = supabase.storage
+            .from('waveforms')
+            .getPublicUrl(peaksPath);
+
+          // Find the upload to get artist info
+          const currentUpload = uploads.find(upload => upload.file === file);
+          if (currentUpload?.artistId) {
+            // Create set in database using MCP
+            try {
+              const { createSet } = await import('@/lib/supabase-utils');
+              const setData = {
+                title: file.name.replace(/\.[^/.]+$/, ''), // Remove file extension
+                artist_id: currentUpload.artistId,
+                audio_url: urlData.publicUrl,
+                peaks_url: peaksUrlData.publicUrl,
+                duration: null, // Could be calculated from peaks if needed
+                release_date: new Date().toISOString().split('T')[0], // Today's date
+                views_count: 0,
+              };
+              
+              const newSet = await createSet(setData);
+              if (newSet) {
+                console.log('Set created successfully:', newSet);
+              }
+            } catch (dbError) {
+              console.error('Error creating set in database:', dbError);
+              // Continue with upload success even if DB creation fails
+            }
+          }
 
           // Update upload status
           setUploads(prev => prev.map(upload => 
@@ -109,7 +167,7 @@ const AdminUploads = () => {
 
           toast({
             title: "Upload successful",
-            description: `${file.name} has been uploaded successfully`,
+            description: `${file.name} has been uploaded and linked to ${currentUpload?.artistName || 'selected artist'}`,
           });
 
         } catch (error) {
@@ -221,6 +279,52 @@ const AdminUploads = () => {
           {/* Waveform Generator */}
           <WaveformGenerator />
 
+          {/* Artist Selection */}
+          <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-6 mb-6 border border-gray-700">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold flex items-center gap-2">
+                <User className="w-5 h-5" />
+                Select Artist
+              </h2>
+              <Link
+                to="/admin"
+                className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm flex items-center gap-2 transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                Create New Artist
+              </Link>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <select
+                value={selectedArtistId}
+                onChange={(e) => setSelectedArtistId(e.target.value)}
+                className="flex-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/20"
+                disabled={artistsLoading}
+                aria-label="Select artist for upload"
+                title="Select artist for upload"
+              >
+                <option value="">Choose an artist...</option>
+                {artists.map(artist => (
+                  <option key={artist.id} value={artist.id}>
+                    {artist.name}
+                  </option>
+                ))}
+              </select>
+              {selectedArtistId && (
+                <div className="text-sm text-gray-400">
+                  Selected: {artists.find(a => a.id === selectedArtistId)?.name}
+                </div>
+              )}
+            </div>
+            
+            {!selectedArtistId && (
+              <p className="text-sm text-yellow-400 mt-2">
+                ⚠️ Please select an artist before uploading files
+              </p>
+            )}
+          </div>
+
           {/* Upload Area */}
           <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-8 mb-8 mt-8 border border-gray-700">
             <div className="text-center">
@@ -229,6 +333,11 @@ const AdminUploads = () => {
                 <h2 className="text-2xl font-semibold mb-2">Upload Audio Files</h2>
                 <p className="text-gray-400">
                   Drag and drop audio files here or click to browse
+                  {selectedArtistId && (
+                    <span className="block text-sm text-blue-400 mt-1">
+                      Files will be associated with: {artists.find(a => a.id === selectedArtistId)?.name}
+                    </span>
+                  )}
                 </p>
               </div>
 
@@ -245,8 +354,8 @@ const AdminUploads = () => {
 
               <Button
                 onClick={() => fileInputRef.current?.click()}
-                disabled={isUploading}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold"
+                disabled={isUploading || !selectedArtistId}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Upload className="h-5 w-5 mr-2" />
                 {isUploading ? 'Uploading...' : 'Select Files'}
@@ -290,6 +399,9 @@ const AdminUploads = () => {
                       {getStatusIcon(upload.status)}
                       <div className="flex-1">
                         <p className="font-medium text-sm">{upload.file.name}</p>
+                        {upload.artistName && (
+                          <p className="text-xs text-blue-400">Artist: {upload.artistName}</p>
+                        )}
                         {/* Show set number if available */}
                         {upload.setNumber !== undefined && (
                           <p className="text-xs text-blue-400">Set #{upload.setNumber}</p>
