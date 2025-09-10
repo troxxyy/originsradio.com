@@ -20,6 +20,7 @@ type UiProject = {
   ticketUrl?: string;
   tiers?: TicketTier[];
   formUrl?: string;
+  price?: number;
 };
 
 const EventDetail = () => {
@@ -39,6 +40,8 @@ const EventDetail = () => {
       try {
         const projectData = await getOurWorkProjectBySlug(eventSlug);
         if (projectData) {
+          const rawPrice = (projectData as any).price;
+          const parsedPrice = rawPrice === null || rawPrice === undefined || rawPrice === '' ? undefined : Number(rawPrice);
           setProject({
             title: projectData.title,
             description: projectData.description,
@@ -50,6 +53,7 @@ const EventDetail = () => {
             ticketUrl: (projectData as any).ticket_url,
             tiers: (projectData as any).tiers,
             formUrl: (projectData as any).form_url,
+            price: Number.isFinite(parsedPrice as number) ? (parsedPrice as number) : undefined,
           });
         } else {
           setProject(null);
@@ -72,6 +76,11 @@ const EventDetail = () => {
   const ticketPriceLabel = useMemo(() => {
     const tiers = project?.tiers;
     if (!tiers || tiers.length === 0) {
+      // Use single price when available
+      if (typeof project?.price === 'number' && Number.isFinite(project.price)) {
+        const value = project.price;
+        return value === 0 ? "₺0.00" : new Intl.NumberFormat(undefined, { style: "currency", currency: "TRY" }).format(value);
+      }
       // For upcoming events without tiers, show ₺0.00
       if (project?.upcoming) {
         return "₺0.00";
@@ -87,7 +96,7 @@ const EventDetail = () => {
       v === 0 ? "₺0.00" : new Intl.NumberFormat(undefined, { style: "currency", currency }).format(v);
     if (minTier.price === maxTier.price) return fmt(minTier.price);
     return `${fmt(minTier.price)}–${fmt(maxTier.price)}`;
-  }, [project?.tiers, project?.upcoming]);
+  }, [project?.tiers, project?.upcoming, project?.price]);
 
   const availabilityLabel = useMemo(() => {
     const tiers = project?.tiers;
@@ -360,6 +369,7 @@ const EventDetail = () => {
                           {ticketPriceLabel && (
                             <div className="flex items-center gap-2">
                               <div className="text-2xl font-bold text-white">
+                                <span className="mr-2 text-base font-normal text-gray-300">starts from</span>
                                 {ticketPriceLabel}
                               </div>
                               {tiersCountLabel && (
@@ -387,7 +397,14 @@ const EventDetail = () => {
 
                         {/* Professional Buy Button */}
                         <button
-                          onClick={() => setIsTicketModalOpen(true)}
+                          onClick={() => {
+                            const url = project.formUrl || project.ticketUrl;
+                            if (url && /^https?:\/\//i.test(url)) {
+                              window.open(url, '_blank', 'noopener');
+                            } else {
+                              setIsTicketModalOpen(true);
+                            }
+                          }}
                           className="group relative inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-white to-gray-100 px-8 py-4 font-semibold text-black transition-all duration-300 hover:from-gray-100 hover:to-white hover:shadow-[0_8px_25px_rgba(255,255,255,0.3)] transform-gpu hover:scale-105"
                         >
                           <Ticket className="h-5 w-5 transition-transform group-hover:scale-110" />

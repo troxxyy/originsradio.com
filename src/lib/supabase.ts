@@ -258,6 +258,11 @@ export interface Database {
           tags: string[]
           date: string | null
           upcoming: boolean
+          location?: string | null
+          ticket_url?: string | null
+          tiers?: Record<string, any> | null
+          form_url?: string | null
+          price?: number | null
           slug: string
           created_at: string
           updated_at: string
@@ -270,6 +275,11 @@ export interface Database {
           tags?: string[]
           date?: string | null
           upcoming?: boolean
+          location?: string | null
+          ticket_url?: string | null
+          tiers?: Record<string, any> | null
+          form_url?: string | null
+          price?: number | null
           slug?: string
           created_at?: string
           updated_at?: string
@@ -282,6 +292,11 @@ export interface Database {
           tags?: string[]
           date?: string | null
           upcoming?: boolean
+          location?: string | null
+          ticket_url?: string | null
+          tiers?: Record<string, any> | null
+          form_url?: string | null
+          price?: number | null
           slug?: string
           created_at?: string
           updated_at?: string
