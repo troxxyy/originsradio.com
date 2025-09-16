@@ -126,17 +126,21 @@ const AdminUploads = () => {
           const fileName = `${timestamp}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
           const filePath = `sets/${fileName}`;
 
-          // Upload to Supabase storage
-          const { data, error } = await supabase.storage
+          // Upload to Supabase storage via signed upload URL (handles large files more reliably)
+          const { data: signed, error: signErr } = await supabase.storage
             .from('sets')
-            .upload(filePath, file, {
-              cacheControl: '3600',
-              upsert: false,
-              contentType: file.type || 'application/octet-stream'
+            .createSignedUploadUrl(filePath);
+          if (signErr || !signed?.token) {
+            throw signErr || new Error('Failed to create signed upload URL');
+          }
+          const { data: uploaded, error: uploadErr } = await supabase.storage
+            .from('sets')
+            .uploadToSignedUrl(filePath, signed.token, file, {
+              contentType: file.type || 'application/octet-stream',
+              upsert: false
             });
-
-          if (error) {
-            throw error;
+          if (uploadErr) {
+            throw uploadErr;
           }
 
           // Get the public URL
