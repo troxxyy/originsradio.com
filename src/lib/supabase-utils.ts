@@ -1,4 +1,4 @@
-import { getSupabaseClient, isSupabaseConfigured } from './supabase'
+import { getSupabaseClient, getSupabaseAdminClient, isSupabaseConfigured } from './supabase'
 import type { Database } from './supabase'
 
 type Artist = Database['public']['Tables']['artists']['Row']
@@ -344,6 +344,28 @@ export const createSet = async (set: Database['public']['Tables']['sets']['Inser
     return null
   }
   
+  return data
+}
+
+// Admin bypass: uses service role client to bypass RLS for admin-only inserts
+export const createSetAdmin = async (set: Database['public']['Tables']['sets']['Insert']): Promise<Set | null> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, cannot create set (admin)')
+    return null
+  }
+
+  const supabaseAdmin = getSupabaseAdminClient()
+  const { data, error } = await supabaseAdmin
+    .from('sets')
+    .insert(set)
+    .select()
+    .maybeSingle()
+
+  if (error) {
+    console.error('Error creating set (admin):', error)
+    return null
+  }
+
   return data
 }
 
