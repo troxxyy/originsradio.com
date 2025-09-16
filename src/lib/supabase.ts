@@ -173,6 +173,7 @@ export interface Database {
           peaks_url?: string | null
           duration: number | null
           release_date: string
+          set_number: number | null
           views_count: number | null
           created_at: string
           updated_at: string
@@ -191,6 +192,7 @@ export interface Database {
           peaks_url?: string | null
           duration?: number | null
           release_date: string
+          set_number?: number | null
           views_count?: number | null
           created_at?: string
           updated_at?: string
@@ -203,6 +205,7 @@ export interface Database {
           peaks_url?: string | null
           duration?: number | null
           release_date?: string
+          set_number?: number | null
           views_count?: number | null
           created_at?: string
           updated_at?: string

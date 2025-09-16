@@ -59,13 +59,13 @@ const Artists = () => {
   // SEO Data
   const seoData = {
     title: "Artists & DJs - Origins Radio | Ankara's Underground Music Scene",
-    description: "Discover talented DJs and music producers from Ankara's underground music scene. Listen to the latest tracks, sets, and performances from featured artists on Origins Radio.",
+    description: "Discover talented DJs and music producers from Ankara's underground music scene. Listen to the latest tracks, sets, and performances from resident artists on Origins Radio.",
     keywords: "DJs, music producers, Ankara, underground music, techno, house, electronic music, Origins Radio, Turkey, artists, musicians",
     structuredData: {
       "@context": "https://schema.org",
       "@type": "ItemList",
       "name": "Artists & DJs",
-      "description": "Featured DJs and music producers from Ankara's underground music scene",
+      "description": "Resident DJs and music producers from Ankara's underground music scene",
       "url": "https://originsradio.com/artists",
       "numberOfItems": artists?.length || 0,
       "itemListElement": artists?.map((artist, index) => ({
@@ -159,13 +159,13 @@ const Artists = () => {
                   onClick={() => setShowFeaturedOnly(!showFeaturedOnly)}
                   className={`px-4 py-3 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap ${
                     showFeaturedOnly
-                      ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 hover:bg-yellow-500/30'
+                      ? 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30'
                       : 'bg-white/10 text-white border border-white/20 hover:bg-white/20'
                   }`}
                 >
                   <Star className="w-4 h-4" />
-                  <span className="hidden sm:inline">Featured Only</span>
-                  <span className="sm:hidden">Featured</span>
+                  <span className="hidden sm:inline">Residence Artists</span>
+                  <span className="sm:hidden">Residence Artists</span>
                 </button>
               </div>
             </div>
@@ -179,7 +179,7 @@ const Artists = () => {
                     : `${filteredArtists.length} artist${filteredArtists.length !== 1 ? 's' : ''} found`
                   }
                   {searchTerm && ` for "${searchTerm}"`}
-                  {showFeaturedOnly && ' (featured only)'}
+                  {showFeaturedOnly && ' (residence artists only)'}
                 </p>
               </div>
             )}
@@ -241,7 +241,7 @@ const Artists = () => {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                       
-                      {/* Featured Badge on Photo */}
+                      {/* Resident Badge on Photo */}
                       {artist.featured && (
                         <motion.div 
                           initial={{ opacity: 0 }}
@@ -249,9 +249,9 @@ const Artists = () => {
                           transition={{ delay: 0.3, duration: 0.8 }}
                           className="absolute top-3 left-3 z-10"
                         >
-                          <div className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-400 text-black px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg border border-white/20">
+                          <div className="bg-gradient-to-r from-red-500 via-red-600 to-red-700 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg border border-red-500/30">
                             <Star className="w-3 h-3 fill-current" />
-                            <span>FEATURED</span>
+                            <span>RESIDENT</span>
                           </div>
                         </motion.div>
                       )}
