@@ -106,7 +106,7 @@ const AdminUploads = () => {
       const supabase = getSupabaseAdminClient();
       // Ensure waveforms bucket exists and is public
       try {
-        await supabase.storage.createBucket('waveforms', { public: true, fileSizeLimit: '5MB', allowedMimeTypes: ['application/json'] });
+        await supabase.storage.createBucket('waveforms', { public: true });
       } catch (e) {
         // ignore if already exists
       }
