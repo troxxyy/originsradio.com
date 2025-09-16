@@ -115,21 +115,29 @@ const AdminUploads = () => {
           const fileName = `${timestamp}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
           const filePath = `${fileName}`;
 
-          // Upload to Supabase storage via signed upload URL (handles large files more reliably)
-          const { data: signed, error: signErr } = await supabase.storage
-            .from('sets')
-            .createSignedUploadUrl(filePath);
-          if (signErr || !signed?.token) {
-            throw signErr || new Error('Failed to create signed upload URL');
-          }
-          const { data: uploaded, error: uploadErr } = await supabase.storage
-            .from('sets')
-            .uploadToSignedUrl(filePath, signed.token, file, {
+          // Try signed upload first; if it fails, fall back to direct upload
+          const storageRef = supabase.storage.from('sets');
+          let uploadedOk = false;
+          try {
+            const { data: signed, error: signErr } = await storageRef.createSignedUploadUrl(filePath);
+            if (signErr || !signed?.token) throw signErr || new Error('Failed to create signed upload URL');
+            const { error: uploadErr } = await storageRef.uploadToSignedUrl(filePath, signed.token, file, {
               contentType: file.type || 'application/octet-stream',
               upsert: false
             });
-          if (uploadErr) {
-            throw uploadErr;
+            if (uploadErr) throw uploadErr;
+            uploadedOk = true;
+          } catch (signedErr) {
+            // Fallback to standard upload
+            const { error: directErr } = await storageRef.upload(filePath, file, {
+              cacheControl: '3600',
+              upsert: false,
+              contentType: file.type || 'application/octet-stream'
+            });
+            if (directErr) {
+              throw directErr;
+            }
+            uploadedOk = true;
           }
 
           // Get the public URL
