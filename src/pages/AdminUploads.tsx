@@ -108,7 +108,7 @@ const AdminUploads = () => {
       try {
         // Ensure sets bucket exists and has a higher file size limit
         try {
-          await supabase.storage.updateBucket('sets', { public: true, fileSizeLimit: '2GB' });
+          await supabase.storage.updateBucket('sets', { public: true, fileSizeLimit: 2147483648 });
         } catch {
           try { await supabase.storage.createBucket('sets', { public: true }); } catch {}
         }
