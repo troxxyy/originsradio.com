@@ -323,6 +323,16 @@ export const createSet = async (set: Database['public']['Tables']['sets']['Inser
   }
   
   const supabase = getSupabaseClient()
+  // Ensure we have at least anonymous session to satisfy authenticated policies
+  try {
+    const { data: sessionData } = await supabase.auth.getSession()
+    if (!sessionData.session) {
+      await supabase.auth.signInAnonymously()
+    }
+  } catch (authErr) {
+    // eslint-disable-next-line no-console
+    console.error('Auth error before creating set:', authErr)
+  }
   const { data, error } = await supabase
     .from('sets')
     .insert(set)

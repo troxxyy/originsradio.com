@@ -611,7 +611,7 @@ const ArtistDetail = () => {
                     </motion.button>
                   </div>
                 
-                  {/* Featured Badge */}
+                  {/* Resident Badge */}
                   {artist.featured && (
                     <motion.div
                       initial={{ opacity: 0 }}
@@ -619,9 +619,9 @@ const ArtistDetail = () => {
                       transition={{ delay: 0.3, duration: 0.8 }}
                       className="absolute top-4 left-4 z-20"
                     >
-                      <div className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-400 text-black px-6 py-3 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg border border-white/20 backdrop-blur-sm">
+                      <div className="bg-gradient-to-r from-red-500 via-red-600 to-red-700 text-white px-6 py-3 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg border border-red-500/30 backdrop-blur-sm">
                         <Star className="w-4 h-4 fill-current" />
-                        <span>FEATURED DJ</span>
+                        <span>RESIDENT DJ</span>
                       </div>
                     </motion.div>
                   )}

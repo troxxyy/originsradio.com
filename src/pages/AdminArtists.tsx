@@ -189,11 +189,11 @@ const AdminArtists = () => {
       switch (action) {
         case 'feature':
           await bulkUpdateMutation.mutateAsync({ ids: selectedArtists, updates: { featured: true } });
-          alert(`Featured ${selectedArtists.length} artists`);
+          alert(`Marked ${selectedArtists.length} resident artist${selectedArtists.length !== 1 ? 's' : ''}`);
           break;
         case 'unfeature':
           await bulkUpdateMutation.mutateAsync({ ids: selectedArtists, updates: { featured: false } });
-          alert(`Unfeatured ${selectedArtists.length} artists`);
+          alert(`Removed resident status from ${selectedArtists.length} artist${selectedArtists.length !== 1 ? 's' : ''}`);
           break;
         case 'delete':
           const deletedCount = await bulkDeleteMutation.mutateAsync(selectedArtists);
@@ -449,10 +449,10 @@ const AdminArtists = () => {
               <div className="glass backdrop-blur-sm rounded-xl p-6 border border-white/10">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-400 text-sm">Featured Artists</p>
+                    <p className="text-gray-400 text-sm">Resident Artists</p>
                     <p className="text-2xl font-bold text-white">{stats?.featured || 0}</p>
                   </div>
-                  <Star className="w-8 h-8 text-yellow-400" />
+                  <Star className="w-8 h-8 text-red-400" />
                 </div>
               </div>
               
@@ -535,9 +535,9 @@ const AdminArtists = () => {
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleBulkAction('feature')}
-                    className="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-lg text-sm hover:bg-yellow-500/30 transition-all"
+                    className="px-3 py-1 bg-red-500/20 text-red-400 rounded-lg text-sm hover:bg-red-500/30 transition-all"
                   >
-                    Feature
+                    Mark Resident
                   </button>
                   <button
                     onClick={() => handleBulkAction('unfeature')}
@@ -669,7 +669,7 @@ const AdminArtists = () => {
                               </div>
                             </div>
                             {artist.featured && (
-                              <Star className="w-4 h-4 text-yellow-400" />
+                              <Star className="w-4 h-4 text-red-400" />
                             )}
                           </div>
                         </td>
@@ -677,8 +677,8 @@ const AdminArtists = () => {
                         <td className="px-6 py-4">
                           <div className="flex flex-wrap gap-1">
                             {artist.featured ? (
-                              <span className="px-2 py-1 bg-yellow-500/20 rounded-full text-xs text-yellow-400 border border-yellow-500/20">
-                                Featured
+                              <span className="px-2 py-1 bg-red-500/20 rounded-full text-xs text-red-400 border border-red-500/20">
+                                Resident
                               </span>
                             ) : (
                               <span className="px-2 py-1 bg-gray-500/10 rounded-full text-xs text-gray-400 border border-gray-500/20">
@@ -1000,7 +1000,7 @@ const AdminArtists = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Featured Artist</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Resident Artist</label>
                   <div className="flex items-center gap-2">
                     <input
                       type="checkbox"
@@ -1010,7 +1010,7 @@ const AdminArtists = () => {
                       className="rounded border-white/20 bg-white/10"
                     />
                     <label htmlFor="featured" className="text-sm text-gray-300">
-                      Mark as featured artist
+                      Mark as resident artist
                     </label>
                   </div>
                 </div>

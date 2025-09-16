@@ -3,6 +3,9 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { getSupabaseAdminClient } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Upload, FileAudio, Loader2, CheckCircle, XCircle, Plus, User } from 'lucide-react';
 import WaveSurfer from 'wavesurfer.js';
@@ -21,6 +24,11 @@ interface UploadStatus {
 const AdminUploads = () => {
   const [uploads, setUploads] = useState<UploadStatus[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [showMetaDialog, setShowMetaDialog] = useState(false);
+  const [pendingMetaFile, setPendingMetaFile] = useState<File | null>(null);
+  const [metaTitle, setMetaTitle] = useState('');
+  const [metaSetNumber, setMetaSetNumber] = useState<string>('');
+  const [metaReleaseDate, setMetaReleaseDate] = useState<string>('');
   const [selectedArtistId, setSelectedArtistId] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -78,7 +86,17 @@ const AdminUploads = () => {
     });
 
     setUploads(prev => [...prev, ...newUploads]);
-    uploadFiles(audioFiles);
+    // Prompt metadata for the first file; process sequentially
+    if (audioFiles.length > 0) {
+      const first = audioFiles[0];
+      setPendingMetaFile(first);
+      const guessTitle = first.name.replace(/\.[^/.]+$/, '');
+      setMetaTitle(guessTitle);
+      const match = first.name.match(/(\d+)/);
+      setMetaSetNumber(match ? String(parseInt(match[1], 10)) : '');
+      setMetaReleaseDate(new Date().toISOString().split('T')[0]);
+      setShowMetaDialog(true);
+    }
   };
 
   const uploadFiles = async (files: File[]) => {
@@ -139,12 +157,13 @@ const AdminUploads = () => {
             try {
               const { createSet } = await import('@/lib/supabase-utils');
               const setData = {
-                title: file.name.replace(/\.[^/.]+$/, ''), // Remove file extension
+                title: file === pendingMetaFile && metaTitle ? metaTitle : file.name.replace(/\.[^/.]+$/, ''),
                 artist_id: currentUpload.artistId,
                 audio_url: urlData.publicUrl,
                 peaks_url: peaksUrlData.publicUrl,
                 duration: null, // Could be calculated from peaks if needed
-                release_date: new Date().toISOString().split('T')[0], // Today's date
+                release_date: file === pendingMetaFile && metaReleaseDate ? metaReleaseDate : new Date().toISOString().split('T')[0],
+                set_number: file === pendingMetaFile && metaSetNumber ? parseInt(metaSetNumber, 10) : currentUpload?.setNumber ?? null,
                 views_count: 0,
               };
               
@@ -199,6 +218,23 @@ const AdminUploads = () => {
     }
 
     setIsUploading(false);
+  };
+
+  const handleMetaCancel = () => {
+    setShowMetaDialog(false);
+    // Proceed with upload for all files with defaults
+    if (pendingMetaFile) {
+      uploadFiles([pendingMetaFile]);
+    }
+    setPendingMetaFile(null);
+  };
+
+  const handleMetaConfirm = () => {
+    setShowMetaDialog(false);
+    if (pendingMetaFile) {
+      uploadFiles([pendingMetaFile]);
+    }
+    setPendingMetaFile(null);
   };
 
   // Compute PCM peaks via WaveSurfer without rendering
@@ -443,6 +479,32 @@ const AdminUploads = () => {
               Files are uploaded to: <code className="bg-gray-700 px-2 py-1 rounded">originsradio/sets/</code>
             </p>
           </div>
+
+          <Dialog open={showMetaDialog} onOpenChange={setShowMetaDialog}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Set details</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="title">Title</Label>
+                  <Input id="title" value={metaTitle} onChange={(e) => setMetaTitle(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="set_number">Set number</Label>
+                  <Input id="set_number" type="number" value={metaSetNumber} onChange={(e) => setMetaSetNumber(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="release_date">Release date</Label>
+                  <Input id="release_date" type="date" value={metaReleaseDate} onChange={(e) => setMetaReleaseDate(e.target.value)} />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="ghost" onClick={handleMetaCancel}>Skip</Button>
+                <Button onClick={handleMetaConfirm}>Save</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </div>

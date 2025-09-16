@@ -138,6 +138,11 @@ const App = () => {
                       <AdminUploads />
                     </RouteTracker>
                   } />
+                  <Route path="/uploads" element={
+                    <RouteTracker>
+                      <AdminUploads />
+                    </RouteTracker>
+                  } />
 
                   <Route path="*" element={
                     <RouteTracker>
