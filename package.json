@@ -83,6 +83,7 @@
     "@vitejs/plugin-react-swc": "^3.6.0",
     "autoprefixer": "^10.4.20",
     "chai": "^4.3.10",
+    "esbuild": "^0.24.2",
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.9",
@@ -98,6 +99,6 @@
     "terser": "^5.39.0",
     "typescript": "^5.3.3",
     "typescript-eslint": "^8.0.1",
-    "vite": "^5.1.4"
+    "vite": "^5.4.20"
   }
 }
