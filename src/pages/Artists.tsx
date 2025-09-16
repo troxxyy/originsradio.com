@@ -164,8 +164,8 @@ const Artists = () => {
                   }`}
                 >
                   <Star className="w-4 h-4" />
-                  <span className="hidden sm:inline">Residence Artists</span>
-                  <span className="sm:hidden">Residence Artists</span>
+                  <span className="hidden sm:inline">Resident Artists</span>
+                  <span className="sm:hidden">Resident Artists</span>
                 </button>
               </div>
             </div>
@@ -179,7 +179,7 @@ const Artists = () => {
                     : `${filteredArtists.length} artist${filteredArtists.length !== 1 ? 's' : ''} found`
                   }
                   {searchTerm && ` for "${searchTerm}"`}
-                  {showFeaturedOnly && ' (residence artists only)'}
+                  {showFeaturedOnly && ' (resident artists only)'}
                 </p>
               </div>
             )}
