@@ -105,18 +105,7 @@ const AdminUploads = () => {
     try {
       const supabase = getSupabaseAdminClient();
       // Ensure waveforms bucket exists and is public
-      try {
-        // Ensure sets bucket exists and has a higher file size limit
-        try {
-          await supabase.storage.updateBucket('sets', { public: true, fileSizeLimit: 2147483648 });
-        } catch {
-          try { await supabase.storage.createBucket('sets', { public: true }); } catch {}
-        }
-        // Ensure waveforms bucket exists
-        await supabase.storage.createBucket('waveforms', { public: true });
-      } catch (e) {
-        // ignore if already exists or update not permitted
-      }
+      // Buckets should be provisioned in Supabase; avoid runtime create/update to prevent 400s
 
       for (const file of files) {
         try {
@@ -124,7 +113,7 @@ const AdminUploads = () => {
           const timestamp = Date.now();
           const fileExtension = file.name.split('.').pop();
           const fileName = `${timestamp}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-          const filePath = `sets/${fileName}`;
+          const filePath = `${fileName}`;
 
           // Upload to Supabase storage via signed upload URL (handles large files more reliably)
           const { data: signed, error: signErr } = await supabase.storage
