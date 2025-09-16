@@ -106,9 +106,16 @@ const AdminUploads = () => {
       const supabase = getSupabaseAdminClient();
       // Ensure waveforms bucket exists and is public
       try {
+        // Ensure sets bucket exists and has a higher file size limit
+        try {
+          await supabase.storage.updateBucket('sets', { public: true, fileSizeLimit: '500MB' });
+        } catch {
+          try { await supabase.storage.createBucket('sets', { public: true }); } catch {}
+        }
+        // Ensure waveforms bucket exists
         await supabase.storage.createBucket('waveforms', { public: true });
       } catch (e) {
-        // ignore if already exists
+        // ignore if already exists or update not permitted
       }
 
       for (const file of files) {
@@ -124,7 +131,8 @@ const AdminUploads = () => {
             .from('sets')
             .upload(filePath, file, {
               cacheControl: '3600',
-              upsert: false
+              upsert: false,
+              contentType: file.type || 'application/octet-stream'
             });
 
           if (error) {
