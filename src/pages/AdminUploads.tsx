@@ -155,7 +155,7 @@ const AdminUploads = () => {
           if (currentUpload?.artistId) {
             // Create set in database using MCP
             try {
-              const { createSet } = await import('@/lib/supabase-utils');
+              const { createSetAdmin } = await import('@/lib/supabase-utils');
               const setData = {
                 title: file === pendingMetaFile && metaTitle ? metaTitle : file.name.replace(/\.[^/.]+$/, ''),
                 artist_id: currentUpload.artistId,
@@ -167,7 +167,7 @@ const AdminUploads = () => {
                 views_count: 0,
               };
               
-              const newSet = await createSet(setData);
+              const newSet = await createSetAdmin(setData);
               if (newSet) {
                 console.log('Set created successfully:', newSet);
               }
