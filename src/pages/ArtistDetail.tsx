@@ -29,7 +29,7 @@ import {
 import PageLayout from '@/components/layout/PageLayout';
 import { useArtistBySlug, useTracksByArtist, useEventsByArtist, useSetsByArtist, useArtistLikeCount, useArtistLikeStatus, useToggleArtistLike } from '@/hooks/use-supabase';
 import ArtistSetItem, { ArtistSetEvent } from '@/components/music/ArtistSetItem';
-import ProgressBar from '@/components/music/ProgressBar';
+import { ProgressBar } from '@/components/home/UpNext';
 import { getSupabaseClient } from '@/lib/supabase';
 
 const ArtistDetail = () => {

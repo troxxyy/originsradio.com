@@ -200,13 +200,13 @@ export const UpNextItem = ({ event, index, onPlay, onSeek, isPlaying, progress }
       }`}
     >
       {/* Header - Art + Info */}
-      <div className="flex items-center gap-3 sm:gap-4 mb-2 sm:mb-3">
+      <div className="flex gap-4 sm:gap-5 mb-4">
         {/* Artwork with overlayed play */}
         {event.artistPhoto ? (
           <button
             onClick={handlePlayClick}
             aria-label={isPlaying ? 'Pause set' : 'Play set'}
-            className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden border border-white/10 focus:outline-none focus:ring-2 focus:ring-white/30"
+            className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border border-white/10 focus:outline-none focus:ring-2 focus:ring-white/30 flex-shrink-0"
           >
             <img
               src={event.artistPhoto}
@@ -218,9 +218,9 @@ export const UpNextItem = ({ event, index, onPlay, onSeek, isPlaying, progress }
               isPlaying ? 'bg-white/70' : 'bg-black/40 hover:bg-black/50'
             }`}>
               {isPlaying ? (
-                <Pause className="w-5 h-5 text-black" />
+                <Pause className="w-6 h-6 text-black" />
               ) : (
-                <Play className="w-5 h-5 text-white ml-0.5" />
+                <Play className="w-6 h-6 text-white ml-0.5" />
               )}
             </div>
           </button>
@@ -228,64 +228,74 @@ export const UpNextItem = ({ event, index, onPlay, onSeek, isPlaying, progress }
           <button
             onClick={handlePlayClick}
             aria-label={isPlaying ? 'Pause set' : 'Play set'}
-            className={`w-12 h-12 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-colors border flex-shrink-0 ${
+            className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center transition-colors border flex-shrink-0 ${
               isPlaying
                 ? 'bg-white text-black border-white/80'
                 : 'bg-white/10 text-white border-white/20 hover:bg-white/15'
             }`}
           >
             {isPlaying ? (
-              <Pause className="w-5 h-5" />
+              <Pause className="w-6 h-6" />
             ) : (
-              <Play className="w-5 h-5 ml-0.5" />
+              <Play className="w-6 h-6 ml-0.5" />
             )}
           </button>
         )}
 
         {/* Track Info */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-0.5">
-            <h3 className="text-white font-semibold text-base sm:text-lg truncate">
+        <div className="flex-1 min-w-0 flex flex-col justify-center">
+          {/* Top Row: Title and Set Number */}
+          <div className="flex items-center gap-3 mb-2">
+            <h3 className="text-white font-bold text-lg sm:text-xl truncate">
               {event.title}
             </h3>
             {event.setNumber && (
-              <span className="text-[10px] px-1.5 py-0.5 bg-white/10 text-white/70 rounded-md font-mono tracking-tight">
+              <span className="text-xs px-2 py-1 bg-white/15 text-white/80 rounded-lg tracking-wide">
                 #{event.setNumber}
               </span>
             )}
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3 text-[11px] sm:text-xs text-white/60 mb-1">
-            <span className="truncate max-w-[40vw] sm:max-w-none">{event.artist}</span>
-            {event.artistLocation && (
-              <>
-                <span className="opacity-50">•</span>
-                <span className="flex items-center gap-1 truncate">
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  {event.artistLocation}
-                </span>
-              </>
-            )}
-            <span className="opacity-50">•</span>
-            <span>{formatDate(event.date)}</span>
+          {/* Artist Name */}
+          <div className="mb-2">
+            <span className="text-white/90 text-sm sm:text-base font-medium truncate block">
+              {event.artist}
+            </span>
           </div>
 
-          {hasArtistSlug && (
+          {/* Bottom Row: Location and Date */}
+          <div className="flex items-center flex-wrap gap-x-4 gap-y-2">
+            {event.artistLocation && (
+              <span className="flex items-center gap-1.5 text-xs text-white/60">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                {event.artistLocation}
+              </span>
+            )}
+            
+            <span className="text-xs text-white/60">
+              {formatDate(event.date)}
+            </span>
+          </div>
+        </div>
+
+        {/* Right Section - View Artist Button */}
+        {hasArtistSlug && (
+          <div className="flex items-center">
             <a
               href={`/artists/${event.artistSlug}`}
               onClick={(e) => e.stopPropagation()}
-              className="inline-flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-400/30 rounded-full text-[10px] font-medium text-blue-300 hover:text-blue-200 hover:border-blue-300/50 transition-all duration-300 group/link touch-manipulation"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-400/30 rounded-full text-xs font-medium text-blue-300 hover:text-blue-200 hover:border-blue-300/50 transition-all duration-300 group/link touch-manipulation"
             >
               <span>View Artist</span>
               <svg className="w-3 h-3 group-hover/link:translate-x-0.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </a>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Waveform + timecodes */}
@@ -498,60 +508,6 @@ const UpNextSection = () => {
         </div>
       ) : (
         <>
-          {/* Anniversary Event Card */}
-          <div className="mb-8">
-            <a 
-              href="/anniversary"
-              className="block group relative overflow-hidden"
-            >
-              <div className="relative bg-black/60 backdrop-blur-xl border border-white/10 rounded-xl p-6 shadow-2xl transition-all duration-500 hover:border-white/20 hover:shadow-white/5">
-                <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-purple-500/10 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-                
-                <div className="relative">
-                  <div className="flex items-center gap-3 mb-4">
-                    <span className="inline-flex items-center px-3 py-1 bg-red-500/20 backdrop-blur-sm border border-red-500/30 rounded-full text-xs font-medium text-red-300">
-                      Past Event
-                    </span>
-                    <h2 className="text-2xl font-bold text-white">3 Years of Origins - Full Event Recording</h2>
-                  </div>
-                  
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <p className="text-gray-300">Experience our epic 24-hour anniversary celebration featuring amazing sets from our talented artists.</p>
-                      <div className="flex flex-wrap gap-4 text-sm text-gray-400">
-                        <div className="flex items-center gap-2">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          <span>24 Hours</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                          </svg>
-                          <span>24 Artists</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                          </svg>
-                          <span>Full Recording</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-end">
-                      <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white px-6 py-3 rounded-full text-sm font-medium group-hover:bg-white/20 transition-all duration-300">
-                        Listen to Full Event
-                        <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </a>
-          </div>
-
           {/* Regular Sets */}
           <div className="space-y-4 sm:space-y-6">
             {setsToShow.map((event, index) => (
