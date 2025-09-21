@@ -23,6 +23,7 @@ const ArtistDetail = lazy(() => import("./pages/ArtistDetail"));
 const AdminArtists = lazy(() => import("./pages/AdminArtists"));
 const AdminUploads = lazy(() => import("./pages/AdminUploads"));
 const Anniversary = lazy(() => import("./pages/Anniversary"));
+const ThisWeek = lazy(() => import("./pages/ThisWeek"));
 
 const queryClient = new QueryClient();
 
@@ -110,6 +111,11 @@ const App = () => {
                   <Route path="/artists" element={
                     <RouteTracker>
                       <Artists />
+                    </RouteTracker>
+                  } />
+                  <Route path="/thisweek" element={
+                    <RouteTracker>
+                      <ThisWeek />
                     </RouteTracker>
                   } />
 
