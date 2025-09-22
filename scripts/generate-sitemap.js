@@ -112,7 +112,7 @@ User-agent: *
 Allow: /
 
 # Disallow admin and private areas
-Disallow: /admin/
+Disallow: /artistcontrolsecret/
 Disallow: /originsradio/adminuploads
 Disallow: /_next/
 Disallow: /api/
