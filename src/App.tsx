@@ -129,12 +129,12 @@ const App = () => {
                       <Anniversary />
                     </RouteTracker>
                   } />
-                  <Route path="/admin/artists" element={
+                  <Route path="/artistcontrolsecret/artists" element={
                     <RouteTracker>
                       <AdminArtists />
                     </RouteTracker>
                   } />
-                  <Route path="/admin" element={
+                  <Route path="/artistcontrolsecret" element={
                     <RouteTracker>
                       <AdminArtists />
                     </RouteTracker>
