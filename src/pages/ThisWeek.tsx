@@ -177,7 +177,7 @@ const ThisWeek = () => {
             id: assets.id,
             name: assets.name,
             location: "Ankara",
-            lineup: Array.isArray(r.lineup_names) && r.lineup_names.length > 0 ? r.lineup_names : (r.event_artist ? [r.event_artist] : undefined),
+            lineup: r.event_artist ? [r.event_artist] : undefined,
             estimatedPriceTry: Number.isFinite(priceNum as number) ? (priceNum as number) : undefined,
             logoSrc: assets.logoSrc,
             eventUrl: r.event_url || undefined,
