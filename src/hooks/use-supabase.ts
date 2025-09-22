@@ -28,7 +28,12 @@ import {
   generateUserId,
   getChatMessages,
   createChatMessage,
-  subscribeToChatMessages
+  subscribeToChatMessages,
+  getThisWeekEvents,
+  getThisWeekEventsByDate,
+  createThisWeekEvent,
+  updateThisWeekEvent,
+  deleteThisWeekEvent
 } from '../lib/supabase-utils'
 import type { Database } from '../lib/supabase'
 import { useEffect } from 'react'
@@ -351,5 +356,56 @@ export const useOurWorkProjects = () => {
     queryKey: ['our_work_projects'],
     queryFn: getOurWorkProjects,
     staleTime: 5 * 60 * 1000,
+  })
+}
+
+// ThisWeek hooks
+export const useThisWeekEvents = () => {
+  return useQuery({
+    queryKey: ['thisweek_events'],
+    queryFn: getThisWeekEvents,
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+export const useThisWeekEventsByDate = (startDate: string, endDate: string) => {
+  return useQuery({
+    queryKey: ['thisweek_events', 'date', startDate, endDate],
+    queryFn: () => getThisWeekEventsByDate(startDate, endDate),
+    enabled: !!startDate && !!endDate,
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+export const useCreateThisWeekEvent = () => {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: createThisWeekEvent,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['thisweek_events'] })
+    },
+  })
+}
+
+export const useUpdateThisWeekEvent = () => {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => updateThisWeekEvent(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['thisweek_events'] })
+    },
+  })
+}
+
+export const useDeleteThisWeekEvent = () => {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: deleteThisWeekEvent,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['thisweek_events'] })
+    },
   })
 }
