@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Calendar, MapPin, Users, Ticket, Clock, Wrench } from "lucide-react";
 import PageLayout from "@/components/layout/PageLayout";
-import { fetchThisWeekRows, ThisWeekSheetRow } from "@/lib/thisweek";
+import { useThisWeekEventsByDate, useOurWorkProjects } from "@/hooks/use-supabase";
 
 type ClubIdentifier =
   | "backyardsecrets"
@@ -16,7 +16,7 @@ type ClubIdentifier =
   | "stir";
 
 interface ClubScheduleItem {
-  id: ClubIdentifier;
+  id: ClubIdentifier | string;
   name: string;
   location: string;
   lineup?: string[];
@@ -25,6 +25,8 @@ interface ClubScheduleItem {
   logoSrc?: string;
   eventUrl?: string;
   eventImageUrl?: string;
+  isOurEvent?: boolean; // Flag to identify our events
+  description?: string; // For our events
 }
 
 interface DaySchedule {
@@ -138,103 +140,123 @@ const ThisWeek = () => {
 
   const { friday, saturday } = useMemo(() => getUpcomingFridayAndSaturday(), []);
 
-  const [sheetSchedule, setSheetSchedule] = useState<DaySchedule[] | null>(null);
+  // Get date range for this week's events
+  const fridayKey = formatYyyyMmDd(friday);
+  const saturdayKey = formatYyyyMmDd(saturday);
+  const startDate = fridayKey;
+  const endDate = saturdayKey;
 
-  useEffect(() => {
-    let isCancelled = false;
-    (async () => {
-      try {
-        const rows = await fetchThisWeekRows();
-        if (isCancelled) return;
+  // Fetch this week's events from Supabase
+  const { data: thisWeekEvents, isLoading: isLoadingEvents } = useThisWeekEventsByDate(startDate, endDate);
+  
+  // Fetch our work projects for our events
+  const { data: ourWorkProjects, isLoading: isLoadingOurWork } = useOurWorkProjects();
 
-        const fridayKey = formatYyyyMmDd(friday);
-        const saturdayKey = formatYyyyMmDd(saturday);
+  // Process events and create schedule
+  const schedule: DaySchedule[] = useMemo(() => {
+    const byDay = new Map<string, ClubScheduleItem[]>();
+    byDay.set(fridayKey, []);
+    byDay.set(saturdayKey, []);
 
-        const byDay = new Map<string, ClubScheduleItem[]>();
-        byDay.set(fridayKey, []);
-        byDay.set(saturdayKey, []);
+    // Process this week's club events
+    if (thisWeekEvents) {
+      for (const event of thisWeekEvents) {
+        const eventDate = parseSheetDate(event.event_date);
+        if (!eventDate) continue;
+        const key = formatYyyyMmDd(eventDate);
+        if (!byDay.has(key)) continue; // only show Fri/Sat
 
-        for (const r of rows) {
-          const eventDate = parseSheetDate(r.event_date);
-          if (!eventDate) continue;
-          const key = formatYyyyMmDd(eventDate);
-          if (!byDay.has(key)) continue; // only show Fri/Sat
+        const normalized = normalizeClubName(event.club_name);
+        const assets = clubAssetsByNormalizedName[normalized];
+        if (!assets) continue; // skip unknown clubs
 
-          const normalized = normalizeClubName(r.club_name);
-          const assets = clubAssetsByNormalizedName[normalized];
-          if (!assets) continue; // skip unknown clubs
-
-          const priceRaw = (r.price ?? "").toString().trim();
-          let priceNum: number | undefined = undefined;
-          const priceMatch = priceRaw.match(/(\d+(?:[.,]\d+)?)/);
-          if (priceMatch) {
-            const normalized = priceMatch[1].replace(",", ".");
-            const parsed = parseFloat(normalized);
-            priceNum = Number.isFinite(parsed) ? Math.round(parsed) : undefined;
-          }
-
-          const item: ClubScheduleItem = {
-            id: assets.id,
-            name: assets.name,
-            location: "Ankara",
-            lineup: r.event_artist ? [r.event_artist] : undefined,
-            estimatedPriceTry: Number.isFinite(priceNum as number) ? (priceNum as number) : undefined,
-            logoSrc: assets.logoSrc,
-            eventUrl: r.event_url || undefined,
-            eventImageUrl: r.image_url || undefined,
-          };
-
-          byDay.get(key)!.push(item);
+        const priceRaw = (event.price ?? "").toString().trim();
+        let priceNum: number | undefined = undefined;
+        const priceMatch = priceRaw.match(/(\d+(?:[.,]\d+)?)/);
+        if (priceMatch) {
+          const normalized = priceMatch[1].replace(",", ".");
+          const parsed = parseFloat(normalized);
+          priceNum = Number.isFinite(parsed) ? Math.round(parsed) : undefined;
         }
 
-        const newSchedule: DaySchedule[] = [
-          {
-            label: "Friday",
-            dateDisplay: formatDateForDisplay(friday),
-            items: byDay.get(fridayKey)!.length > 0 ? byDay.get(fridayKey)! : baseClubs,
-          },
-          {
-            label: "Saturday",
-            dateDisplay: formatDateForDisplay(saturday),
-            items: byDay.get(saturdayKey)!.length > 0 ? byDay.get(saturdayKey)! : baseClubs,
-          },
-        ];
+        const item: ClubScheduleItem = {
+          id: assets.id,
+          name: assets.name,
+          location: "Ankara",
+          lineup: event.event_artist ? [event.event_artist] : undefined,
+          estimatedPriceTry: Number.isFinite(priceNum as number) ? (priceNum as number) : undefined,
+          logoSrc: assets.logoSrc,
+          eventUrl: event.event_url || undefined,
+          eventImageUrl: event.image_url || undefined,
+          isOurEvent: false,
+        };
 
-        setSheetSchedule(newSchedule);
-      } catch (err) {
-        // Silently fallback to base schedule
-        console.warn("Failed to fetch ThisWeek sheet:", err);
+        byDay.get(key)!.push(item);
       }
-    })();
-    return () => {
-      isCancelled = true;
-    };
-  }, [friday, saturday]);
+    }
 
-  // Placeholder schedules; will be filled by scraper later
-  const schedule: DaySchedule[] = useMemo(
-    () => [
+    // Process our work projects (our events)
+    if (ourWorkProjects) {
+      // Normalize target day timestamps (midnight) for distance comparisons
+      const fridayTs = new Date(friday.getFullYear(), friday.getMonth(), friday.getDate()).getTime()
+      const saturdayTs = new Date(saturday.getFullYear(), saturday.getMonth(), saturday.getDate()).getTime()
+
+      for (const project of ourWorkProjects) {
+        if (!project.upcoming) continue;
+
+        // Determine which day bucket to place the event into
+        let bucketKey = fridayKey; // default to Friday so it always shows
+
+        const projectDate = project.date ? parseSheetDate(project.date) : null;
+        if (projectDate) {
+          const pTs = new Date(projectDate.getFullYear(), projectDate.getMonth(), projectDate.getDate()).getTime()
+          if (formatYyyyMmDd(projectDate) === fridayKey) {
+            bucketKey = fridayKey
+          } else if (formatYyyyMmDd(projectDate) === saturdayKey) {
+            bucketKey = saturdayKey
+          } else {
+            // Choose the closer of Friday/Saturday
+            const df = Math.abs(pTs - fridayTs)
+            const ds = Math.abs(pTs - saturdayTs)
+            bucketKey = df <= ds ? fridayKey : saturdayKey
+          }
+        }
+
+        const item: ClubScheduleItem = {
+          id: `our-event-${project.id}`,
+          name: project.title,
+          location: (project as any).location || "Ankara",
+          description: project.description as string,
+          estimatedPriceTry: (project as any).price || 0,
+          eventUrl: (project as any).ticket_url || (project as any).form_url || undefined,
+          eventImageUrl: project.image_url,
+          isOurEvent: true,
+        };
+
+        if (!byDay.has(bucketKey)) {
+          byDay.set(bucketKey, [])
+        }
+        byDay.get(bucketKey)!.push(item);
+      }
+    }
+
+    // If no events for a day, show base clubs
+    const fridayItems = byDay.get(fridayKey)!.length > 0 ? byDay.get(fridayKey)! : baseClubs;
+    const saturdayItems = byDay.get(saturdayKey)!.length > 0 ? byDay.get(saturdayKey)! : baseClubs;
+
+    return [
       {
         label: "Friday",
         dateDisplay: formatDateForDisplay(friday),
-        items: baseClubs.map((club) => ({
-          ...club,
-          lineup: undefined, // to be scraped
-          estimatedPriceTry: undefined, // to be scraped
-        })),
+        items: fridayItems,
       },
       {
         label: "Saturday",
         dateDisplay: formatDateForDisplay(saturday),
-        items: baseClubs.map((club) => ({
-          ...club,
-          lineup: undefined,
-          estimatedPriceTry: undefined,
-        })),
+        items: saturdayItems,
       },
-    ],
-    [friday, saturday]
-  );
+    ];
+  }, [thisWeekEvents, ourWorkProjects, friday, saturday, fridayKey, saturdayKey]);
 
   const Price = ({ value }: { value: number | undefined }) => {
     const display =
@@ -279,7 +301,7 @@ const ThisWeek = () => {
             Updated weekly
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-3">This Week</h1>
-          <p className="text-gray-300 max-w-2xl mx-auto">Friday and Saturday lineups in Ankara.</p>
+          <p className="text-gray-300 max-w-2xl mx-auto">Friday and Saturday events in Ankara.</p>
         </div>
 
         {/* City Tabs */}
@@ -309,7 +331,7 @@ const ThisWeek = () => {
         {/* Weekdays */}
         {city === "ankara" ? (
           <div className="space-y-10">
-            {(sheetSchedule ?? schedule).map((day) => (
+            {schedule.map((day) => (
               <section key={day.label} className="rounded-2xl overflow-hidden border border-white/10 bg-gradient-to-b from-white/5 to-transparent">
                 <header className="flex items-center justify-between px-5 py-4 border-b border-white/10">
                   <div className="flex items-center gap-3">
@@ -322,7 +344,11 @@ const ThisWeek = () => {
                 <div className="p-5">
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                     {day.items.map((item) => (
-                      <div key={`${day.label}-${item.id}`} className="group rounded-2xl border border-white/10 bg-white/[0.06] hover:bg-white/[0.08] hover:shadow-[0_0_30px_rgba(255,255,255,0.08)] transition-all overflow-hidden">
+                      <div key={`${day.label}-${item.id}`} className={`group rounded-2xl border transition-all overflow-hidden ${
+                        item.isOurEvent 
+                          ? "border-orange-500/30 bg-gradient-to-br from-orange-500/10 to-orange-600/5 hover:bg-gradient-to-br hover:from-orange-500/15 hover:to-orange-600/10 hover:shadow-[0_0_30px_rgba(255,165,0,0.15)]" 
+                          : "border-white/10 bg-white/[0.06] hover:bg-white/[0.08] hover:shadow-[0_0_30px_rgba(255,255,255,0.08)]"
+                      }`}>
                         {/* Poster */}
                         <div className="relative bg-white/5 border-b border-white/10 aspect-[4/5] overflow-hidden">
                           {item.eventImageUrl ? (
@@ -346,10 +372,17 @@ const ThisWeek = () => {
                               )}
                             </div>
                           )}
+                          {item.isOurEvent && (
+                            <div className="absolute top-2 left-2">
+                              <span className="px-2 py-0.5 rounded-md bg-orange-500/90 backdrop-blur border border-orange-400/30 text-xs text-white font-semibold">
+                                Our Event
+                              </span>
+                            </div>
+                          )}
                           {typeof item.estimatedPriceTry !== 'undefined' && (
                             <div className="absolute top-2 right-2">
                               <span className="px-2 py-0.5 rounded-md bg-black/60 backdrop-blur border border-white/10 text-xs text-white/90">
-                                {item.estimatedPriceTry === 0 ? 'Free' : `${item.estimatedPriceTry?.toLocaleString(undefined, { maximumFractionDigits: 0 })} TRY`}
+                                {item.estimatedPriceTry === 0 ? '0.00 Turkish Lira' : `${item.estimatedPriceTry?.toLocaleString(undefined, { maximumFractionDigits: 0 })} Turkish Lira`}
                               </span>
                             </div>
                           )}
@@ -387,16 +420,26 @@ const ThisWeek = () => {
                           </div>
 
                           <div className="flex flex-col gap-3">
-                            <Lineup names={item.lineup} />
+                            {item.isOurEvent && item.description ? (
+                              <div className="text-sm text-gray-300 line-clamp-3">
+                                {item.description}
+                              </div>
+                            ) : (
+                              <Lineup names={item.lineup} />
+                            )}
                             {item.eventUrl && (
                               <div>
                                 <a
                                   href={item.eventUrl}
                                   target="_blank"
                                   rel="noreferrer"
-                                  className="inline-flex items-center gap-2 text-sm text-white/90 px-3 py-1 rounded-md bg-white/10 border border-white/10 hover:bg-white/15"
+                                  className={`inline-flex items-center gap-2 text-sm px-3 py-1 rounded-md border transition-colors ${
+                                    item.isOurEvent
+                                      ? "text-orange-100 bg-orange-500/20 border-orange-400/30 hover:bg-orange-500/30"
+                                      : "text-white/90 bg-white/10 border-white/10 hover:bg-white/15"
+                                  }`}
                                 >
-                                  View event
+                                  {item.isOurEvent ? "Get Tickets" : "View event"}
                                 </a>
                               </div>
                             )}
@@ -425,7 +468,7 @@ const ThisWeek = () => {
 
         {/* Note */}
         <p className="text-xs text-gray-400 mt-8 text-center">
-          Data updates weekly from our Supabase database.
+          Club events and our own events updated from our Supabase database. Orange cards are our events.
         </p>
       </div>
     </PageLayout>

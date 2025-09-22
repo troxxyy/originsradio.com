@@ -806,3 +806,121 @@ export const getOurWorkProjectBySlug = async (slug: string): Promise<OurWorkProj
 
   return data
 }
+
+// ThisWeek utilities
+export const getThisWeekEvents = async (): Promise<any[]> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, returning empty thisweek events array')
+    return []
+  }
+
+  const supabase = getSupabaseClient()
+  const { data, error } = await supabase
+    .from('thisweek')
+    .select('*')
+    .order('event_date', { ascending: true })
+
+  if (error) {
+    console.error('Error fetching thisweek events:', error)
+    throw error
+  }
+
+  return data || []
+}
+
+export const getThisWeekEventsByDate = async (startDate: string, endDate: string): Promise<any[]> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, returning empty thisweek events array')
+    return []
+  }
+
+  const supabase = getSupabaseClient()
+  const { data, error } = await supabase
+    .from('thisweek')
+    .select('*')
+    .gte('event_date', startDate)
+    .lte('event_date', endDate)
+    .order('event_date', { ascending: true })
+
+  if (error) {
+    console.error('Error fetching thisweek events by date:', error)
+    throw error
+  }
+
+  return data || []
+}
+
+export const createThisWeekEvent = async (eventData: {
+  club_name: string
+  event_artist: string
+  price: string
+  image_url: string
+  event_date: string
+  event_url?: string
+}): Promise<any> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, cannot create thisweek event')
+    throw new Error('Supabase not configured')
+  }
+
+  const supabase = getSupabaseAdminClient()
+  const { data, error } = await supabase
+    .from('thisweek')
+    .insert([eventData])
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error creating thisweek event:', error)
+    throw error
+  }
+
+  return data
+}
+
+export const updateThisWeekEvent = async (id: string, eventData: Partial<{
+  club_name: string
+  event_artist: string
+  price: string
+  image_url: string
+  event_date: string
+  event_url: string
+}>): Promise<any> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, cannot update thisweek event')
+    throw new Error('Supabase not configured')
+  }
+
+  const supabase = getSupabaseAdminClient()
+  const { data, error } = await supabase
+    .from('thisweek')
+    .update(eventData)
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error updating thisweek event:', error)
+    throw error
+  }
+
+  return data
+}
+
+export const deleteThisWeekEvent = async (id: string): Promise<void> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, cannot delete thisweek event')
+    throw new Error('Supabase not configured')
+  }
+
+  const supabase = getSupabaseAdminClient()
+  const { error } = await supabase
+    .from('thisweek')
+    .delete()
+    .eq('id', id)
+
+  if (error) {
+    console.error('Error deleting thisweek event:', error)
+    throw error
+  }
+}
