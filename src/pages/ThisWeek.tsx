@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Calendar, MapPin, Users, Ticket, Clock, Wrench } from "lucide-react";
 import PageLayout from "@/components/layout/PageLayout";
-import { fetchThisWeekRows, ThisWeekSheetRow } from "@/lib/thisweek-sheet";
+import { fetchThisWeekRows, ThisWeekSheetRow } from "@/lib/thisweek";
 
 type ClubIdentifier =
   | "backyardsecrets"
@@ -177,7 +177,7 @@ const ThisWeek = () => {
             id: assets.id,
             name: assets.name,
             location: "Ankara",
-            lineup: r.event_artist ? [r.event_artist] : undefined,
+            lineup: Array.isArray(r.lineup_names) && r.lineup_names.length > 0 ? r.lineup_names : (r.event_artist ? [r.event_artist] : undefined),
             estimatedPriceTry: Number.isFinite(priceNum as number) ? (priceNum as number) : undefined,
             logoSrc: assets.logoSrc,
             eventUrl: r.event_url || undefined,
@@ -425,7 +425,7 @@ const ThisWeek = () => {
 
         {/* Note */}
         <p className="text-xs text-gray-400 mt-8 text-center">
-          Data updates weekly from our Google Sheet source.
+          Data updates weekly from our Supabase database.
         </p>
       </div>
     </PageLayout>
