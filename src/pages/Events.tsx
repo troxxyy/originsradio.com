@@ -358,7 +358,7 @@ const Events = () => {
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
+                  transition={{ duration: 0.6, delay: 0.03 }}
                   className="mb-8"
                 >
                   <h2 className="text-3xl font-bold text-gray-400 mb-4">Past Events</h2>

@@ -535,7 +535,7 @@ const ArtistDetail = () => {
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
               className="relative"
             >
               <div className="glass backdrop-blur-sm rounded-3xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.1)] transform-gpu">
@@ -543,7 +543,7 @@ const ArtistDetail = () => {
                   <motion.img
                     initial={{ scale: 1.1 }}
                     animate={{ scale: 1 }}
-                    transition={{ duration: 1.5, ease: "easeOut" }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
                     src={artist.photo_url || '/placeholder.svg'}
                     alt={artist.name}
                     className="w-full h-full object-cover"
@@ -635,7 +635,7 @@ const ArtistDetail = () => {
                       <motion.h1
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 }}
+                        transition={{ delay: 0.1 }}
                         className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
                       >
                         {artist.name}
@@ -644,7 +644,7 @@ const ArtistDetail = () => {
                       <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4 }}
+                        transition={{ delay: 0.15 }}
                         className="flex flex-wrap items-center gap-2 sm:gap-4 mb-6"
                       >
                         {artist.location && (
@@ -663,7 +663,7 @@ const ArtistDetail = () => {
                         <motion.div
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.5 }}
+                          transition={{ delay: 0.2 }}
                           className="flex flex-wrap gap-3 mb-6"
                         >
                           {artist.genre.slice(0, 3).map((genre, index) => (
@@ -671,7 +671,7 @@ const ArtistDetail = () => {
                               key={genre}
                               initial={{ opacity: 0, scale: 0.8 }}
                               animate={{ opacity: 1, scale: 1 }}
-                              transition={{ delay: 0.6 + index * 0.1 }}
+                              transition={{ delay: 0.25 + index * 0.05 }}
                               className="px-4 py-2 bg-gradient-to-r from-blue-500/20 to-blue-600/20 rounded-full text-sm text-white font-medium border border-blue-500/30 backdrop-blur-sm"
                             >
                               {genre}
@@ -684,7 +684,7 @@ const ArtistDetail = () => {
                         <motion.p
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.6 }}
+                          transition={{ delay: 0.3 }}
                           className="text-gray-300 text-lg leading-relaxed mb-6"
                         >
                           {artist.bio}
@@ -695,7 +695,7 @@ const ArtistDetail = () => {
                       <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.7 }}
+                        transition={{ delay: 0.35 }}
                         className="mb-6"
                       >
                         <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
@@ -719,7 +719,7 @@ const ArtistDetail = () => {
                         <motion.div
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.8 }}
+                          transition={{ delay: 0.4 }}
                           className="flex gap-3"
                         >
                           {Object.entries(artist.social_links)
@@ -747,7 +747,7 @@ const ArtistDetail = () => {
                       <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.8 }}
+                        transition={{ delay: 0.4 }}
                         className="glass backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/10 hover:border-white/20 transition-all duration-300"
                       >
                         <h3 className="text-lg sm:text-xl font-semibold text-white mb-4 flex items-center gap-2">
@@ -797,7 +797,7 @@ const ArtistDetail = () => {
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
+                transition={{ duration: 0.3, delay: 0.1 }}
               >
                 <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
                   <div className="w-1 h-6 sm:h-8 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full"></div>
@@ -829,7 +829,7 @@ const ArtistDetail = () => {
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
+                transition={{ duration: 0.3, delay: 0.2 }}
               >
                 <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
                   <div className="w-1 h-6 sm:h-8 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full"></div>
@@ -844,7 +844,7 @@ const ArtistDetail = () => {
                          key={track.id}
                          initial={{ opacity: 0, x: -30 }}
                          animate={{ opacity: 1, x: 0 }}
-                         transition={{ duration: 0.6, delay: index * 0.1 }}
+                         transition={{ duration: 0.3, delay: index * 0.05 }}
                          whileHover={{ scale: 1.02, x: 5 }}
                          className="glass backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.1)] transform-gpu"
                        >
@@ -901,7 +901,7 @@ const ArtistDetail = () => {
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.6 }}
+                transition={{ duration: 0.3, delay: 0.3 }}
               >
                 <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
                   <div className="w-1 h-6 sm:h-8 bg-gradient-to-b from-green-500 to-green-600 rounded-full"></div>
@@ -916,7 +916,7 @@ const ArtistDetail = () => {
                          key={event.id}
                          initial={{ opacity: 0, y: 30 }}
                          animate={{ opacity: 1, y: 0 }}
-                         transition={{ duration: 0.6, delay: index * 0.1 }}
+                         transition={{ duration: 0.3, delay: index * 0.05 }}
                          whileHover={{ scale: 1.02, y: -5 }}
                          className="glass backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.1)] transform-gpu"
                        >

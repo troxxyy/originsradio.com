@@ -1,12 +1,13 @@
-import { useState, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { Canvas } from "@react-three/fiber";
 import { cn } from "@/lib/utils";
+import OrbitingLogo from "@/components/three/OrbitingLogo";
+import VibrantLights from "@/components/three/VibrantLights";
 
 interface LoadingScreenProps {
   onLoadingComplete?: () => void;
   minLoadTime?: number;
 }
-
-
 
 const LoadingScreen = ({ 
   onLoadingComplete, 
@@ -16,6 +17,7 @@ const LoadingScreen = ({
   const [opacity, setOpacity] = useState(1);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [loadingText, setLoadingText] = useState("Loading resources...");
+  const [isLogoReady, setIsLogoReady] = useState(false);
 
   useEffect(() => {
     console.log("Loading screen mounted");
@@ -68,11 +70,34 @@ const LoadingScreen = ({
       )}
       style={{ opacity }}
     >
-      <div className="relative w-64 h-64 mb-8">
+      <div className="relative w-80 h-80 sm:w-96 sm:h-96 mb-8">
+        <div className="absolute -inset-10 bg-vibrant-animated blur-2xl opacity-60" />
+        <Canvas
+          camera={{ position: [0, 0.1, 3], fov: 90 }}
+          className={cn(
+            "absolute inset-0 pointer-events-none transition-opacity duration-700",
+            isLogoReady ? "opacity-100" : "opacity-0"
+          )}
+          shadows
+        >
+          <ambientLight intensity={0.45} />
+          <VibrantLights intensity={1.15} />
+          <Suspense fallback={null}>
+            <OrbitingLogo 
+              onLoaded={() => setIsLogoReady(true)}
+              scale={3}
+              rotation={[0, 0, Math.PI / 2]}
+            />
+          </Suspense>
+        </Canvas>
         <img 
           src="/originslogo.png" 
           alt="Origins Radio" 
-          className="w-full h-full object-contain animate-float"
+          className={cn(
+            "absolute inset-0 w-full h-full object-contain transition-opacity duration-500",
+            isLogoReady ? "opacity-0 scale-95" : "opacity-100 animate-float"
+          )}
+          style={{ pointerEvents: "none" }}
         />
       </div>
       
@@ -97,4 +122,4 @@ const LoadingScreen = ({
   );
 };
 
-export default LoadingScreen; 
+export default LoadingScreen;
