@@ -1,5 +1,7 @@
 import { ReactNode, CSSProperties } from "react";
-import Navigation from "@/components/Navigation";
+import MusicPlayer from "@/components/music/MusicPlayer";
+import EventFooter from "@/components/events/EventFooter";
+import { useLocation } from "react-router-dom";
 
 
 interface PageLayoutProps {
@@ -7,6 +9,7 @@ interface PageLayoutProps {
   backgroundImage?: string;
   customBackground?: string;
   customBackgroundStyle?: CSSProperties;
+  showFooter?: boolean;
 }
 
 const PageLayout = ({
@@ -14,7 +17,11 @@ const PageLayout = ({
   backgroundImage = "/backgr.jpg",
   customBackground,
   customBackgroundStyle,
+  showFooter = true,
 }: PageLayoutProps) => {
+  const location = useLocation();
+  const showMainPlayer = false; // main player disabled, only floating player
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-start sm:justify-center relative overflow-hidden">
   
@@ -28,8 +35,8 @@ const PageLayout = ({
           ></div>
         ) : (
           <>
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-20"></div>
-            <div className="absolute inset-0 bg-gradient-to-b from-background/80 to-background/30 z-30"></div>
+            <div className="absolute inset-0 bg-[#040406]/60 backdrop-blur-sm z-20"></div>
+            <div className="absolute inset-0 bg-gradient-to-b from-[rgba(4,4,6,0.85)] to-[rgba(17,23,38,0.4)] z-30"></div>
             <img 
               src={backgroundImage} 
               alt="Background" 
@@ -39,15 +46,24 @@ const PageLayout = ({
         )}
       </div>
       
-      {/* Navigation */}
-      <div className="relative z-40 w-full">
-        <Navigation />
-      </div>
+      {/* Navigation handled at App level */}
       
       {/* Page content - Highest layer */}
       <div className="relative z-40 w-full flex-1 flex flex-col items-center justify-start sm:justify-center py-8 sm:py-0">
         {children}
       </div>
+
+      {/* Global music player (floating bar always, full card only on home) */}
+      <div className="relative z-40 w-full">
+        <MusicPlayer showMain={showMainPlayer} />
+      </div>
+
+      {/* Global Footer */}
+      {showFooter && (
+        <div className="relative z-40 w-full">
+          <EventFooter />
+        </div>
+      )}
     </div>
   );
 };

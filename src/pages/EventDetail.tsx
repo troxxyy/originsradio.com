@@ -6,7 +6,6 @@ import { useOurWorkProjects } from "@/hooks/use-supabase";
 import { Calendar, MapPin, Tag, Ticket, ArrowLeft, Share2 } from "lucide-react";
 import TicketPurchaseModal, { TicketTier } from "@/components/events/TicketPurchaseModal";
 import EventRules from "@/components/events/EventRules";
-import EventFooter from "@/components/events/EventFooter";
 import { getOurWorkProjectBySlug } from "@/lib/supabase-utils";
 
 type UiProject = {
@@ -444,9 +443,6 @@ const EventDetail = () => {
             <EventRules />
           </div>
         </div>
-
-        {/* Event Footer */}
-        <EventFooter />
 
         <TicketPurchaseModal
           isOpen={isTicketModalOpen}

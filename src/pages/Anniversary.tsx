@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Helmet } from "react-helmet-async";
 import PageLayout from "@/components/layout/PageLayout";
 import Navigation from "@/components/Navigation";
-import LivePlayer, { LivePlayerRef } from "@/components/music/LivePlayer";
+import MusicPlayer from "@/components/music/MusicPlayer";
 import { Clock, Radio, Calendar, Music, Sparkles, Play } from "lucide-react";
 import ParticlesHeader from "@/components/ui/ParticlesHeader";
 
@@ -17,7 +17,6 @@ interface ArtistSchedule {
 const Anniversary = () => {
   const [currentHour, setCurrentHour] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const playerRef = useRef<LivePlayerRef>(null);
   
   // Schedule remains the same...
   const schedule: ArtistSchedule[] = [
@@ -198,10 +197,7 @@ const Anniversary = () => {
   const handleSetSelect = (hour: number) => {
     setCurrentHour(hour);
     // Reset and play the new set
-    if (playerRef.current) {
-      playerRef.current.reset();
-      playerRef.current.play().catch(console.error);
-    }
+    // no imperative ref; MusicPlayer single mode will autoPlay on source change
   };
 
   // Handle playback start
@@ -311,13 +307,15 @@ const Anniversary = () => {
                 </div>
               </div>
               
-              <LivePlayer
-                ref={playerRef}
-                currentArtist={currentArtist.artist}
-                currentSet={currentArtist.setTitle}
-                isLive={false}
-                streamUrl={currentArtist.streamUrl}
-                onPlaybackStart={handlePlaybackStart}
+              <MusicPlayer
+                showMain={true}
+                mode="single"
+                sourceUrl={currentArtist.streamUrl}
+                sourceTitle={currentArtist.setTitle}
+                sourceArtist={currentArtist.artist}
+                startAtSeconds={0}
+                autoPlay={true}
+                showFloating={false}
               />
             </div>
           </div>

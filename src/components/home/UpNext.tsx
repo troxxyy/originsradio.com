@@ -65,7 +65,7 @@ interface ProgressBarProps {
 }
 
 // Progress Bar Component with touch support
-export const ProgressBar = ({ progress, onSeek, className = "", thumbSize = "w-2 h-2" }: ProgressBarProps) => {
+export const ProgressBar = ({ progress, onSeek, className = "", thumbSize = "w-3 h-3" }: ProgressBarProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const progressBarRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
@@ -150,7 +150,7 @@ export const ProgressBar = ({ progress, onSeek, className = "", thumbSize = "w-2
   return (
     <div 
       ref={progressBarRef}
-      className={`${mobileBarHeight} w-full mx-auto mt-4 bg-[#383838] relative overflow-visible rounded-full cursor-pointer select-none touch-none ${className}`}
+      className={`${mobileBarHeight} w-full mx-auto mt-1 bg-white/50 relative overflow-visible rounded-full cursor-pointer select-none touch-none ${className}`}
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
     >
@@ -195,12 +195,12 @@ export const UpNextItem = ({ event, index, onPlay, onSeek, isPlaying, progress }
 
   return (
     <div
-      className={`group relative bg-black/40 border border-white/10 rounded-2xl p-4 sm:p-5 transition-colors ${
-        isPlaying ? 'bg-black/55 border-white/20' : 'hover:bg-black/50'
+      className={`group relative glass bg-white/[0.03] border-white/10 rounded-3xl p-4 sm:p-5 shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition-colors ${
+        isPlaying ? 'ring-1 ring-white/20' : 'hover:bg-white/[0.05]'
       }`}
     >
       {/* Header - Art + Info */}
-      <div className="flex gap-4 sm:gap-5 mb-4">
+      <div className="flex gap-4 sm:gap- mb-4">
         {/* Artwork with overlayed play */}
         {event.artistPhoto ? (
           <button
@@ -287,7 +287,7 @@ export const UpNextItem = ({ event, index, onPlay, onSeek, isPlaying, progress }
             <a
               href={`/artists/${event.artistSlug}`}
               onClick={(e) => e.stopPropagation()}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-400/30 rounded-full text-xs font-medium text-blue-300 hover:text-blue-200 hover:border-blue-300/50 transition-all duration-300 group/link touch-manipulation"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-white/10 border border-white/20 text-white/80 hover:bg-white/15 hover:border-white/30 transition-all duration-300 group/link touch-manipulation"
             >
               <span>View Artist</span>
               <svg className="w-3 h-3 group-hover/link:translate-x-0.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -300,7 +300,7 @@ export const UpNextItem = ({ event, index, onPlay, onSeek, isPlaying, progress }
 
       {/* Waveform + timecodes */}
       <div className="mb-1 sm:mb-2">
-        <div className="rounded-xl bg-black/30 border border-white/10 p-3 sm:p-4">
+        <div className="rounded-full glass bg-white/[0.03] border-white/5 p-3 sm:p-4 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:shadow-[0_10px_30px_rgba(0,0,0,0.25)]">
           <ProgressBar progress={progress} onSeek={onSeek} />
         </div>
       </div>
@@ -433,7 +433,13 @@ const useAudioPlayer = () => {
 };
 
 // Main Component
-const UpNextSection = () => {
+type UpNextSectionProps = {
+  compact?: boolean;
+  maxItems?: number;
+  title?: string;
+}
+
+const UpNextSection = ({ compact = false, maxItems, title }: UpNextSectionProps) => {
   const isMobile = useIsMobile();
   const [showAll, setShowAll] = useState(false);
   
@@ -473,24 +479,32 @@ const UpNextSection = () => {
     return bNum - aNum;
   });
 
-  const setsToShow = showAll ? upcomingEvents : upcomingEvents.slice(0, 5);
+  const defaultMax = compact ? 2 : 5;
+  const limit = typeof maxItems === 'number' ? maxItems : defaultMax;
+  const setsToShow = showAll ? upcomingEvents : upcomingEvents.slice(0, limit);
 
   const handlePlayTrack = (trackIndex: number) => {
     handlePlay(trackIndex, upcomingEvents[trackIndex].audioSrc);
   };
 
   return (
-    <section className="relative mt-4 sm:mt-4 w-full max-w-4xl mx-auto px-3 sm:px-6 py-12 sm:py-16">
+    <section className={`relative mt-4 sm:mt-4 w-full max-w-7xl mx-auto px-3 sm:px-6 ${compact ? 'py-6' : 'py-12 sm:py-16'}`}>
       <style dangerouslySetInnerHTML={{ __html: customStyles }} />
-      <div className="absolute -top-10 -left-20 w-64 h-64 bg-[#363636]/20 rounded-full filter blur-3xl animate-slow-pulse"></div>
-      <div className="absolute -bottom-10 -right-20 w-128 h-128 bg-[#787878]/20 rounded-full filter blur-3xl animate-slow-pulse" style={{ animationDelay: '2s' }}></div>
+      {!compact && (
+        <>
+          <div className="absolute -top-10 -left-20 w-64 h-64 bg-[#363636]/20 rounded-full filter blur-3xl animate-slow-pulse"></div>
+          <div className="absolute -bottom-10 -right-20 w-128 h-128 bg-[#787878]/20 rounded-full filter blur-3xl animate-slow-pulse" style={{ animationDelay: '2s' }}></div>
+        </>
+      )}
       
-      <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-2 text-center leading-tight">Special Sets</h1>
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mb-8 sm:mb-10">
-        <div className="h-0.5 w-8 sm:w-12 bg-gradient-to-r from-[#363636] to-[#787878]"></div>
-        <p className="text-base sm:text-xl text-center text-white/80 px-2">Pre-recorded Sets Just For Origins Radio</p>
-        <div className="h-0.5 w-8 sm:w-12 bg-gradient-to-r from-[#787878] to-[#d1d1d1]"></div>
-      </div>
+      <h1 className={`${compact ? 'text-2xl sm:text-3xl' : 'text-3xl sm:text-4xl md:text-5xl'} font-bold mb-2 text-center leading-tight`}>{title || 'Special Sets'}</h1>
+      {!compact && (
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mb-8 sm:mb-10">
+          <div className="h-0.5 w-8 sm:w-12 bg-gradient-to-r from-[#363636] to-[#787878]"></div>
+          <p className="text-base sm:text-xl text-center text-white/80 px-2">Pre-recorded Sets Just For Origins Radio</p>
+          <div className="h-0.5 w-8 sm:w-12 bg-gradient-to-r from-[#787878] to-[#d1d1d1]"></div>
+        </div>
+      )}
       
       {isLoading ? (
         <div className="text-center py-8 sm:py-12">
@@ -508,8 +522,8 @@ const UpNextSection = () => {
         </div>
       ) : (
         <>
-          {/* Regular Sets */}
-          <div className="space-y-4 sm:space-y-6">
+          {/* Regular Sets - responsive grid */}
+          <div className={`grid grid-cols-1 md:grid-cols-2 ${compact ? 'gap-3' : 'gap-4 md:gap-6'}`}>
             {setsToShow.map((event, index) => (
               <UpNextItem 
                 key={index}
@@ -522,7 +536,7 @@ const UpNextSection = () => {
               />
             ))}
           </div>
-          {!showAll && upcomingEvents.length > 5 && (
+          {!compact && !showAll && upcomingEvents.length > limit && (
             <div className="flex justify-center mt-8">
               <button
                 onClick={() => setShowAll(true)}
@@ -535,19 +549,21 @@ const UpNextSection = () => {
         </>
       )}
       
-      <div className="mt-8 sm:mt-12 text-center">
-        <a 
-          href="https://www.youtube.com/@originsradiotr" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 text-white/70 hover:text-white transition-colors touch-manipulation px-4 py-2 rounded-lg hover:bg-white/10"
-        >
-          <span className="text-sm sm:text-base">More on YouTube</span>
-          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-          </svg>
-        </a>
-      </div>
+      {!compact && (
+        <div className="mt-8 sm:mt-12 text-center">
+          <a 
+            href="https://www.youtube.com/@originsradiotr" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-white/70 hover:text-white transition-colors touch-manipulation px-4 py-2 rounded-lg hover:bg-white/10"
+          >
+            <span className="text-sm sm:text-base">More on YouTube</span>
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+            </svg>
+          </a>
+        </div>
+      )}
       
       <audio ref={audioRef} preload="metadata" />
     </section>

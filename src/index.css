@@ -20,7 +20,7 @@
 
 @layer base {
   :root {
-    --background: 240 10% 3.9%;
+    --background: 240 20% 2%;
     --foreground: 0 0% 98%;
     --card: 240 10% 3.9%;
     --card-foreground: 0 0% 98%;
@@ -363,5 +363,63 @@
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Vibrant animated gradient background */
+@keyframes vibrant-gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.bg-vibrant-animated {
+  background: linear-gradient(135deg,
+    #ff6aa9 0%,
+    #ffb703 20%,
+    #00ffd5 40%,
+    #29a0ff 60%,
+    #a259ff 80%,
+    #ff3b3b 100%
+  );
+  background-size: 400% 400%;
+  animation: vibrant-gradient-shift 16s ease infinite;
+  will-change: background-position, filter;
+}
+
+/* Animated hue rotation utility for subtle color cycling */
+@keyframes hue-rotate-cycle {
+  0% { filter: hue-rotate(0deg) saturate(1.1); }
+  50% { filter: hue-rotate(180deg) saturate(1.25); }
+  100% { filter: hue-rotate(360deg) saturate(1.1); }
+}
+
+.animate-hue-cycle {
+  animation: hue-rotate-cycle 14s linear infinite;
+}
+
+/* Light color pulsing */
+@keyframes pulse-bright {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+}
+
+.animate-pulse-bright {
+  animation: pulse-bright 4.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-vibrant-animated {
+    animation: none;
+  }
+  .animate-hue-cycle,
+  .animate-pulse-bright {
+    animation: none;
+  }
 }
 
