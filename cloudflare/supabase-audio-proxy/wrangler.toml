@@ -1,0 +1,8 @@
+name = "supabase-audio-proxy"
+main = "src/index.js"
+compatibility_date = "2025-10-05"
+
+# Optional: configure a route to serve from your domain
+# routes = [ { pattern = "yourdomain.com/proxy/*", script = "supabase-audio-proxy" } ]
+
+

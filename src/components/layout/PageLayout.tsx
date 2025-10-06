@@ -1,5 +1,4 @@
 import { ReactNode, CSSProperties } from "react";
-import MusicPlayer from "@/components/music/MusicPlayer";
 import EventFooter from "@/components/events/EventFooter";
 import { useLocation } from "react-router-dom";
 
@@ -23,7 +22,7 @@ const PageLayout = ({
   const showMainPlayer = false; // main player disabled, only floating player
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start sm:justify-center relative overflow-hidden">
+    <div className={`min-h-screen flex flex-col items-stretch justify-start relative pt-[env(safe-area-inset-top)]`}>
   
       
       {/* Background image with effects */}
@@ -49,14 +48,11 @@ const PageLayout = ({
       {/* Navigation handled at App level */}
       
       {/* Page content - Highest layer */}
-      <div className="relative z-40 w-full flex-1 flex flex-col items-center justify-start sm:justify-center py-8 sm:py-0">
+      <div className="relative z-40 w-full flex-1 flex flex-col items-stretch justify-start pt-16 sm:pt-20 pb-[env(safe-area-inset-bottom)]">
         {children}
       </div>
 
-      {/* Global music player (floating bar always, full card only on home) */}
-      <div className="relative z-40 w-full">
-        <MusicPlayer showMain={showMainPlayer} />
-      </div>
+      {/* Floating music player is rendered at App level */}
 
       {/* Global Footer */}
       {showFooter && (

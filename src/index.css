@@ -1,6 +1,6 @@
 @font-face {
-  font-family: 'Avenir';
-  src: url('/fonts/Avenir.ttc') format('truetype-collection');
+  font-family: 'Newake';
+  src: url('/fonts/NewakeFont-Demo.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -9,7 +9,47 @@
 @font-face {
   font-family: 'Avenir';
   src: url('/fonts/Avenir.ttc') format('truetype-collection');
-  font-weight: normal;
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Avenir';
+  src: url('/fonts/Avenir.ttc') format('truetype-collection');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Avenir';
+  src: url('/fonts/Avenir.ttc') format('truetype-collection');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Avenir';
+  src: url('/fonts/Avenir.ttc') format('truetype-collection');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Avenir';
+  src: url('/fonts/Avenir.ttc') format('truetype-collection');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Avenir';
+  src: url('/fonts/Avenir.ttc') format('truetype-collection');
+  font-weight: 900;
   font-style: normal;
   font-display: swap;
 }
@@ -45,7 +85,7 @@
 
 @layer base {
   * {
-    @apply border-border selection:bg-white/20 selection:text-white;
+    @apply selection:bg-white/20 selection:text-white;
   }
   
   html {
@@ -76,6 +116,26 @@
       -webkit-overflow-scrolling: touch;
     }
   }
+}
+
+/* Logo hover animation */
+.logo-hover {
+  transition: transform 300ms ease, filter 300ms ease, opacity 300ms ease;
+  will-change: transform, filter;
+}
+
+.logo-hover:hover {
+  transform: translateY(-2px) scale(1.05);
+  filter: drop-shadow(0 0 10px rgba(255,255,255,0.35));
+}
+
+/* Hide Spline branding inside orb container as a defensive fallback */
+.orb-container a[href*="spline.design"],
+.orb-container .spline-watermark,
+.orb-container .spline-branding {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 .glass {
@@ -365,6 +425,53 @@
   overflow: hidden;
 }
 
+/* 3D Text Animation */
+.hover-3d-text {
+  transform-style: preserve-3d;
+  transition: all 0.4s ease-out;
+  display: inline-block;
+  padding: 0.25rem;
+}
+
+.group-hover-container:hover .hover-3d-text {
+  transform: translateZ(20px) rotateY(2deg);
+  text-shadow: 
+    0 0 15px rgba(59, 72, 255, 0.5),
+    0 0 25px rgba(59, 72, 255, 0.3);
+}
+
+.group-hover-container:hover .hover-3d-text:nth-child(2) {
+  transform: translateZ(15px) rotateY(1.5deg);
+  transition-delay: 0.05s;
+}
+
+.group-hover-container:hover .hover-3d-text:nth-child(3) {
+  transform: translateZ(25px) rotateY(2.5deg);
+  transition-delay: 0.1s;
+}
+
+.group:has(.group-hover-container:hover) {
+  transform: scale(1.05);
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+@keyframes float-3d {
+  0%, 100% {
+    transform: translateY(0) translateZ(0);
+  }
+  50% {
+    transform: translateY(-15px) translateZ(15px);
+  }
+}
+
+.animate-float-3d {
+  animation: float-3d 4s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+
 /* Vibrant animated gradient background */
 @keyframes vibrant-gradient-shift {
   0% {
@@ -421,5 +528,78 @@
   .animate-pulse-bright {
     animation: none;
   }
+}
+
+/* Blog 3D Card Stack */
+.blog-stack-container {
+  perspective: 2000px;
+  transform-style: preserve-3d;
+}
+
+/* Prevent body scroll on blog listing page */
+body:has(.blog-no-scroll) {
+  overflow: hidden;
+  height: 100vh;
+}
+
+.blog-card-3d {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+/* Parallax layers for blog detail */
+.parallax-layer-slow {
+  transform: translateY(var(--scroll-slow, 0px));
+  will-change: transform;
+}
+
+.parallax-layer-fast {
+  transform: translateY(var(--scroll-fast, 0px));
+  will-change: transform;
+}
+
+/* Homepage scroll lock */
+body.homepage-locked,
+html.homepage-locked {
+  overflow: hidden !important;
+  height: 100vh !important;
+  position: fixed !important;
+  width: 100% !important;
+  touch-action: none !important;
+  overscroll-behavior: none !important;
+  -webkit-overflow-scrolling: none !important;
+}
+
+/* Blog navigation arrows */
+.blog-nav-arrow {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.blog-nav-arrow:hover:not(:disabled) {
+  transform: scale(1.1);
+  box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+}
+
+.blog-nav-arrow:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.blog-nav-arrow:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Glass morphism for blog content */
+.blog-glass {
+  background: rgba(17, 17, 17, 0.8);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Smooth scroll for blog detail */
+.blog-detail-scroll {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 

@@ -1,8 +1,6 @@
-import { Suspense, useEffect, useState } from "react";
-import { Canvas } from "@react-three/fiber";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import OrbitingLogo from "@/components/three/OrbitingLogo";
-import VibrantLights from "@/components/three/VibrantLights";
+import Orb from "@/components/three/Orb";
 
 interface LoadingScreenProps {
   onLoadingComplete?: () => void;
@@ -71,25 +69,15 @@ const LoadingScreen = ({
       style={{ opacity }}
     >
       <div className="relative w-80 h-80 sm:w-96 sm:h-96 mb-8">
-        <div className="absolute -inset-10 bg-vibrant-animated blur-2xl opacity-60" />
-        <Canvas
-          camera={{ position: [0, 0.1, 3], fov: 90 }}
+        
+        <div
           className={cn(
             "absolute inset-0 pointer-events-none transition-opacity duration-700",
             isLogoReady ? "opacity-100" : "opacity-0"
           )}
-          shadows
         >
-          <ambientLight intensity={0.45} />
-          <VibrantLights intensity={1.15} />
-          <Suspense fallback={null}>
-            <OrbitingLogo 
-              onLoaded={() => setIsLogoReady(true)}
-              scale={3}
-              rotation={[0, 0, Math.PI / 2]}
-            />
-          </Suspense>
-        </Canvas>
+          <Orb />
+        </div>
         <img 
           src="/originslogo.png" 
           alt="Origins Radio" 

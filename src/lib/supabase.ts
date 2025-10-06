@@ -305,6 +305,59 @@ export interface Database {
           updated_at?: string
         }
       }
+      blogs: {
+        Row: {
+          id: string
+          title: string
+          slug: string
+          content: string
+          excerpt: string | null
+          author: string
+          cover_image_url: string | null
+          status: 'draft' | 'published'
+          featured: boolean
+          tags: string[]
+          seo_title: string | null
+          seo_description: string | null
+          published_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          slug: string
+          content: string
+          excerpt?: string | null
+          author: string
+          cover_image_url?: string | null
+          status?: 'draft' | 'published'
+          featured?: boolean
+          tags?: string[]
+          seo_title?: string | null
+          seo_description?: string | null
+          published_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          slug?: string
+          content?: string
+          excerpt?: string | null
+          author?: string
+          cover_image_url?: string | null
+          status?: 'draft' | 'published'
+          featured?: boolean
+          tags?: string[]
+          seo_title?: string | null
+          seo_description?: string | null
+          published_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never

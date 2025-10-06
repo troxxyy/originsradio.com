@@ -22,9 +22,13 @@ import {
   Clock,
   X,
   Save,
-  UserPlus
+  UserPlus,
+  FileText,
+  BookOpen,
+  Tag
 } from 'lucide-react';
 import PageLayout from '@/components/layout/PageLayout';
+import BlogManagement from '@/components/admin/BlogManagement';
 import { 
   getPaginatedArtists, 
   getArtistStats, 
@@ -40,6 +44,9 @@ import {
 } from '@/data/artists-supabase';
 
 const AdminArtists = () => {
+  // Tab state
+  const [activeTab, setActiveTab] = useState<'artists' | 'blogs'>('artists');
+
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLocation, setSelectedLocation] = useState<string>('all');
@@ -383,22 +390,50 @@ const AdminArtists = () => {
     <PageLayout>
       <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
         
-        {/* Header */}
+        {/* Tab Navigation */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
-          >
-            <div>
-              <h1 className="text-3xl font-bold text-white mb-2">Artist Management</h1>
-              <p className="text-gray-400">
-                {artistsLoading ? 'Loading artists...' : `Manage ${total} artists in your database`}
-              </p>
-              {artistsError && (
-                <p className="text-red-400 text-sm mt-1">Error loading artists: {artistsError.message}</p>
-              )}
-            </div>
+          <div className="flex gap-4 mb-8">
+            <button
+              onClick={() => setActiveTab('artists')}
+              className={`px-6 py-3 rounded-lg font-semibold transition-all ${
+                activeTab === 'artists'
+                  ? 'bg-white text-black'
+                  : 'bg-white/10 text-white hover:bg-white/20 border border-white/20'
+              }`}
+            >
+              Artists
+            </button>
+            <button
+              onClick={() => setActiveTab('blogs')}
+              className={`px-6 py-3 rounded-lg font-semibold transition-all ${
+                activeTab === 'blogs'
+                  ? 'bg-white text-black'
+                  : 'bg-white/10 text-white hover:bg-white/20 border border-white/20'
+              }`}
+            >
+              Blog Posts
+            </button>
+          </div>
+        </div>
+
+        {activeTab === 'artists' ? (
+          <div>
+            {/* Header */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+              >
+                <div>
+                  <h1 className="text-3xl font-bold text-white mb-2">Artist Management</h1>
+                  <p className="text-gray-400">
+                    {artistsLoading ? 'Loading artists...' : `Manage ${total} artists in your database`}
+                  </p>
+                  {artistsError && (
+                    <p className="text-red-400 text-sm mt-1">Error loading artists: {artistsError.message}</p>
+                  )}
+                </div>
             <div className="flex gap-3">
               <button 
                 onClick={handleAddArtist}
@@ -407,6 +442,13 @@ const AdminArtists = () => {
                 <Plus className="w-4 h-4" />
                 Add Artist
               </button>
+                  <a
+                    href="/artistcontrolsecret/schedule"
+                    className="px-4 py-2 bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg hover:bg-red-500/30 transition-all flex items-center gap-2"
+                  >
+                    <Calendar className="w-4 h-4" />
+                    Manage Weekly Radio Schedule
+                  </a>
               <button 
                 onClick={exportArtists}
                 className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 transition-all flex items-center gap-2"
@@ -1112,6 +1154,12 @@ const AdminArtists = () => {
                 </button>
               </div>
             </motion.div>
+          </div>
+        )}
+          </div>
+        ) : (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <BlogManagement />
           </div>
         )}
       </div>

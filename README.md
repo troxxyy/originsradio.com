@@ -1,3 +1,16 @@
+## Audio proxy for Supabase (Cloudflare Worker)
+
+To ensure CORS and Range headers for audio analysis, deploy a minimal Cloudflare Worker and set the proxy base URL in env:
+
+1. Deploy a Worker (example name `supabase-audio-proxy`).
+2. Set env in your app:
+
+```
+VITE_AUDIO_PROXY_ORIGIN=https://supabase-audio-proxy.<your-account>.workers.dev/
+```
+
+With this set, audio URLs are wrapped via `src/lib/audioProxy.ts` and `<audio crossOrigin="anonymous">` is enabled in `src/components/music/MusicPlayer.tsx` so `Orb` can attach a Web Audio analyser.
+
 
 
 # Origins Radio
