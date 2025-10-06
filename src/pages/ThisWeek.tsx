@@ -293,7 +293,7 @@ const ThisWeek = () => {
 
   return (
     <PageLayout customBackground="bg-gradient-to-br from-black via-gray-900 to-black">
-      <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-24">
+      <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
         {/* Hero */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-gray-300 mb-3">
@@ -306,7 +306,7 @@ const ThisWeek = () => {
 
         {/* City Tabs */}
         <div className="mb-8 flex items-center justify-center">
-          <div className="inline-flex rounded-full border border-white/10 bg-white/5 p-1">
+          <div className="inline-flex rounded-full border border-white/10 bg-white/5 p-1 overflow-x-auto max-w-full whitespace-nowrap scrollbar-hide">
             {[
               { key: "ankara", label: "Ankara" },
               { key: "istanbul", label: "Istanbul" },
@@ -330,7 +330,7 @@ const ThisWeek = () => {
 
         {/* Weekdays */}
         {city === "ankara" ? (
-          <div className="space-y-10">
+          <div className="space-y-6 sm:space-y-10">
             {schedule.map((day) => (
               <section key={day.label} className="rounded-2xl overflow-hidden border border-white/10 bg-gradient-to-b from-white/5 to-transparent">
                 <header className="flex items-center justify-between px-5 py-4 border-b border-white/10">

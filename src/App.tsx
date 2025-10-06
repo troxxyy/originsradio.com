@@ -3,11 +3,14 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Link } from "react-router-dom";
+import { LogIn } from "lucide-react";
 import { HelmetProvider } from "react-helmet-async";
 import LoadingScreen from "./components/LoadingScreen";
+import ArtistControlGuard from "@/components/admin/ArtistControlGuard";
 import Navigation from "./components/Navigation";
 import TicketPopup from "./components/TicketPopup";
+import MusicPlayer from "./components/music/MusicPlayer";
 import About from "./pages/About";
 
 // Lazy load route components
@@ -24,6 +27,13 @@ const AdminArtists = lazy(() => import("./pages/AdminArtists"));
 const AdminUploads = lazy(() => import("./pages/AdminUploads"));
 const Anniversary = lazy(() => import("./pages/Anniversary"));
 const ThisWeek = lazy(() => import("./pages/ThisWeek"));
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogDetail = lazy(() => import("./pages/BlogDetail"));
+const RadioSchedule = lazy(() => import("./pages/RadioSchedule"));
+const AdminRadioSchedule = lazy(() => import("./pages/AdminRadioSchedule"));
+const ArtistLogin = lazy(() => import("./pages/ArtistLogin"));
+const ArtistSignup = lazy(() => import("./pages/ArtistSignup"));
+const ArtistDashboard = lazy(() => import("./pages/ArtistDashboard"));
 
 const queryClient = new QueryClient();
 
@@ -36,6 +46,36 @@ const RouteTracker = ({ children }: { children: React.ReactNode }) => {
   // Using the pathname as a key forces React to remount the entire component tree
   // when the route changes, ensuring proper cleanup of resources
   return <div key={location.pathname}>{children}</div>;
+};
+
+// Artist Login Button Component - Only shows on homepage
+const ArtistLoginButton = () => {
+  const location = useLocation();
+  const isHomePage = location.pathname === "/";
+
+  if (!isHomePage) return null;
+
+  return (
+    <div className="fixed top-3 right-3 sm:top-6 sm:right-6 z-50 perspective-1000">
+      <Link 
+        to="/artist/login" 
+        className="block group"
+        aria-label="Artist Login"
+        title="Artist Login"
+      >
+        {/* Mobile: icon-only button */}
+        <span className="sm:hidden inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 transition-colors">
+          <LogIn className="w-5 h-5 text-white" />
+        </span>
+        {/* Desktop: original image */}
+        <img 
+          src="/artistlogin.png" 
+          alt="Artist Login" 
+          className="hidden sm:block h-auto max-h-20"
+        />
+      </Link>
+    </div>
+  );
 };
 
 const App = () => {
@@ -71,6 +111,8 @@ const App = () => {
           <div style={{ display: isLoading ? "none" : "block" }}>
             <BrowserRouter>
               <Navigation />
+              <ArtistLoginButton />
+              <MusicPlayer />
               <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
                 <Routes>
                   <Route path="/" element={
@@ -113,9 +155,24 @@ const App = () => {
                       <Artists />
                     </RouteTracker>
                   } />
+                  <Route path="/radio/schedule" element={
+                    <RouteTracker>
+                      <RadioSchedule />
+                    </RouteTracker>
+                  } />
                   <Route path="/thisweek" element={
                     <RouteTracker>
                       <ThisWeek />
+                    </RouteTracker>
+                  } />
+                  <Route path="/blog" element={
+                    <RouteTracker>
+                      <Blog />
+                    </RouteTracker>
+                  } />
+                  <Route path="/blog/:slug" element={
+                    <RouteTracker>
+                      <BlogDetail />
                     </RouteTracker>
                   } />
 
@@ -129,14 +186,40 @@ const App = () => {
                       <Anniversary />
                     </RouteTracker>
                   } />
-                  <Route path="/artistcontrolsecret/artists" element={
+                  <Route path="/artist/login" element={
                     <RouteTracker>
-                      <AdminArtists />
+                      <ArtistLogin />
+                    </RouteTracker>
+                  } />
+                  <Route path="/artist/signup" element={
+                    <RouteTracker>
+                      <ArtistSignup />
+                    </RouteTracker>
+                  } />
+                  <Route path="/artist/dashboard" element={
+                    <RouteTracker>
+                      <ArtistDashboard />
                     </RouteTracker>
                   } />
                   <Route path="/artistcontrolsecret" element={
                     <RouteTracker>
-                      <AdminArtists />
+                      <ArtistControlGuard>
+                        <AdminArtists />
+                      </ArtistControlGuard>
+                    </RouteTracker>
+                  } />
+                  <Route path="/artistcontrolsecret/artists" element={
+                    <RouteTracker>
+                      <ArtistControlGuard>
+                        <AdminArtists />
+                      </ArtistControlGuard>
+                    </RouteTracker>
+                  } />
+                  <Route path="/artistcontrolsecret/schedule" element={
+                    <RouteTracker>
+                      <ArtistControlGuard>
+                        <AdminRadioSchedule />
+                      </ArtistControlGuard>
                     </RouteTracker>
                   } />
                   <Route path="/originsradio/adminuploads" element={

@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { Helmet } from "react-helmet-async";
 import PageLayout from "@/components/layout/PageLayout";
 import Navigation from "@/components/Navigation";
-import MusicPlayer from "@/components/music/MusicPlayer";
 import { Clock, Radio, Calendar, Music, Sparkles, Play } from "lucide-react";
 import ParticlesHeader from "@/components/ui/ParticlesHeader";
 
@@ -297,8 +296,8 @@ const Anniversary = () => {
             </div>
           </div>
 
-          {/* Player Interface */}
-          <div className="relative group mb-8">
+          {/* Player Interface - HIDDEN */}
+          {/* <div className="relative group mb-8">
             <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
             <div className="relative bg-black/60 backdrop-blur-xl border border-white/10 rounded-xl p-6 shadow-2xl hover:shadow-purple-500/5 transition-all duration-500">
               <div className="flex items-center justify-between mb-6">
@@ -318,7 +317,7 @@ const Anniversary = () => {
                 showFloating={false}
               />
             </div>
-          </div>
+          </div> */}
 
           {/* 24-Hour Schedule */}
           <div className="relative group">

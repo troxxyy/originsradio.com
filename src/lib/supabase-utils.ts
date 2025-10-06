@@ -7,6 +7,7 @@ type Set = Database['public']['Tables']['sets']['Row']
 type Event = Database['public']['Tables']['events']['Row']
 type ChatMessage = Database['public']['Tables']['chat_messages']['Row']
 type OurWorkProject = Database['public']['Tables']['our_work_projects']['Row']
+type SetRow = Database['public']['Tables']['sets']['Row']
 
 // Utility function to generate slug from name (kept for backward compatibility)
 export const generateSlug = (name: string): string => {
@@ -923,4 +924,156 @@ export const deleteThisWeekEvent = async (id: string): Promise<void> => {
     console.error('Error deleting thisweek event:', error)
     throw error
   }
+}
+
+// Radio schedule utilities
+export interface RadioScheduleWeeklyRow {
+  id: string
+  day_of_week: number
+  start_time_local: string
+  duration_minutes: number
+  content_type: 'set' | 'stream'
+  set_id?: string | null
+  stream_url?: string | null
+  title: string
+  timezone?: string | null
+  is_active?: boolean | null
+  sets?: Pick<SetRow, 'audio_url' | 'duration'> & {
+    artists?: { name: string | null; photo_url: string | null } | null
+  } | null
+}
+
+export const getWeeklyRadioSchedule = async (): Promise<RadioScheduleWeeklyRow[]> => {
+  if (!isSupabaseConfigured()) {
+    console.warn('Supabase not configured, returning empty radio schedule')
+    return []
+  }
+
+  const supabase = getSupabaseClient()
+  const { data, error } = await supabase
+    .from('radio_schedule_weekly')
+    .select(`
+      id, day_of_week, start_time_local, duration_minutes, content_type, set_id, stream_url, title, timezone, is_active,
+      sets:sets(
+        audio_url,
+        duration,
+        artists:artists(name, photo_url)
+      )
+    `)
+    .eq('is_active', true)
+    .order('day_of_week', { ascending: true })
+
+  if (error) {
+    // Table may not exist yet; return empty and avoid throwing to keep UI functional until schedule is added
+    console.warn('getWeeklyRadioSchedule error:', error.message)
+    return []
+  }
+
+  // Coerce via unknown to satisfy type checker; shapes depend on relational select
+  return (data as unknown as RadioScheduleWeeklyRow[]) || []
+}
+
+// Artist account link helpers
+export interface ArtistAccountRow {
+  id: string
+  user_id: string
+  email: string | null
+  artist_id: string
+  created_at: string
+}
+
+export const getLinkedArtistForCurrentUser = async (): Promise<string | null> => {
+  if (!isSupabaseConfigured()) return null
+  const supabase = getSupabaseClient()
+  const { data: session } = await supabase.auth.getSession()
+  const userId = session.session?.user?.id
+  if (!userId) return null
+  const { data, error } = await supabase
+    .from('artist_accounts')
+    .select('artist_id')
+    .eq('user_id', userId)
+    .maybeSingle()
+  if (error) return null
+  return (data as any)?.artist_id || null
+}
+
+export const linkCurrentUserToArtist = async (artistId: string): Promise<boolean> => {
+  if (!isSupabaseConfigured()) return false
+  const supabase = getSupabaseClient()
+  const { data: session } = await supabase.auth.getSession()
+  const user = session.session?.user
+  if (!user) return false
+  const { error } = await supabase
+    .from('artist_accounts')
+    .insert({ user_id: user.id, email: user.email ?? null, artist_id: artistId })
+  if (error) {
+    // eslint-disable-next-line no-console
+    console.error('linkCurrentUserToArtist error', error)
+    return false
+  }
+  return true
+}
+
+// Admin CRUD helpers for radio_schedule_weekly
+export const getAllWeeklyRadioSchedule = async (): Promise<RadioScheduleWeeklyRow[]> => {
+  if (!isSupabaseConfigured()) return []
+  const supabase = getSupabaseClient()
+  const { data, error } = await supabase
+    .from('radio_schedule_weekly')
+    .select(`
+      id, day_of_week, start_time_local, duration_minutes, content_type, set_id, stream_url, title, timezone, is_active,
+      sets:sets(
+        audio_url,
+        duration,
+        artists:artists(name, photo_url)
+      )
+    `)
+    .order('day_of_week', { ascending: true })
+    .order('start_time_local', { ascending: true })
+  if (error) {
+    console.error('Error fetching all weekly schedule:', error)
+    return []
+  }
+  return (data as unknown as RadioScheduleWeeklyRow[]) || []
+}
+
+export const upsertWeeklyRadioSchedule = async (row: Partial<RadioScheduleWeeklyRow> & { id?: string }) => {
+  if (!isSupabaseConfigured()) throw new Error('Supabase not configured')
+  const supabaseAdmin = getSupabaseAdminClient()
+  const payload: any = {
+    id: row.id,
+    day_of_week: row.day_of_week,
+    start_time_local: row.start_time_local,
+    duration_minutes: row.duration_minutes ?? 60,
+    content_type: row.content_type,
+    set_id: row.set_id ?? null,
+    stream_url: row.stream_url ?? null,
+    title: row.title ?? '',
+    timezone: row.timezone ?? 'Europe/Istanbul',
+    is_active: row.is_active ?? true,
+  }
+  const { data, error } = await supabaseAdmin
+    .from('radio_schedule_weekly')
+    .upsert(payload, { onConflict: 'id' })
+    .select()
+    .maybeSingle()
+  if (error) {
+    console.error('Error upserting weekly radio schedule:', error)
+    throw error
+  }
+  return data
+}
+
+export const deleteWeeklyRadioSchedule = async (id: string): Promise<boolean> => {
+  if (!isSupabaseConfigured()) throw new Error('Supabase not configured')
+  const supabaseAdmin = getSupabaseAdminClient()
+  const { error } = await supabaseAdmin
+    .from('radio_schedule_weekly')
+    .delete()
+    .eq('id', id)
+  if (error) {
+    console.error('Error deleting weekly radio schedule:', error)
+    return false
+  }
+  return true
 }

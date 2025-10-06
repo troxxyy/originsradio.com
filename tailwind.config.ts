@@ -18,6 +18,19 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        'sans': ['Avenir', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        'newake': ['Newake', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        'newmark': ['Newake', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+      },
+      fontWeight: {
+        'thin': '100',
+        'light': '300',
+        'normal': '400',
+        'medium': '500',
+        'bold': '700',
+        'black': '900',
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
