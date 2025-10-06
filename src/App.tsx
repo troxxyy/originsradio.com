@@ -59,20 +59,12 @@ const ArtistLoginButton = () => {
     <div className="fixed top-3 right-3 sm:top-6 sm:right-6 z-50 perspective-1000">
       <Link 
         to="/artist/login" 
-        className="block group"
+        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 text-white transition-colors group"
         aria-label="Artist Login"
         title="Artist Login"
       >
-        {/* Mobile: icon-only button */}
-        <span className="sm:hidden inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 transition-colors">
-          <LogIn className="w-5 h-5 text-white" />
-        </span>
-        {/* Desktop: original image */}
-        <img 
-          src="/artistlogin.png" 
-          alt="Artist Login" 
-          className="hidden sm:block h-auto max-h-20"
-        />
+        <LogIn className="w-4 h-4 group-hover:scale-110 transition-transform" />
+        <span className="text-sm font-medium">Artist Login</span>
       </Link>
     </div>
   );

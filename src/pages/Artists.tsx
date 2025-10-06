@@ -2,7 +2,8 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
 import { Search, Filter, Music, MapPin, Star } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { LogIn } from 'lucide-react';
 import PageLayout from '@/components/layout/PageLayout';
 import { useArtists } from '@/hooks/use-supabase';
 import { generateSlug } from '@/lib/supabase-utils';
@@ -89,6 +90,18 @@ const Artists = () => {
 
   return (
     <PageLayout customBackground="bg-gradient-to-br from-black via-gray-900 to-black">
+      {/* Artist Login button (fixed, top-right) */}
+      <div className="fixed top-3 right-3 sm:top-6 sm:right-6 z-50">
+        <Link 
+          to="/artist/login" 
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 text-white transition-colors group"
+          aria-label="Artist Login"
+          title="Artist Login"
+        >
+          <LogIn className="w-4 h-4 group-hover:scale-110 transition-transform" />
+          <span className="text-sm font-medium">Artist Login</span>
+        </Link>
+      </div>
       <Helmet>
         <title>{seoData.title}</title>
         <meta name="description" content={seoData.description} />
