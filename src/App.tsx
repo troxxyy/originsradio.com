@@ -48,27 +48,6 @@ const RouteTracker = ({ children }: { children: React.ReactNode }) => {
   return <div key={location.pathname}>{children}</div>;
 };
 
-// Artist Login Button Component - Only shows on homepage
-const ArtistLoginButton = () => {
-  const location = useLocation();
-  const isHomePage = location.pathname === "/";
-
-  if (!isHomePage) return null;
-
-  return (
-    <div className="fixed top-3 right-3 sm:top-6 sm:right-6 z-50 perspective-1000">
-      <Link 
-        to="/artist/login" 
-        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 text-white transition-colors group"
-        aria-label="Artist Login"
-        title="Artist Login"
-      >
-        <LogIn className="w-4 h-4 group-hover:scale-110 transition-transform" />
-        <span className="text-sm font-medium">Artist Login</span>
-      </Link>
-    </div>
-  );
-};
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(() => {
@@ -100,10 +79,9 @@ const App = () => {
           {isLoading && <LoadingScreen onLoadingComplete={handleLoadingComplete} />}
 
           {/* Main Content - Only shown when loading is complete */}
-          <div style={{ display: isLoading ? "none" : "block" }}>
+          <div className={isLoading ? "loading-hidden" : "block"}>
             <BrowserRouter>
               <Navigation />
-              <ArtistLoginButton />
               <MusicPlayer />
               <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
                 <Routes>

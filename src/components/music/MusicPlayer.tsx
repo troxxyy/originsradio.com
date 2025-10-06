@@ -42,6 +42,9 @@ const MusicPlayer = () => {
   const startOffsetSeconds = onDemandSetUrl ? 0 : (scheduledIsLive ? 0 : (currentSlot?.secondsSinceStart ?? 0));
   const nowTitle = onDemandSetUrl ? onDemandTitle : (currentSlot?.item?.title ?? 'Radio');
   const nowArtist = onDemandSetUrl ? onDemandArtist : ((currentSlot?.item as any)?.set?.artists?.name ?? 'Origins Radio');
+  const nowDate = onDemandSetUrl 
+    ? formatDate((latestSet as any)?.release_date) 
+    : (currentSlot?.startedAtUtc ? formatDate(currentSlot.startedAtUtc.toISOString()) : '');
   const isPlayDisabled = isAudioLoading || !streamUrl;
 
   // Load hidden state from localStorage
@@ -179,11 +182,13 @@ const MusicPlayer = () => {
                 )}
                 <div className="flex flex-col leading-tight min-w-0">
                   <span className="text-white/90 text-sm sm:text-base truncate max-w-[46vw] sm:max-w-[340px]">
-                    {nowTitle}
-                  </span>
-                  <span className="text-white/60 text-xs sm:text-sm truncate max-w-[46vw] sm:max-w-[340px]">
                     {nowArtist}
                   </span>
+                  {nowDate && (
+                    <span className="text-white/40 text-[10px] sm:text-xs truncate max-w-[46vw] sm:max-w-[340px]">
+                      {nowDate}
+                    </span>
+                  )}
                 </div>
               </div>
 
