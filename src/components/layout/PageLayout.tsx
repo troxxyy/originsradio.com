@@ -19,6 +19,7 @@ const PageLayout = ({
   showFooter = true,
 }: PageLayoutProps) => {
   const location = useLocation();
+  const isHome = location.pathname === "/";
   const showMainPlayer = false; // main player disabled, only floating player
 
   return (
@@ -48,7 +49,7 @@ const PageLayout = ({
       {/* Navigation handled at App level */}
       
       {/* Page content - Highest layer */}
-      <div className="relative z-40 w-full flex-1 flex flex-col items-stretch justify-start pt-16 sm:pt-20 pb-[env(safe-area-inset-bottom)]">
+      <div className={`relative z-40 w-full flex-1 flex flex-col items-stretch justify-start ${isHome ? 'pt-0' : 'pt-16 sm:pt-20'} pb-[env(safe-area-inset-bottom)]`}>
         {children}
       </div>
 

@@ -1,5 +1,3 @@
-import { supabase } from './supabase'
-
 export type Artist = {
   id: string
   name: string
@@ -14,27 +12,36 @@ export type Artist = {
   created_at: string
 }
 
+// TODO: Replace with real Supabase client in Next.js app
+// For now, fetch from a public API route or fallback.
+
 export async function getAllArtistSlugs(): Promise<string[]> {
-  const { data, error } = await supabase
-    .from('artist_sitemap')
-    .select('slug')
-  if (error || !data) return []
-  return data.map((r: { slug: string }) => r.slug)
+  // Placeholder: adjust to your data source.
+  const res = await fetch(process.env.NEXT_PUBLIC_ARTISTS_SLUGS_URL || 'https://api.origins.radio/artists/slugs', { cache: 'no-store' })
+  if (!res.ok) return []
+  const slugs = (await res.json()) as string[]
+  return slugs
 }
 
 export async function getArtistBySlug(slug: string): Promise<Artist | null> {
-  const { data, error } = await supabase
-    .rpc('artist_by_slug', { p_slug: slug })
-  if (error || !data || data.length === 0) return null
-  return data[0] as unknown as Artist
+  const url = (process.env.NEXT_PUBLIC_ARTIST_BY_SLUG_URL || 'https://api.origins.radio/artists') + `/${encodeURIComponent(slug)}`
+  const res = await fetch(url, { next: { revalidate: 86400 } })
+  if (!res.ok) return null
+  const artist = (await res.json()) as Artist
+  return artist
 }
 
 export async function getArtistsForSitemap(): Promise<Array<{ slug: string; lastmod: string; changefreq: string; priority: number }>> {
-  const { data, error } = await supabase
-    .from('artist_sitemap')
-    .select('slug,lastmod,changefreq,priority')
-  if (error || !data) return []
-  return data as Array<{ slug: string; lastmod: string; changefreq: string; priority: number }>
+  // Ideally from DB with updated_at; fallback to fetch artists list
+  const res = await fetch(process.env.NEXT_PUBLIC_ARTISTS_INDEX_URL || 'https://api.origins.radio/artists', { cache: 'no-store' })
+  if (!res.ok) return []
+  const artists = (await res.json()) as Artist[]
+  return artists.map((a) => ({
+    slug: a.slug,
+    lastmod: a.updated_at || a.created_at,
+    changefreq: 'weekly',
+    priority: a.featured ? 0.9 : 0.6,
+  }))
 }
 
 

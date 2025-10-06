@@ -20,6 +20,8 @@ const Orb = ({ className = "", rotationSpeed = -0.02, setId }: OrbProps) => {
   const freqDataRef = useRef<Uint8Array<ArrayBuffer> | null>(null);
   const teardownAudioRef = useRef<(() => void) | null>(null);
   const boundAudioElRef = useRef<HTMLAudioElement | null>(null);
+  const mousePositionRef = useRef<{ x: number; y: number }>({ x: 0.5, y: 0.5 });
+  const mouseCleanupRef = useRef<(() => void) | null>(null);
   const DEFAULT_Y_FOR_BASS = 120;
   const DEFAULT_TOP_FOR_HIGH = 68;
 
@@ -142,6 +144,25 @@ const Orb = ({ className = "", rotationSpeed = -0.02, setId }: OrbProps) => {
 
     setupAudioAnalyser();
 
+    // Setup mouse tracking
+    const handleMouseMove = (e: MouseEvent) => {
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width;
+        const y = (e.clientY - rect.top) / rect.height;
+        mousePositionRef.current = { x: Math.max(0, Math.min(1, x)), y: Math.max(0, Math.min(1, y)) };
+      }
+    };
+
+    // Add mouse event listener
+    document.addEventListener('mousemove', handleMouseMove);
+
+    // Cleanup function for mouse listener
+    const cleanupMouseListener = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+    };
+    mouseCleanupRef.current = cleanupMouseListener;
+
     // Start infinite z-rotation animation at constant speed and feed audio variables
     const tick = () => {
       rotationAngleRef.current += rotationSpeedRef.current;
@@ -190,6 +211,12 @@ const Orb = ({ className = "", rotationSpeed = -0.02, setId }: OrbProps) => {
           splineRef.current?.setVariable("topforhigh", DEFAULT_TOP_FOR_HIGH);
         } catch {}
       }
+
+      // Update mouse following variables
+      try {
+        splineRef.current?.setVariable("ymousefollow", mousePositionRef.current.y);
+        splineRef.current?.setVariable("zmousefollow", mousePositionRef.current.x);
+      } catch {}
       animationFrameRef.current = requestAnimationFrame(tick);
     };
     // Kick it off
@@ -202,11 +229,13 @@ const Orb = ({ className = "", rotationSpeed = -0.02, setId }: OrbProps) => {
     return () => {
       if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
       if (watermarkObserverRef.current) watermarkObserverRef.current.disconnect();
+      if (mouseCleanupRef.current) mouseCleanupRef.current();
+      if (teardownAudioRef.current) teardownAudioRef.current();
       splineRef.current = null;
     };
   }, []);
   return (
-    <div className={`relative w-full h-full orb-container ${className}`}>
+    <div className={`absolute inset-0 orb-container ${className}`} ref={containerRef}>
       <Suspense
         fallback={
           <div className="flex h-full w-full items-center justify-center">
@@ -214,14 +243,12 @@ const Orb = ({ className = "", rotationSpeed = -0.02, setId }: OrbProps) => {
           </div>
         }
       >
-        <div className="absolute inset-0" ref={containerRef}>
-          <Spline
-            scene="/orbvol2/public/scene.splinecode"
-            wasmPath="/orbvol2/public/"
-            className="w-full h-full"
-            onLoad={handleLoad}
-          />
-        </div>
+        <Spline
+          scene="/orbvol2/public/scene.splinecode"
+          wasmPath="/orbvol2/public/"
+          className="!w-full !h-full block absolute inset-0"
+          onLoad={handleLoad}
+        />
       </Suspense>
     </div>
   );

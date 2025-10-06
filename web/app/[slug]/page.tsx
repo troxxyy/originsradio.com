@@ -49,36 +49,10 @@ export default async function Page({ params }: { params: { slug: string } }) {
     description: artist.bio || undefined,
   }
   return (
-    <main className="container py-10">
+    <main className="max-w-3xl mx-auto px-6 py-10">
       <JsonLd json={jsonLd} />
-      <div className="flex flex-col md:flex-row gap-8 items-start">
-        {artist.photo_url && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={artist.photo_url}
-            alt={artist.name}
-            className="w-full md:w-64 h-64 object-cover rounded-xl card"
-          />
-        )}
-        <div className="flex-1">
-          <h1 className="text-4xl font-semibold">{artist.name}</h1>
-          {artist.location && (
-            <p className="mt-2 opacity-80">{artist.location}</p>
-          )}
-          {artist.bio && (
-            <p className="mt-6 leading-7 opacity-90 whitespace-pre-line">{artist.bio}</p>
-          )}
-          {artist.social_links && (
-            <div className="mt-6 flex flex-wrap gap-3">
-              {Object.entries(artist.social_links).map(([key, url]) => (
-                <a key={key} href={String(url)} target="_blank" rel="noopener noreferrer" className="card px-3 py-1 rounded-md hover:opacity-90">
-                  {key}
-                </a>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
+      <h1 className="text-3xl font-semibold">{artist.name}</h1>
+      {artist.bio && <p className="mt-4 text-neutral-700">{artist.bio}</p>}
     </main>
   )
 }
