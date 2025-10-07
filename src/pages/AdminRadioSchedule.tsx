@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import PageLayout from '@/components/layout/PageLayout'
 import { getAllWeeklyRadioSchedule, upsertWeeklyRadioSchedule, deleteWeeklyRadioSchedule, getSets } from '@/lib/supabase-utils'
 
-const HOURS = [16,17,18,19,20,21,22,23]
+const HOURS = [19,20,21,22,23]
 const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
 
 export default function AdminRadioSchedule() {
@@ -60,7 +60,7 @@ export default function AdminRadioSchedule() {
     const m = new Map<string, any>()
     for (const r of rows) {
       const hour = parseInt((r.start_time_local || '0:00').split(':')[0], 10)
-      if (hour >= 16 && hour <= 23) {
+      if (hour >= 19 && hour <= 23) {
         m.set(`${r.day_of_week}-${hour}`, r)
       }
     }

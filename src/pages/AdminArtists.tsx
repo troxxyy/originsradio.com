@@ -248,6 +248,7 @@ const AdminArtists = () => {
       social_links: artist.social_links || {},
     });
     setShowEditModal(true);
+    console.log('Edit Modal Opened. Body classes:', document.body.className);
   };
 
   const handleDeleteArtist = (artist: Artist) => {
@@ -266,6 +267,7 @@ const AdminArtists = () => {
       social_links: {},
     });
     setShowAddModal(true);
+    console.log('Add Modal Opened. Body classes:', document.body.className);
   };
 
   const handleSaveArtist = async (isEdit: boolean) => {
@@ -286,6 +288,7 @@ const AdminArtists = () => {
           alert(`Updated artist: ${formData.name}`);
           setShowEditModal(false);
           setSelectedArtist(null);
+          console.log('Edit Modal Closed. Body classes:', document.body.className);
         } else {
           alert('Error updating artist');
         }
@@ -304,6 +307,7 @@ const AdminArtists = () => {
         if (newArtist) {
           alert(`Added artist: ${newArtist.name}`);
           setShowAddModal(false);
+          console.log('Add Modal Closed. Body classes:', document.body.className);
         } else {
           alert('Error adding artist');
         }
@@ -793,11 +797,18 @@ const AdminArtists = () => {
 
         {/* Add/Edit Modal */}
         {(showAddModal || showEditModal) && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => {
+              setShowAddModal(false);
+              setShowEditModal(false);
+            }}
+          >
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="glass backdrop-blur-sm rounded-2xl border border-white/10 p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+              className="glass backdrop-blur-sm rounded-2xl border border-white/10 p-6 w-full max-w-6xl max-h-[90vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-white flex items-center gap-2">
@@ -1109,6 +1120,7 @@ const AdminArtists = () => {
                   onClick={() => {
                     setShowAddModal(false);
                     setShowEditModal(false);
+                    console.log('Add/Edit Modal Cancelled. Body classes:', document.body.className);
                   }}
                   className="px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg hover:bg-white/20 transition-all"
                 >
@@ -1121,10 +1133,25 @@ const AdminArtists = () => {
 
         {/* Delete Confirmation Modal */}
         {showDeleteModal && selectedArtist && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            style={{ touchAction: 'auto' }}
+            onTouchStart={(e) => { e.stopPropagation(); }}
+            onTouchMove={(e) => { e.stopPropagation(); }}
+            onTouchEnd={(e) => { e.stopPropagation(); }}
+            onPointerDown={(e) => { e.stopPropagation(); }}
+            onPointerMove={(e) => { e.stopPropagation(); }}
+            onMouseDown={(e) => { e.stopPropagation(); }}
+          >
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
+              style={{ touchAction: 'auto' }}
+              onTouchStart={(e) => { e.stopPropagation(); }}
+              onTouchMove={(e) => { e.stopPropagation(); }}
+              onTouchEnd={(e) => { e.stopPropagation(); }}
+              onPointerDown={(e) => { e.stopPropagation(); }}
+              onPointerMove={(e) => { e.stopPropagation(); }}
               className="glass backdrop-blur-sm rounded-2xl border border-white/10 p-6 w-full max-w-md"
             >
               <div className="flex items-center gap-3 mb-4">
