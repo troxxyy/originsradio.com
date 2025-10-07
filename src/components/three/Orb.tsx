@@ -8,7 +8,7 @@ interface OrbProps {
   setId?: string; // optional: force a specific Supabase set for SSE
 }
 
-const Orb = ({ className = "", rotationSpeed = -0.02, setId }: OrbProps) => {
+const Orb = ({ className = "", rotationSpeed = -0.08, setId }: OrbProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const watermarkObserverRef = useRef<MutationObserver | null>(null);
   const splineRef = useRef<Application | null>(null);
@@ -22,6 +22,10 @@ const Orb = ({ className = "", rotationSpeed = -0.02, setId }: OrbProps) => {
   const boundAudioElRef = useRef<HTMLAudioElement | null>(null);
   const mousePositionRef = useRef<{ x: number; y: number }>({ x: 0.5, y: 0.5 });
   const mouseCleanupRef = useRef<(() => void) | null>(null);
+  // Smoothed mouse position for follower (interpolates toward real cursor)
+  const mouseSmoothRef = useRef<{ x: number; y: number }>({ x: 0.8, y: 0.8 });
+  // Higher lerp factor -> follower responds faster (0..1)
+  const CURSOR_LERP_FACTOR = 1.2;
   const DEFAULT_Y_FOR_BASS = 120;
   const DEFAULT_TOP_FOR_HIGH = 68;
 
@@ -212,10 +216,14 @@ const Orb = ({ className = "", rotationSpeed = -0.02, setId }: OrbProps) => {
         } catch {}
       }
 
-      // Update mouse following variables
+      // Smoothly interpolate a follower position toward the real mouse to control responsiveness
       try {
-        splineRef.current?.setVariable("ymousefollow", mousePositionRef.current.y);
-        splineRef.current?.setVariable("zmousefollow", mousePositionRef.current.x);
+        const target = mousePositionRef.current;
+        const smooth = mouseSmoothRef.current;
+        smooth.x += (target.x - smooth.x) * CURSOR_LERP_FACTOR;
+        smooth.y += (target.y - smooth.y) * CURSOR_LERP_FACTOR;
+        splineRef.current?.setVariable("ymousefollow", smooth.y);
+        splineRef.current?.setVariable("zmousefollow", smooth.x);
       } catch {}
       animationFrameRef.current = requestAnimationFrame(tick);
     };

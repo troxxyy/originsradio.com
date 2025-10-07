@@ -61,6 +61,12 @@ const ArtistLogin = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black flex items-center justify-center px-4 py-16">
       <div className="glass backdrop-blur-sm rounded-2xl border border-white/10 p-6 w-full max-w-md">
+        {/* Beta disclaimer - prominent red banner */}
+        <div className="mb-4 p-3 rounded-lg border border-red-500 bg-red-600/10 text-red-200 text-sm">
+          <strong className="block font-semibold">Beta feature</strong>
+          <span className="block">This artist area is in beta — we're gathering feedback. Please be cautious when using it.</span>
+        </div>
+
         <div className="mb-6 text-center">
           <h1 className="text-2xl font-bold text-white">Artist Login</h1>
           <p className="text-gray-400 text-sm mt-1">Sign in to manage your profile and sets</p>
