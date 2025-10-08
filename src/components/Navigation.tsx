@@ -1,10 +1,13 @@
+'use client'
+
 import { Home, Info, Users, Ticket, Navigation as NavigationIcon, BookOpen } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const Navigation = () => {
-  const location = useLocation();
-  const isGoCrazyPage = location.pathname === "/gocrazy";
+  const pathname = usePathname();
+  const isGoCrazyPage = pathname === "/gocrazy";
   
   const links = [
     { name: "", icon: Home, href: "/" },
@@ -28,7 +31,7 @@ const Navigation = () => {
       {/* Home button in its own bubble */}
       <div className={cn(navItemClass, "px-4 sm:px-6")}>
         <Link
-          to={links[0].href}
+          href={links[0].href}
           className="text-white/100 hover:text-white transition-colors group flex items-center nav-link"
         >
           {(() => {
@@ -46,7 +49,7 @@ const Navigation = () => {
         {links.slice(1).map((link) => (
           <div key={link.name} className="relative">
             <Link
-              to={link.href}
+              href={link.href}
               className="text-white/100 hover:text-white transition-colors group flex items-center gap-2 px-1 nav-link"
             >
               {link.icon && <link.icon className={cn("w-5 h-5", (link as any).iconClassName)} />}

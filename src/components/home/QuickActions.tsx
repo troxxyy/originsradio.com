@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom'
+'use client'
+
+import Link from 'next/link'
 import { Calendar, Users, Radio, Music, Instagram, Youtube } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { motion } from 'framer-motion'
@@ -62,7 +64,7 @@ const QuickActions = () => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4, delay: idx * 0.05 }}
           >
-            <Link to={action.href}>
+            <Link href={action.href}>
               <Card className="border-white/10 bg-white/[0.03] backdrop-blur-sm hover:bg-white/[0.08] transition-all duration-300 group cursor-pointer h-full">
                 <CardContent className="p-4 sm:p-5 text-center">
                   <div className={`inline-flex p-3 sm:p-4 rounded-2xl bg-white/10 mb-3 group-hover:scale-110 group-hover:bg-white/15 transition-all duration-300`}>

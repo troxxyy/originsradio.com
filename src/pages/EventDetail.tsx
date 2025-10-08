@@ -1,5 +1,7 @@
+'use client'
+
 import { useMemo, useState, useEffect, type CSSProperties } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useRouter, useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import PageLayout from "@/components/layout/PageLayout";
 import { useOurWorkProjects } from "@/hooks/use-supabase";
@@ -23,10 +25,11 @@ type UiProject = {
 };
 
 const EventDetail = () => {
-  const { eventSlug } = useParams();
+  const params = useParams();
+  const eventSlug = params?.eventSlug as string | undefined;
   const [project, setProject] = useState<UiProject | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
+  const router = useRouter();
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -277,7 +280,7 @@ const EventDetail = () => {
         <div className="relative px-6 pt-28 sm:px-8 lg:px-12">
           <div className="mx-auto max-w-7xl">
             <button
-              onClick={() => navigate(-1)}
+              onClick={() => router.back()}
               className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white transition-colors hover:border-white/20 hover:bg-white/10"
             >
               <ArrowLeft className="h-4 w-4" /> Back

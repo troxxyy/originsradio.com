@@ -1,5 +1,8 @@
+'use client'
+
 import { useMemo } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Calendar, MapPin, ArrowRight, Star, Music4 } from 'lucide-react'
 import { useSets, useOurWorkProjects, useArtists } from '@/hooks/use-supabase'
 import { generateSlug } from '@/lib/supabase-utils'
@@ -15,7 +18,7 @@ const formatDate = (dateStr?: string | null) => {
 }
 
 const HomeOverview = () => {
-  const navigate = useNavigate()
+  const router = useRouter()
 
   // Up Next (latest set)
   const { data: sets } = useSets()
@@ -43,7 +46,7 @@ const HomeOverview = () => {
 
   const openArtist = (name: string) => {
     const slug = generateSlug(name)
-    navigate(`/artists/${slug}`)
+    router.push(`/artists/${slug}`)
   }
 
   return (
@@ -51,10 +54,10 @@ const HomeOverview = () => {
       <div className="mb-4 sm:mb-6 flex items-center justify-between">
         <h2 className="text-xl sm:text-2xl font-semibold text-white">Overview</h2>
         <div className="flex items-center gap-4 text-sm">
-          <Link to="/events" className="text-white/80 hover:text-white inline-flex items-center gap-1">
+          <Link href="/events" className="text-white/80 hover:text-white inline-flex items-center gap-1">
             Events <ArrowRight className="w-3.5 h-3.5" />
           </Link>
-          <Link to="/artists" className="text-white/80 hover:text-white inline-flex items-center gap-1">
+          <Link href="/artists" className="text-white/80 hover:text-white inline-flex items-center gap-1">
             Artists <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -63,7 +66,7 @@ const HomeOverview = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Latest Set */}
         <Link
-          to="#upnext"
+          href="#upnext"
           className="group rounded-2xl overflow-hidden border border-white/10 bg-white/[0.04] hover:bg-white/[0.06] transition-colors"
         >
           <div className="p-4 flex items-center gap-4">
@@ -95,7 +98,7 @@ const HomeOverview = () => {
           {(upcoming.length > 0 ? upcoming : [null, null]).slice(0, 2).map((p, i) => (
             <Link
               key={p?.slug || `evt-${i}`}
-              to={p?.slug ? `/events/${p.slug}` : '/events'}
+              href={p?.slug ? `/events/${p.slug}` : '/events'}
               className="group rounded-2xl overflow-hidden border border-white/10 bg-white/[0.04] hover:bg-white/[0.06] transition-colors"
             >
               <div className="flex gap-4 p-4">

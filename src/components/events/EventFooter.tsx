@@ -1,8 +1,10 @@
+'use client'
+
 import { Mail, Youtube, Instagram, Cloud, Radio, MapPin, Calendar, Music } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import PrivacyPolicyDialog from "./PrivacyPolicyDialog";
 import ConsumerDisclosureDialog from "./ConsumerDisclosureDialog";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 interface EventFooterProps {}
 
@@ -35,19 +37,19 @@ const EventFooter = ({}: EventFooterProps) => {
           <div className="space-y-4">
             <h3 className="text-sm sm:text-base font-semibold uppercase tracking-wide text-white/90">Explore</h3>
             <div className="flex flex-col gap-4">
-              <Link to="/" className="text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 flex items-center gap-2 py-1">
+              <Link href="/" className="text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 flex items-center gap-2 py-1">
                 <Music className="h-4 w-4" />
                 Live Radio
               </Link>
-              <Link to="/events" className="text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 flex items-center gap-2 py-1">
+              <Link href="/events" className="text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 flex items-center gap-2 py-1">
                 <Calendar className="h-4 w-4" />
                 Events
               </Link>
-              <Link to="/artists" className="text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 flex items-center gap-2 py-1">
+              <Link href="/artists" className="text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 flex items-center gap-2 py-1">
                 <Radio className="h-4 w-4" />
                 Artists
               </Link>
-              <Link to="/about" className="text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 py-1">
+              <Link href="/about" className="text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 py-1">
                 About Us
               </Link>
             </div>

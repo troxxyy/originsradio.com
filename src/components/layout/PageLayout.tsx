@@ -1,6 +1,8 @@
+'use client'
+
 import { ReactNode, CSSProperties } from "react";
 import EventFooter from "@/components/events/EventFooter";
-import { useLocation } from "react-router-dom";
+import { usePathname } from "next/navigation";
 
 
 interface PageLayoutProps {
@@ -18,8 +20,8 @@ const PageLayout = ({
   customBackgroundStyle,
   showFooter = true,
 }: PageLayoutProps) => {
-  const location = useLocation();
-  const isHome = location.pathname === "/";
+  const pathname = usePathname();
+  const isHome = pathname === "/";
   const showMainPlayer = false; // main player disabled, only floating player
 
   return (

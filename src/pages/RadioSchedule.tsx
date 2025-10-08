@@ -1,5 +1,7 @@
+'use client'
+
 import { useMemo, useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
 import PageLayout from '@/components/layout/PageLayout'
 import { useWeeklyRadioSchedule, useCurrentRadioSlot } from '@/hooks/use-radio'
 import { generateSlug } from '@/lib/supabase-utils'
@@ -24,7 +26,7 @@ function getIstanbulTime() {
 
 export default function RadioSchedule() {
   const { data = [], isLoading, error } = useWeeklyRadioSchedule()
-  const navigate = useNavigate()
+  const router = useRouter()
   const [currentTime, setCurrentTime] = useState(getIstanbulTime())
   const { currentSlot } = useCurrentRadioSlot(5000)
 
@@ -129,7 +131,7 @@ export default function RadioSchedule() {
                                 artistId={item.set?.artists?.id}
                                 onClick={() => {
                                   if (item.set?.artists?.name) {
-                                    navigate(`/artists/${generateSlug(item.set.artists.name)}`)
+                                    router.push(`/artists/${generateSlug(item.set.artists.name)}`)
                                   }
                                 }}
                               />

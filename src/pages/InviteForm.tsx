@@ -1,5 +1,7 @@
+'use client'
+
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { User, Mail, Phone, Calendar, MapPin, ArrowLeft } from "lucide-react";
 import PageLayout from "@/components/layout/PageLayout";
@@ -9,8 +11,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 const InviteForm = () => {
-  const { eventSlug } = useParams();
-  const navigate = useNavigate();
+  const params = useParams();
+  const eventSlug = params?.eventSlug as string | undefined;
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   
@@ -59,7 +62,7 @@ const InviteForm = () => {
               Thank you for your interest. We'll review your request and get back to you soon.
             </p>
             <Button 
-              onClick={() => navigate("/events")}
+              onClick={() => router.push("/events")}
               className="bg-white text-black hover:bg-gray-200"
             >
               Back to Events
@@ -82,7 +85,7 @@ const InviteForm = () => {
           <div className="mb-6">
             <Button
               variant="ghost"
-              onClick={() => navigate(-1)}
+              onClick={() => router.back()}
               className="text-gray-400 hover:text-white mb-4"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />

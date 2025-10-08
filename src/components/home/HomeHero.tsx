@@ -1,4 +1,7 @@
-import { Link, useNavigate } from "react-router-dom";
+'use client'
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { Ticket, Users, Radio, Navigation, LogIn } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -9,7 +12,7 @@ type RouteKey = "events" | "fm" | "artists" | "thisWeek";
 
 type RouteItem = {
   key: RouteKey;
-  to: string;
+  href: string;
   icon: any;
   text: string;
   description?: string;
@@ -59,13 +62,13 @@ const HomeHero: React.FC = () => {
 
   const mobileOrder = ["fm", "events", "artists", "thisWeek"] as const;
 
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const routes: RouteItem[] = [
-    { key: "events", to: "/events", icon: Ticket, text: "Events", description: "Our Exclusive", position: "top-left" },
-    { key: "fm", to: "/radio/schedule", icon: Radio, text: "Fm", description: "Timetable for Week", position: "top-right" },
-    { key: "artists", to: "/artists", icon: Users, text: "Artists", description: "Join Us", position: "bottom-left" },
-    { key: "thisWeek", to: "/thisweek", icon: Navigation, text: "This Week", description: "In Your City", position: "bottom-right" },
+    { key: "events", href: "/events", icon: Ticket, text: "Events", description: "Our Exclusive", position: "top-left" },
+    { key: "fm", href: "/radio/schedule", icon: Radio, text: "Fm", description: "Timetable for Week", position: "top-right" },
+    { key: "artists", href: "/artists", icon: Users, text: "Artists", description: "Join Us", position: "bottom-left" },
+    { key: "thisWeek", href: "/thisweek", icon: Navigation, text: "This Week", description: "In Your City", position: "bottom-right" },
   ];
 
   const handleHover = (key: RouteKey, isHovering: boolean) => {
@@ -91,7 +94,7 @@ const HomeHero: React.FC = () => {
 
       <div className="fixed top-3 right-3 sm:top-6 sm:right-6 z-[80] perspective-1000 pointer-events-auto">
         <Link
-          to="/artist/login"
+          href="/artist/login"
           className="artist-login-btn inline-flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 text-white transition-colors group"
           aria-label="Artist Login"
           title="Artist Login"
@@ -111,7 +114,7 @@ const HomeHero: React.FC = () => {
               const isHovered = hoverStates[route.key as keyof typeof hoverStates];
 
               return (
-                <Link key={route.key} to={route.to} className={`${sectionClass} text-white group items-center`} style={{ perspective: "1000px" }}>
+                <Link key={route.key} href={route.href} className={`${sectionClass} text-white group items-center`} style={{ perspective: "1000px" }}>
                   <div
                     className={textGroupClass}
                     onMouseEnter={() => handleHover(route.key, true)}
@@ -120,12 +123,12 @@ const HomeHero: React.FC = () => {
                     <div className="flex items-center gap-3 mb-2 justify-center">
                       {route.key === "events" ? (
                         <>
-                          <ScrambleText text={route.text} active={isHovered} className={`${headlineClass} block hover-3d-text`} onClick={() => navigate(route.to)} />
+                          <ScrambleText text={route.text} active={isHovered} className={`${headlineClass} block hover-3d-text`} onClick={() => router.push(route.href)} />
                           <IconComponent className="w-8 h-8 text-white/80 group-hover:text-white transition-colors" />
                         </>
                       ) : (
                         <>
-                          <ScrambleText text={route.text} active={isHovered} className={`${headlineClass} block hover-3d-text`} onClick={() => navigate(route.to)} />
+                          <ScrambleText text={route.text} active={isHovered} className={`${headlineClass} block hover-3d-text`} onClick={() => router.push(route.href)} />
                           <IconComponent className="w-8 h-8 text-white/80 group-hover:text-white transition-colors" />
                         </>
                       )}
@@ -144,17 +147,17 @@ const HomeHero: React.FC = () => {
               const isHovered = hoverStates[route.key as keyof typeof hoverStates];
 
               return (
-                <Link key={route.key} to={route.to} className={`${sectionClass} text-white group items-center`} style={{ perspective: "1000px" }}>
+                <Link key={route.key} href={route.href} className={`${sectionClass} text-white group items-center`} style={{ perspective: "1000px" }}>
                   <div className={textGroupClass} onMouseEnter={() => handleHover(route.key, true)} onMouseLeave={() => handleMouseLeave(route.key)}>
                     <div className="flex items-center gap-3 mb-2">
                       {route.key === "events" ? (
                         <>
                           <IconComponent className="w-8 h-8 text-white/80 group-hover:text-white transition-colors" />
-                          <ScrambleText text={route.text} active={isHovered} className={`${headlineClass} block hover-3d-text`} onClick={() => navigate(route.to)} />
+                          <ScrambleText text={route.text} active={isHovered} className={`${headlineClass} block hover-3d-text`} onClick={() => router.push(route.href)} />
                         </>
                       ) : (
                         <>
-                          <ScrambleText text={route.text} active={isHovered} className={`${headlineClass} block hover-3d-text`} onClick={() => navigate(route.to)} />
+                          <ScrambleText text={route.text} active={isHovered} className={`${headlineClass} block hover-3d-text`} onClick={() => router.push(route.href)} />
                           <IconComponent className="w-8 h-8 text-white/80 group-hover:text-white transition-colors" />
                         </>
                       )}
@@ -173,7 +176,7 @@ const HomeHero: React.FC = () => {
               const isHovered = hoverStates[route.key as keyof typeof hoverStates];
 
               return (
-                <Link key={route.key} to={route.to} className={`${sectionClass} text-white group items-center`} style={{ perspective: "1000px" }}>
+                <Link key={route.key} href={route.href} className={`${sectionClass} text-white group items-center`} style={{ perspective: "1000px" }}>
                   <div className={textGroupClass} onMouseEnter={() => handleHover(route.key, true)} onMouseLeave={() => handleMouseLeave(route.key)}>
                     <div className="flex items-center gap-4 mb-2">
                       {route.key === "thisWeek" ? (

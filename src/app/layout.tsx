@@ -1,7 +1,16 @@
-'use client'
+import type { Metadata } from 'next'
+import { Providers } from './providers'
+import '../index.css'
 
-// Force dynamic rendering for entire app
-export const dynamic = 'force-dynamic'
+export const metadata: Metadata = {
+  title: 'OriginsRadio - Ankara\'s Interactive Radio Station',
+  description: 'OriginsRadio - Ankara\'s premier interactive radio station featuring live shows, music, events, and cultural experiences.',
+  icons: {
+    icon: '/favicon/favicon.ico',
+    apple: '/favicon/apple-touch-icon.png',
+  },
+  themeColor: '#000000',
+}
 
 export default function RootLayout({
   children,
@@ -11,19 +20,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <meta charSet="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>OriginsRadio - Ankara's Interactive Radio Station</title>
-        <meta name="description" content="OriginsRadio - Ankara's premier interactive radio station featuring live shows, music, events, and cultural experiences." />
-        <link rel="canonical" href="https://originsradio.com/" />
-        <link rel="icon" href="/favicon/favicon.ico" />
-        <link rel="mask-icon" href="/favicon/safari-pinned-tab.svg" color="#5bbad5" />
-        <meta name="theme-color" content="#000000" />
         {/* IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! */}
         <script src="https://cdn.gpteng.co/gptengineer.js" type="module" async></script>
       </head>
       <body>
-        <div id="root">{children}</div>
+        <Providers>{children}</Providers>
       </body>
     </html>
   )
