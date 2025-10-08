@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import PageLayout from '@/components/layout/PageLayout'
 import { useWeeklyRadioSchedule, useCurrentRadioSlot } from '@/hooks/use-radio'
+import { generateSlug } from '@/lib/supabase-utils'
 
 const HOURS = [19,20,21,22,23]
 const DAY_LABELS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
@@ -127,8 +128,8 @@ export default function RadioSchedule() {
                                 photoUrl={item.set?.artists?.photo_url || ''}
                                 artistId={item.set?.artists?.id}
                                 onClick={() => {
-                                  if (item.set?.artists?.slug) {
-                                    navigate(`/artists/${item.set.artists.slug}`)
+                                  if (item.set?.artists?.name) {
+                                    navigate(`/artists/${generateSlug(item.set.artists.name)}`)
                                   }
                                 }}
                               />
