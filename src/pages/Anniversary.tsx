@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useEffect, useRef } from "react";
 import { Helmet } from "react-helmet-async";
 import PageLayout from "@/components/layout/PageLayout";

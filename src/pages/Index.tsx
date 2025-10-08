@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect } from "react";
 import PageLayout from "@/components/layout/PageLayout";
 import HomeHero from "@/components/home/HomeHero";

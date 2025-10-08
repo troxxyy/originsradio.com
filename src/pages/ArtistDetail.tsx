@@ -1,5 +1,7 @@
+'use client'
+
 import { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
 import { 
@@ -33,8 +35,9 @@ import { ProgressBar } from '@/components/home/UpNext';
 import { getSupabaseClient } from '@/lib/supabase';
 
 const ArtistDetail = () => {
-  const { artistSlug } = useParams<{ artistSlug: string }>();
-  const navigate = useNavigate();
+  const params = useParams();
+  const artistSlug = params?.artistSlug as string | undefined;
+  const router = useRouter();
   const [currentTrack, setCurrentTrack] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioRef, setAudioRef] = useState<HTMLAudioElement | null>(null);
@@ -473,7 +476,7 @@ const ArtistDetail = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => navigate('/artists')}
+              onClick={() => router.push('/artists')}
               className="px-8 py-4 bg-white/10 border border-white/20 rounded-xl text-white font-semibold hover:bg-white/20 transition-all shadow-lg"
             >
               Back to DJs
@@ -520,7 +523,7 @@ const ArtistDetail = () => {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               whileHover={{ x: -5 }}
-              onClick={() => navigate('/artists')}
+              onClick={() => router.push('/artists')}
               className="flex items-center gap-3 text-white/80 hover:text-white transition-all duration-300 mb-8 group"
             >
               <div className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center group-hover:bg-white/20 transition-all">

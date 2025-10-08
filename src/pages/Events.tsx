@@ -1,10 +1,12 @@
+'use client'
+
 import { motion } from "framer-motion";
 import { useState, useEffect, useMemo } from "react";
 import { Calendar, MapPin } from "lucide-react";
 import PageLayout from "@/components/layout/PageLayout";
 import { useOurWorkProjects } from "@/hooks/use-supabase";
 import type { TicketTier } from "@/components/events/TicketPurchaseModal";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { generateSlug } from "@/lib/supabase-utils";
 
 interface ProjectUiModel {
@@ -223,7 +225,7 @@ const Events = () => {
       className="group cursor-pointer h-full"
     >
       <Link 
-        to={`/events/${project.slug || generateSlug(project.title)}`}
+        href={`/events/${project.slug || generateSlug(project.title)}`}
         onClick={() => setIsNavigating(true)}
       >
         <div className={`glass backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.1)] transform-gpu hover:scale-105 h-full flex flex-col min-h-[28rem] sm:min-h-[30rem] md:min-h-[32rem] lg:min-h-[34rem] ${isPast ? 'opacity-60' : ''}`}>

@@ -1,7 +1,9 @@
+'use client'
+
 import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { Star } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
 import { useArtists } from '@/hooks/use-supabase'
 import { generateSlug } from '@/lib/supabase-utils'
 
@@ -13,7 +15,7 @@ type ResidentArtistsProps = {
 
 const ResidentArtists = ({ compact = false, maxItems, title }: ResidentArtistsProps) => {
   const { data: artists, isLoading, error } = useArtists()
-  const navigate = useNavigate()
+  const router = useRouter()
 
   const residents = useMemo(() => {
     const defaultMax = compact ? 6 : 8
@@ -23,7 +25,7 @@ const ResidentArtists = ({ compact = false, maxItems, title }: ResidentArtistsPr
 
   const openArtist = (name: string) => {
     const slug = generateSlug(name)
-    navigate(`/artists/${slug}`)
+    router.push(`/artists/${slug}`)
   }
 
   return (

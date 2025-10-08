@@ -1,6 +1,8 @@
+'use client'
+
 import { useState, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { getSupabaseAdminClient } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -332,7 +334,7 @@ const AdminUploads = () => {
                 Select Artist
               </h2>
               <Link
-                to="/artistcontrolsecret"
+                href="/artistcontrolsecret"
                 className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm flex items-center gap-2 transition-colors"
               >
                 <Plus className="w-4 h-4" />

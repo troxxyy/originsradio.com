@@ -1,7 +1,9 @@
+'use client'
+
 import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { Calendar, MapPin, ArrowRight } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { useOurWorkProjects } from '@/hooks/use-supabase'
 
 type UiProject = {
@@ -54,7 +56,7 @@ const UpcomingEvents = ({ compact = false, maxItems, title }: UpcomingEventsProp
           )}
         </div>
         <Link
-          to="/events"
+          href="/events"
           className="inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors"
         >
           <span>View all</span>
@@ -78,7 +80,7 @@ const UpcomingEvents = ({ compact = false, maxItems, title }: UpcomingEventsProp
               transition={{ duration: 0.4, delay: idx * 0.05 }}
               className="group rounded-2xl overflow-hidden border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
             >
-              <Link to={p.slug ? `/events/${p.slug}` : '/events'} className="block h-full">
+              <Link href={p.slug ? `/events/${p.slug}` : '/events'} className="block h-full">
                 <div className={`relative ${compact ? 'h-36' : 'h-44'} w-full overflow-hidden`}>
                   <img
                     src={p.image_url || '/placeholder.svg'}
