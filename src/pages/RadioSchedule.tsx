@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useRef, useEffect, useState } from 'react'
 import PageLayout from '@/components/layout/PageLayout'
 import { useWeeklyRadioSchedule } from '@/hooks/use-radio'
 
@@ -16,6 +16,8 @@ function getHourLabel(h: number) {
 
 export default function RadioSchedule() {
   const { data = [], isLoading, error } = useWeeklyRadioSchedule()
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [touchActive, setTouchActive] = useState(false)
 
   const itemsByKey = useMemo(() => {
     const map = new Map<string, typeof data[number]>()
@@ -29,16 +31,97 @@ export default function RadioSchedule() {
     return map
   }, [data])
 
+  // Enhanced touch handling for better swipe experience
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    let startX = 0
+    let startY = 0
+    let isScrolling = false
+    let lastTouchTime = 0
+
+    const handleTouchStart = (e: TouchEvent) => {
+      startX = e.touches[0].clientX
+      startY = e.touches[0].clientY
+      isScrolling = false
+      lastTouchTime = Date.now()
+      setTouchActive(true)
+      
+      // Debug: Log touch start
+      console.log('Radio Schedule: Touch start', { startX, startY })
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      const currentTime = Date.now()
+      const timeDiff = currentTime - lastTouchTime
+      
+      // Only process if enough time has passed (throttle)
+      if (timeDiff < 16) return
+      
+      if (!isScrolling) {
+        const deltaX = Math.abs(e.touches[0].clientX - startX)
+        const deltaY = Math.abs(e.touches[0].clientY - startY)
+        
+        // Determine if this is a horizontal swipe
+        if (deltaX > deltaY && deltaX > 10) {
+          isScrolling = true
+          e.preventDefault()
+        }
+      } else if (isScrolling) {
+        // Continue preventing default for horizontal swipes
+        e.preventDefault()
+      }
+      
+      lastTouchTime = currentTime
+    }
+
+    const handleTouchEnd = () => {
+      isScrolling = false
+      setTouchActive(false)
+    }
+
+    // Add wheel event handling for desktop users
+    const handleWheel = (e: WheelEvent) => {
+      // Allow horizontal scrolling with mouse wheel
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        e.preventDefault()
+        container.scrollLeft += e.deltaX
+      }
+    }
+
+    container.addEventListener('touchstart', handleTouchStart, { passive: false })
+    container.addEventListener('touchmove', handleTouchMove, { passive: false })
+    container.addEventListener('touchend', handleTouchEnd)
+    container.addEventListener('wheel', handleWheel, { passive: false })
+
+    return () => {
+      container.removeEventListener('touchstart', handleTouchStart)
+      container.removeEventListener('touchmove', handleTouchMove)
+      container.removeEventListener('touchend', handleTouchEnd)
+      container.removeEventListener('wheel', handleWheel)
+    }
+  }, [])
+
   return (
     <PageLayout showFooter={false} customBackground="bg-black">
       <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black text-white">
+        {/* Touch indicator for debugging */}
+        {touchActive && (
+          <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+            Touch Active
+          </div>
+        )}
         <div className="w-full px-0 py-4">
           {isLoading ? (
             <div className="flex items-center justify-center h-[60vh]">Loading…</div>
           ) : error ? (
             <div className="text-red-400">Failed to load schedule</div>
           ) : (
-            <div className="relative overflow-x-auto overscroll-x-contain touch-pan-x snap-x snap-mandatory">
+            <div 
+              ref={containerRef}
+              className="radio-schedule-container relative overflow-x-auto overscroll-x-contain touch-pan-x snap-x snap-mandatory"
+            >
               <div
                 className="grid w-full"
                 style={{

@@ -632,6 +632,43 @@ html.homepage-locked {
   -webkit-overflow-scrolling: none !important;
 }
 
+/* Allow touch interactions for radio schedule */
+.radio-schedule-container {
+  touch-action: pan-x !important;
+  overscroll-behavior-x: contain !important;
+  -webkit-overflow-scrolling: touch !important;
+  scroll-behavior: smooth !important;
+  scroll-snap-type: x mandatory !important;
+  /* Add momentum scrolling for better mobile experience */
+  -webkit-overflow-scrolling: touch !important;
+  /* Ensure smooth scrolling */
+  scroll-behavior: smooth !important;
+}
+
+/* Ensure snap points work properly on mobile */
+.radio-schedule-container .grid > div {
+  scroll-snap-align: start !important;
+}
+
+/* Improve touch responsiveness */
+.radio-schedule-container * {
+  touch-action: pan-x !important;
+}
+
+/* Add visual feedback for touch interactions */
+.radio-schedule-container:active {
+  transform: scale(0.98);
+  transition: transform 0.1s ease;
+}
+
+/* Ensure proper scrolling on all devices */
+@media (hover: none) and (pointer: coarse) {
+  .radio-schedule-container {
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-x: contain !important;
+  }
+}
+
 /* Loading screen hidden state */
 .loading-hidden {
   display: none;
