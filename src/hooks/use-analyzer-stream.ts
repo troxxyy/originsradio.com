@@ -10,9 +10,9 @@ export function useAnalyzerStream(setId?: string) {
   const abortRef = useRef<AbortController | null>(null)
 
   useEffect(() => {
-    const enabled = import.meta.env.VITE_ANALYZER_STREAM === '1'
-    const base = import.meta.env.VITE_SUPABASE_FUNCTIONS_URL
-    const anon = import.meta.env.VITE_SUPABASE_ANON_KEY
+    const enabled = process.env.NEXT_PUBLIC_ANALYZER_STREAM === '1'
+    const base = process.env.NEXT_PUBLIC_SUPABASE_FUNCTIONS_URL
+    const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
     if (!enabled || !base || !anon) return
 
     const url = `${base.replace(/\/$/, '')}/analyze-set${setId ? `?set_id=${encodeURIComponent(setId)}` : ''}`

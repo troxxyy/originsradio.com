@@ -112,6 +112,3 @@ export default function ArtistSignupPage() {
   )
 }
 
-export default ArtistSignup
-
-

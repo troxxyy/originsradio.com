@@ -443,6 +443,3 @@ export default function ArtistDashboardPage() {
   )
 }
 
-export default ArtistDashboard
-
-

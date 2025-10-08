@@ -1194,6 +1194,4 @@ export default function AdminArtistsPage() {
       </div>
     </PageLayout>
   );
-};
-
-export default AdminArtists; 
+} 

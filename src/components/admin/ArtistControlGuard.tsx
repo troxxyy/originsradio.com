@@ -19,6 +19,7 @@ export default function ArtistControlGuard({ children }: ArtistControlGuardProps
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [authenticated, setAuthenticated] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false
     return localStorage.getItem(AUTH_KEY) === 'true'
   })
   const [now, setNow] = useState<number>(() => Date.now())
@@ -29,6 +30,7 @@ export default function ArtistControlGuard({ children }: ArtistControlGuardProps
   }, [])
 
   const lockoutUntil = useMemo<number>(() => {
+    if (typeof window === 'undefined') return 0
     const v = localStorage.getItem(LOCKOUT_KEY)
     return v ? parseInt(v) : 0
   }, [now])
@@ -102,7 +104,7 @@ export default function ArtistControlGuard({ children }: ArtistControlGuardProps
           <Button type="submit" className="w-full">Enter</Button>
         </form>
         <div className="mt-4 text-xs text-gray-500">
-          Attempts remaining: {Math.max(0, 5 - parseInt(localStorage.getItem(ATTEMPTS_KEY) || '0'))}
+          Attempts remaining: {typeof window !== 'undefined' ? Math.max(0, 5 - parseInt(localStorage.getItem(ATTEMPTS_KEY) || '0')) : 5}
         </div>
       </div>
     </div>

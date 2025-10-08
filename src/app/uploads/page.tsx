@@ -520,6 +520,4 @@ export default function AdminUploadsPage() {
       </div>
     </div>
   );
-};
-
-export default AdminUploads; 
+} 

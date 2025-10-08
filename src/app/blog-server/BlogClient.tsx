@@ -91,10 +91,7 @@ export default function BlogClient({ initialBlogs }: BlogClientProps) {
   return (
     <PageLayout showFooter={false}>
       <div className="min-h-screen bg-black overflow-hidden">
-        <ParticlesHeader 
-          title="Blog" 
-          subtitle="Stories, insights, and updates from Origins Radio"
-        />
+        <ParticlesHeader />
         
         <div className="h-[calc(100vh-200px)] w-full">
           <Swiper

@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { getSupabaseClient, isSupabaseConfigured } from '@/lib/supabase'
 
-export default function ArtistLoginPage() {
+function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
@@ -130,6 +130,15 @@ export default function ArtistLoginPage() {
   )
 }
 
-export default ArtistLogin
-
+export default function ArtistLoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black flex items-center justify-center">
+        <div className="text-gray-400">Loading...</div>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
+  )
+}
 
