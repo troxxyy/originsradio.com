@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-const supabaseServiceKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY
 
 // Create Supabase client only if environment variables are available
 export const supabase = supabaseUrl && supabaseAnonKey 
@@ -22,7 +22,7 @@ export const isSupabaseConfigured = () => {
 // Helper function to get Supabase client with error handling
 export const getSupabaseClient = () => {
   if (!supabase) {
-    throw new Error('Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY environment variables.')
+    throw new Error('Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY environment variables.')
   }
   return supabase
 }
@@ -30,7 +30,7 @@ export const getSupabaseClient = () => {
 // Helper function to get Supabase admin client with error handling
 export const getSupabaseAdminClient = () => {
   if (!supabaseAdmin) {
-    throw new Error('Supabase admin is not configured. Please set VITE_SUPABASE_SERVICE_ROLE_KEY environment variable.')
+    throw new Error('Supabase admin is not configured. Please set NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY environment variable.')
   }
   return supabaseAdmin
 }
