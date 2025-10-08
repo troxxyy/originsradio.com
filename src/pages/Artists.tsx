@@ -1,8 +1,11 @@
+'use client'
+
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
 import { Search, Filter, Music, MapPin, Star } from 'lucide-react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { LogIn } from 'lucide-react';
 import PageLayout from '@/components/layout/PageLayout';
 import { useArtists } from '@/hooks/use-supabase';
@@ -12,7 +15,7 @@ const Artists = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const navigate = useNavigate();
+  const router = useRouter();
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -54,7 +57,7 @@ const Artists = () => {
 
   const handleArtistClick = (artist: any) => {
     const slug = generateSlug(artist.name);
-    navigate(`/artists/${slug}`);
+    router.push(`/artists/${slug}`);
   };
 
   // SEO Data
@@ -93,7 +96,7 @@ const Artists = () => {
       {/* Artist Login button (fixed, top-right) */}
       <div className="fixed top-3 right-3 sm:top-6 sm:right-6 z-50">
         <Link 
-          to="/artist/login" 
+          href="/artist/login" 
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 text-white transition-colors group"
           aria-label="Artist Login"
           title="Artist Login"

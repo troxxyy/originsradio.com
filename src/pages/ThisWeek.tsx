@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useMemo, useState } from "react";
 import { Calendar, MapPin, Users, Ticket, Clock, Wrench } from "lucide-react";
 import PageLayout from "@/components/layout/PageLayout";

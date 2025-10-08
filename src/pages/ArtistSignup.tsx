@@ -1,9 +1,12 @@
+'use client'
+
 import { useEffect, useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { getSupabaseClient, isSupabaseConfigured } from '@/lib/supabase'
 
 const ArtistSignup = () => {
-  const navigate = useNavigate()
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -14,10 +17,10 @@ const ArtistSignup = () => {
       if (!isSupabaseConfigured()) return
       const supabase = getSupabaseClient()
       const { data } = await supabase.auth.getSession()
-      if (data.session) navigate('/artist/dashboard', { replace: true })
+      if (data.session) router.replace('/artist/dashboard')
     }
     checkSession()
-  }, [navigate])
+  }, [router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -44,7 +47,7 @@ const ArtistSignup = () => {
         setError(signUpError.message)
         return
       }
-      navigate('/artist/login?verify=1', { replace: true })
+      router.replace('/artist/login?verify=1')
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unexpected error'
       setError(message)
@@ -102,7 +105,7 @@ const ArtistSignup = () => {
         </form>
 
         <div className="mt-4 text-center text-sm text-gray-400">
-          Already have an account? <Link to="/artist/login" className="text-white">Log in</Link>
+          Already have an account? <Link href="/artist/login" className="text-white">Log in</Link>
         </div>
       </div>
     </div>

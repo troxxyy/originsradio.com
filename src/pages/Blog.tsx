@@ -1,5 +1,7 @@
+'use client'
+
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import PageLayout from '@/components/layout/PageLayout';
 import { getPublishedBlogs, type Blog } from '@/data/blogs-supabase';
 import { supabase } from '@/lib/supabase';
@@ -289,7 +291,7 @@ const BlogPage = () => {
                   
                   return [
                     <SwiperSlide key={blog.id}>
-                      <Link to={`/blog/${blog.slug}`} className="block h-full">
+                      <Link href={`/blog/${blog.slug}`} className="block h-full">
                         <div className="relative w-full h-full">
                           {blog.cover_image_url && (
                             <img className="w-full h-full object-cover" src={blog.cover_image_url} alt={blog.title} />

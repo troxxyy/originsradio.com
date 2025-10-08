@@ -1,5 +1,7 @@
+'use client'
+
 import { useEffect, useMemo, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { usePathname, useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 
@@ -12,8 +14,8 @@ const ATTEMPTS_KEY = 'artistcontrol_attempts'
 const AUTH_KEY = 'artistcontrol_authenticated'
 
 export default function ArtistControlGuard({ children }: ArtistControlGuardProps) {
-  const navigate = useNavigate()
-  const location = useLocation()
+  const router = useRouter()
+  const pathname = usePathname()
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [authenticated, setAuthenticated] = useState<boolean>(() => {
@@ -35,10 +37,10 @@ export default function ArtistControlGuard({ children }: ArtistControlGuardProps
 
   useEffect(() => {
     // If locked out, send them away from secret path
-    if (remainingLockSeconds > 0 && location.pathname.startsWith('/artistcontrolsecret')) {
-      navigate('/', { replace: true })
+    if (remainingLockSeconds > 0 && pathname?.startsWith('/artistcontrolsecret')) {
+      router.replace('/')
     }
-  }, [remainingLockSeconds, location.pathname, navigate])
+  }, [remainingLockSeconds, pathname, router])
 
   if (authenticated) {
     return <>{children}</>
@@ -72,7 +74,7 @@ export default function ArtistControlGuard({ children }: ArtistControlGuardProps
       const fifteenMinutes = 15 * 60 * 1000
       localStorage.setItem(LOCKOUT_KEY, String(nowTs + fifteenMinutes))
       setError('Too many wrong attempts. You are locked out for 15 minutes.')
-      navigate('/', { replace: true })
+      router.replace('/')
       return
     }
     setError(`Wrong password. ${5 - nextAttempts} tries left.`)
