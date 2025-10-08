@@ -221,7 +221,7 @@ const AdminUploads = () => {
       console.error('Supabase admin client error:', error);
       toast({
         title: "Configuration Error",
-        description: "Please set VITE_SUPABASE_SERVICE_ROLE_KEY environment variable for admin uploads",
+        description: "Please set NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY environment variable for admin uploads",
         variant: "destructive"
       });
     }

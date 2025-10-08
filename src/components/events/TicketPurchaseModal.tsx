@@ -66,12 +66,12 @@ const TicketPurchaseModal = ({
     try {
       if (!supabase) throw new Error("Supabase is not configured");
       const { data: sessionRes } = await supabase.auth.getSession();
-      const accessToken = sessionRes?.session?.access_token || (import.meta as any).env?.VITE_SUPABASE_ANON_KEY;
+      const accessToken = sessionRes?.session?.access_token || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
       const { data, error } = await supabase.functions.invoke("issue-ticket", {
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          apikey: (import.meta as any).env?.VITE_SUPABASE_ANON_KEY,
+          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
         },
         body: {
           email: email || undefined,

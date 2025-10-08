@@ -2,7 +2,6 @@ import { useState, useEffect, Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation, Link } from "react-router-dom";
 import { LogIn } from "lucide-react";
 import { HelmetProvider } from "react-helmet-async";
@@ -34,8 +33,6 @@ const AdminRadioSchedule = lazy(() => import("./pages/AdminRadioSchedule"));
 const ArtistLogin = lazy(() => import("./pages/ArtistLogin"));
 const ArtistSignup = lazy(() => import("./pages/ArtistSignup"));
 const ArtistDashboard = lazy(() => import("./pages/ArtistDashboard"));
-
-const queryClient = new QueryClient();
 
 const ONE_HOUR = 60 * 60 * 1000; //one minute
 
@@ -69,11 +66,10 @@ const App = () => {
 
   return (
     <HelmetProvider>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <TicketPopup />
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <TicketPopup />
 
           {/* Loading Screen - Only show when needed */}
           {isLoading && <LoadingScreen onLoadingComplete={handleLoadingComplete} />}
@@ -213,7 +209,6 @@ const App = () => {
             </BrowserRouter>
           </div>
         </TooltipProvider>
-      </QueryClientProvider>
     </HelmetProvider>
   );
 };
