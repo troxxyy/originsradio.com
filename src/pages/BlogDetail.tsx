@@ -1,13 +1,17 @@
+'use client'
+
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { ArrowLeft, Calendar, User, Tag } from 'lucide-react';
 import PageLayout from '@/components/layout/PageLayout';
 import { getBlogBySlug, getRelatedBlogs, type Blog } from '@/data/blogs-supabase';
 import { supabase } from '@/lib/supabase';
 
 const BlogDetail = () => {
-  const { slug } = useParams<{ slug: string }>();
-  const navigate = useNavigate();
+  const params = useParams();
+  const slug = params?.slug as string | undefined;
+  const router = useRouter();
   const [blog, setBlog] = useState<Blog | null>(null);
   const [relatedBlogs, setRelatedBlogs] = useState<Blog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -105,7 +109,7 @@ const BlogDetail = () => {
               
               <div className="space-y-4">
                 <button
-                  onClick={() => navigate('/blog')}
+                  onClick={() => router.push('/blog')}
                   className="block w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
                 >
                   Back to Blog
@@ -130,7 +134,7 @@ const BlogDetail = () => {
         {/* Back Button */}
         <div className="fixed top-6 left-6 z-50">
           <Link
-            to="/blog"
+            href="/blog"
             className="inline-flex items-center gap-2 px-4 py-2 bg-black/80 backdrop-blur-sm border border-white/20 rounded-full text-white hover:bg-white/10 transition-all"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -224,7 +228,7 @@ const BlogDetail = () => {
                   {relatedBlogs.map((relatedBlog) => (
                     <Link
                       key={relatedBlog.id}
-                      to={`/blog/${relatedBlog.slug}`}
+                      href={`/blog/${relatedBlog.slug}`}
                       className="block bg-gray-900/90 backdrop-blur-sm rounded-xl overflow-hidden hover:bg-white/10 transition-all group"
                     >
                       {relatedBlog.cover_image_url && (

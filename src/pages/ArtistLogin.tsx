@@ -1,10 +1,13 @@
+'use client'
+
 import { useEffect, useState } from 'react'
-import { useNavigate, Link, useLocation } from 'react-router-dom'
+import { useRouter, useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 import { getSupabaseClient, isSupabaseConfigured } from '@/lib/supabase'
 
 const ArtistLogin = () => {
-  const navigate = useNavigate()
-  const location = useLocation()
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -17,18 +20,17 @@ const ArtistLogin = () => {
       const supabase = getSupabaseClient()
       const { data } = await supabase.auth.getSession()
       if (data.session) {
-        navigate('/artist/dashboard', { replace: true })
+        router.replace('/artist/dashboard')
       }
     }
     checkSession()
-  }, [navigate])
+  }, [router])
 
   useEffect(() => {
-    const params = new URLSearchParams(location.search)
-    if (params.get('verify') === '1') {
+    if (searchParams?.get('verify') === '1') {
       setShowVerifyNotice(true)
     }
-  }, [location.search])
+  }, [searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -49,7 +51,7 @@ const ArtistLogin = () => {
         setError(signInError.message)
         return
       }
-      navigate('/artist/dashboard', { replace: true })
+      router.replace('/artist/dashboard')
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unexpected error'
       setError(message)
@@ -119,9 +121,9 @@ const ArtistLogin = () => {
         </form>
 
         <div className="mt-4 text-center text-sm text-gray-400">
-          No account? <Link to="/artist/signup" className="text-white">Sign up</Link>
+          No account? <Link href="/artist/signup" className="text-white">Sign up</Link>
           <span className="mx-2">•</span>
-          <Link to="/" className="hover:text-white">Back to home</Link>
+          <Link href="/" className="hover:text-white">Back to home</Link>
         </div>
       </div>
     </div>

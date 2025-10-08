@@ -1,5 +1,7 @@
+'use client'
+
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams } from "next/navigation";
 import PageLayout from "@/components/layout/PageLayout";
 import { getSupabaseClient } from "@/lib/supabase";
 
@@ -11,7 +13,8 @@ interface TicketRow {
 }
 
 export default function TicketVerify() {
-  const { code } = useParams();
+  const params = useParams();
+  const code = params?.code as string | undefined;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [ticket, setTicket] = useState<TicketRow | null>(null);

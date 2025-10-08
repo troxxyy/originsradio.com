@@ -1,5 +1,7 @@
+'use client'
+
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
 import PageLayout from '@/components/layout/PageLayout'
 import { isSupabaseConfigured, getSupabaseClient } from '@/lib/supabase'
 import { getArtists, getArtistById, updateArtist } from '@/data/artists-supabase'
@@ -9,7 +11,7 @@ import { addArtist } from '@/data/artists-supabase'
 type Artist = Awaited<ReturnType<typeof getArtistById>>
 
 const ArtistDashboard = () => {
-  const navigate = useNavigate()
+  const router = useRouter()
   const [sessionChecked, setSessionChecked] = useState(false)
   const [selectedArtistId, setSelectedArtistId] = useState<string | null>(null)
   const [artists, setArtists] = useState<Awaited<ReturnType<typeof getArtists>>>([])
@@ -41,13 +43,13 @@ const ArtistDashboard = () => {
       const supabase = getSupabaseClient()
       const { data } = await supabase.auth.getSession()
       if (!data.session) {
-        navigate('/artist/login', { replace: true })
+        router.replace('/artist/login')
         return
       }
       setSessionChecked(true)
     }
     guard()
-  }, [navigate])
+  }, [router])
 
   // Load selection and artists
   useEffect(() => {
@@ -267,7 +269,7 @@ const ArtistDashboard = () => {
       await supabase.auth.signOut()
     }
     localStorage.removeItem('selected_artist_id')
-    navigate('/artist/login', { replace: true })
+    router.replace('/artist/login')
   }
 
   if (!sessionChecked) {

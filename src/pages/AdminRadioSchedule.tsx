@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useMemo, useState } from 'react'
 import PageLayout from '@/components/layout/PageLayout'
 import { getAllWeeklyRadioSchedule, upsertWeeklyRadioSchedule, deleteWeeklyRadioSchedule, getSets } from '@/lib/supabase-utils'
