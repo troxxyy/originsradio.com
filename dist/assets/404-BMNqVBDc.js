@@ -1,2 +1,0 @@
-import{j as e}from"./index-CLApVZdG.js";import{L as t}from"./vendor-Dt4B7j68.js";const s=()=>e.jsx("div",{className:"min-h-screen flex items-center justify-center bg-gray-860",children:e.jsxs("div",{className:"text-center",children:[e.jsx("h1",{className:"text-4xl font-bold mb-4"}),e.jsx("p",{className:"text-7xl font-bold font-avenir text-white font-size-123 mb-4",children:"BURDA NE YAPIYORSUN :/"}),e.jsx(t,{to:"/",className:"text-white-900 hover:text-blue-700 underline",children:"Geri Dön"})]})});export{s as default};
-//# sourceMappingURL=404-BMNqVBDc.js.map
