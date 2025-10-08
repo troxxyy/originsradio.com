@@ -1,15 +1,10 @@
+'use client'
+
 import '../../index.css'
+import { ClientOnly } from '../client'
 
-export async function generateStaticParams() {
-  // Return only the root route  
-  return [{ slug: [] }]
-}
+export const dynamic = 'force-dynamic'
 
-// Prevent dynamic params - only generate the routes we specify
-export const dynamicParams = false
-
-// Use client component for everything
-export default async function CatchAllPage() {
-  const { ClientOnly } = await import('../client')
+export default function CatchAllPage() {
   return <ClientOnly />
 }

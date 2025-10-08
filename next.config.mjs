@@ -1,19 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export', // Outputs a Single-Page Application (SPA).
-  distDir: './dist', // Changes the build output directory to `./dist/`.
-  trailingSlash: false, // Set to false for SPA  
+  // Using default Next.js build (not static export) to work with React Router
+  // Vercel will deploy this as a serverless Next.js application
   images: {
-    unoptimized: true, // Required for static export
+    unoptimized: true,
   },
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      // Don't analyze these modules on the server/build
-      config.externals = [...(config.externals || []), {
-        'react-router-dom': 'react-router-dom',
-      }]
-    }
-    return config
+  // Skip trailing slashes
+  trailingSlash: false,
+  // Skip static optimization completely
+  generateBuildId: async () => {
+    return 'build-id'
   },
 }
 
