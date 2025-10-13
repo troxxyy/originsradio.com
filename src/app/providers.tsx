@@ -44,8 +44,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
           {/* Loading Screen - Only show when needed */}
           {isLoading && <LoadingScreen onLoadingComplete={handleLoadingComplete} />}
 
-          {/* Main Content - Only shown when loading is complete */}
-          <div className={isLoading ? "loading-hidden" : "block"}>
+          {/* Main Content - Use inline styles for immediate hiding to prevent flash */}
+          <div 
+            style={{ 
+              display: isLoading ? 'none' : 'block',
+              visibility: isLoading ? 'hidden' : 'visible',
+              opacity: isLoading ? 0 : 1
+            }}
+          >
             <Navigation />
             <MusicPlayer />
             {children}

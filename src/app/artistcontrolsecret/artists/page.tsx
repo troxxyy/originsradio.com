@@ -800,7 +800,7 @@ export default function AdminArtistsPage() {
         {/* Add/Edit Modal */}
         {(showAddModal || showEditModal) && (
           <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4"
             onClick={() => {
               setShowAddModal(false);
               setShowEditModal(false);
@@ -810,7 +810,7 @@ export default function AdminArtistsPage() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               onClick={(e) => e.stopPropagation()}
-              className="glass backdrop-blur-sm rounded-2xl border border-white/10 p-6 w-full max-w-6xl max-h-[90vh] overflow-y-auto"
+              className="bg-gray-900/95 backdrop-blur-xl rounded-2xl border border-white/20 p-6 w-full max-w-6xl max-h-[90vh] overflow-y-auto shadow-2xl"
             >
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-white flex items-center gap-2">
@@ -1136,7 +1136,7 @@ export default function AdminArtistsPage() {
         {/* Delete Confirmation Modal */}
         {showDeleteModal && selectedArtist && (
           <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4"
             style={{ touchAction: 'auto' }}
             onTouchStart={(e) => { e.stopPropagation(); }}
             onTouchMove={(e) => { e.stopPropagation(); }}
@@ -1154,7 +1154,7 @@ export default function AdminArtistsPage() {
               onTouchEnd={(e) => { e.stopPropagation(); }}
               onPointerDown={(e) => { e.stopPropagation(); }}
               onPointerMove={(e) => { e.stopPropagation(); }}
-              className="glass backdrop-blur-sm rounded-2xl border border-white/10 p-6 w-full max-w-md"
+              className="bg-gray-900/95 backdrop-blur-xl rounded-2xl border border-white/20 p-6 w-full max-w-md shadow-2xl"
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 bg-red-500/20 rounded-full">
