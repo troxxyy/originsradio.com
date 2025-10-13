@@ -41,21 +41,17 @@ export function Providers({ children }: { children: React.ReactNode }) {
           <Sonner />
           <TicketPopup />
 
-          {/* Loading Screen - Only show when needed */}
+          {/* Loading Screen */}
           {isLoading && <LoadingScreen onLoadingComplete={handleLoadingComplete} />}
 
-          {/* Main Content - Use inline styles for immediate hiding to prevent flash */}
-          <div 
-            style={{ 
-              display: isLoading ? 'none' : 'block',
-              visibility: isLoading ? 'hidden' : 'visible',
-              opacity: isLoading ? 0 : 1
-            }}
-          >
-            <Navigation />
-            <MusicPlayer />
-            {children}
-          </div>
+          {/* Main Content - Only render after loading */}
+          {!isLoading && (
+            <>
+              <Navigation />
+              <MusicPlayer />
+              {children}
+            </>
+          )}
         </TooltipProvider>
       </HelmetProvider>
     </QueryClientProvider>
