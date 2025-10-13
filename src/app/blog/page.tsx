@@ -52,18 +52,32 @@ export default function BlogPage() {
     }
   };
 
-  const handleTouchStart = (swiper: SwiperType, event: TouchEvent) => {
+  const handleTouchStart = (swiper: SwiperType, event: MouseEvent | PointerEvent | TouchEvent) => {
     touchStartTime.current = Date.now();
-    const touch = event.touches[0];
-    touchStartPos.current = { x: touch.clientX, y: touch.clientY };
+    if ('touches' in event) {
+      const touch = event.touches[0];
+      touchStartPos.current = { x: touch.clientX, y: touch.clientY };
+    } else {
+      touchStartPos.current = { x: event.clientX, y: event.clientY };
+    }
   };
 
-  const handleTouchEnd = (swiper: SwiperType, event: TouchEvent) => {
+  const handleTouchEnd = (swiper: SwiperType, event: MouseEvent | PointerEvent | TouchEvent) => {
     const touchEndTime = Date.now();
-    const touch = event.changedTouches[0];
+    let clientX: number, clientY: number;
+    
+    if ('changedTouches' in event) {
+      const touch = event.changedTouches[0];
+      clientX = touch.clientX;
+      clientY = touch.clientY;
+    } else {
+      clientX = event.clientX;
+      clientY = event.clientY;
+    }
+    
     const deltaTime = touchEndTime - touchStartTime.current;
-    const deltaX = Math.abs(touch.clientX - touchStartPos.current.x);
-    const deltaY = Math.abs(touch.clientY - touchStartPos.current.y);
+    const deltaX = Math.abs(clientX - touchStartPos.current.x);
+    const deltaY = Math.abs(clientY - touchStartPos.current.y);
     const delta = Math.max(deltaX, deltaY);
     
     // Determine swipe direction
