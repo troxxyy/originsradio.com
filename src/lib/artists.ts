@@ -1,3 +1,5 @@
+import { createClient } from '@supabase/supabase-js'
+
 export type Artist = {
   id: string
   name: string
@@ -12,36 +14,78 @@ export type Artist = {
   created_at: string
 }
 
-// TODO: Replace with real Supabase client in Next.js app
-// For now, fetch from a public API route or fallback.
+// Create Supabase client for server-side operations
+const getSupabaseClient = () => {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  return createClient(supabaseUrl, supabaseKey)
+}
 
 export async function getAllArtistSlugs(): Promise<string[]> {
-  // Placeholder: adjust to your data source.
-  const res = await fetch(process.env.NEXT_PUBLIC_ARTISTS_SLUGS_URL || 'https://api.origins.radio/artists/slugs', { cache: 'no-store' })
-  if (!res.ok) return []
-  const slugs = (await res.json()) as string[]
-  return slugs
+  try {
+    const supabase = getSupabaseClient()
+    const { data, error } = await supabase
+      .from('artists')
+      .select('slug')
+      .eq('active', true)
+    
+    if (error) {
+      console.error('Error fetching artist slugs:', error)
+      return []
+    }
+    
+    return data?.map(a => a.slug) || []
+  } catch (error) {
+    console.error('Error in getAllArtistSlugs:', error)
+    return []
+  }
 }
 
 export async function getArtistBySlug(slug: string): Promise<Artist | null> {
-  const url = (process.env.NEXT_PUBLIC_ARTIST_BY_SLUG_URL || 'https://api.origins.radio/artists') + `/${encodeURIComponent(slug)}`
-  const res = await fetch(url, { next: { revalidate: 86400 } })
-  if (!res.ok) return null
-  const artist = (await res.json()) as Artist
-  return artist
+  try {
+    const supabase = getSupabaseClient()
+    const { data, error } = await supabase
+      .from('artists')
+      .select('*')
+      .eq('slug', slug)
+      .eq('active', true)
+      .maybeSingle()
+    
+    if (error) {
+      console.error('Error fetching artist by slug:', error)
+      return null
+    }
+    
+    return data
+  } catch (error) {
+    console.error('Error in getArtistBySlug:', error)
+    return null
+  }
 }
 
 export async function getArtistsForSitemap(): Promise<Array<{ slug: string; lastmod: string; changefreq: string; priority: number }>> {
-  // Ideally from DB with updated_at; fallback to fetch artists list
-  const res = await fetch(process.env.NEXT_PUBLIC_ARTISTS_INDEX_URL || 'https://api.origins.radio/artists', { cache: 'no-store' })
-  if (!res.ok) return []
-  const artists = (await res.json()) as Artist[]
-  return artists.map((a) => ({
-    slug: a.slug,
-    lastmod: a.updated_at || a.created_at,
-    changefreq: 'weekly',
-    priority: a.featured ? 0.9 : 0.6,
-  }))
+  try {
+    const supabase = getSupabaseClient()
+    const { data, error } = await supabase
+      .from('artists')
+      .select('slug, updated_at, created_at, featured')
+      .eq('active', true)
+    
+    if (error) {
+      console.error('Error fetching artists for sitemap:', error)
+      return []
+    }
+    
+    return data?.map((a) => ({
+      slug: a.slug,
+      lastmod: a.updated_at || a.created_at,
+      changefreq: 'weekly',
+      priority: a.featured ? 0.9 : 0.6,
+    })) || []
+  } catch (error) {
+    console.error('Error in getArtistsForSitemap:', error)
+    return []
+  }
 }
 
 
