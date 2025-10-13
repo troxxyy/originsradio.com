@@ -12,8 +12,7 @@ export const generateArtistSitemap = async (): Promise<SitemapUrl[]> => {
     const supabase = getSupabaseClient();
     const { data: artists, error } = await supabase
       .from('artists')
-      .select('id, name, updated_at, created_at')
-      .eq('active', true);
+      .select('id, name, updated_at, created_at');
 
     if (error) {
       console.error('Error fetching artists for sitemap:', error);

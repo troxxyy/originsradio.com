@@ -27,7 +27,6 @@ export async function getAllArtistSlugs(): Promise<string[]> {
     const { data, error } = await supabase
       .from('artists')
       .select('slug')
-      .eq('active', true)
     
     if (error) {
       console.error('Error fetching artist slugs:', error)
@@ -48,7 +47,6 @@ export async function getArtistBySlug(slug: string): Promise<Artist | null> {
       .from('artists')
       .select('*')
       .eq('slug', slug)
-      .eq('active', true)
       .maybeSingle()
     
     if (error) {
@@ -69,7 +67,6 @@ export async function getArtistsForSitemap(): Promise<Array<{ slug: string; last
     const { data, error } = await supabase
       .from('artists')
       .select('slug, updated_at, created_at, featured')
-      .eq('active', true)
     
     if (error) {
       console.error('Error fetching artists for sitemap:', error)
