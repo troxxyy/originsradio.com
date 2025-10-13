@@ -4,8 +4,9 @@ import { getArtistBySlug } from '../../lib/artists'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
-export default async function Image({ params }: { params: { slug: string } }) {
-  const artist = await getArtistBySlug(params.slug)
+export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const artist = await getArtistBySlug(slug)
   const name = artist?.name ?? 'Origins Radio'
   const photo = artist?.photo_url
   return new ImageResponse(

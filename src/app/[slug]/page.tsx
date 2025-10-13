@@ -16,8 +16,9 @@ export async function generateStaticParams() {
   return slugs.map((slug) => ({ slug }))
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const artist = await getArtistBySlug(params.slug)
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const artist = await getArtistBySlug(slug)
   if (!artist) return { robots: { index: false, follow: false } }
   const url = `https://origins.radio/${artist.slug}`
   return {
@@ -35,8 +36,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 }
 
-export default async function Page({ params }: { params: { slug: string } }) {
-  const artist = await getArtistBySlug(params.slug)
+export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const artist = await getArtistBySlug(slug)
   if (!artist) return null
   const url = `https://origins.radio/${artist.slug}`
   const jsonLd = {
