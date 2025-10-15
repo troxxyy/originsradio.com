@@ -300,7 +300,7 @@ export const UpNextItem = ({ event, index, onPlay, onSeek, isPlaying, progress }
 
       {/* Waveform + timecodes */}
       <div className="mb-1 sm:mb-2">
-        <div className="rounded-full glass bg-white/[0.03] border-white/5 p-3 sm:p-4 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:shadow-[0_10px_30px_rgba(0,0,0,0.25)]">
+        <div className="rounded-full glass bg-white/[0.03] border-white/5 p-3 sm:p-4 transition-all duration-500 ease-out group-hover:shadow-[0_10px_30px_rgba(0,0,0,0.25)]">
           <ProgressBar progress={progress} onSeek={onSeek} />
         </div>
       </div>

@@ -7,6 +7,33 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // Optimize for virtual environments and production builds
+  output: 'standalone',
+  experimental: {
+    // Enable optimizations for better performance in virtual environments
+    optimizePackageImports: ['@radix-ui/react-icons', 'lucide-react'],
+  },
+  // Ensure proper handling of static assets
+  assetPrefix: process.env.NODE_ENV === 'production' ? '' : '',
+  // Optimize images for better performance
+  images: {
+    formats: ['image/webp', 'image/avif'],
+    minimumCacheTTL: 60,
+  },
+  // Enable compression
+  compress: true,
+  // Optimize bundle size
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      };
+    }
+    return config;
+  },
 }
 
 export default nextConfig
