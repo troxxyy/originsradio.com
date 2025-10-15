@@ -27,7 +27,7 @@ const Orb = ({ className = "", rotationSpeed = -0.08, setId }: OrbProps) => {
   // Higher lerp factor -> follower responds faster (0..1)
   const CURSOR_LERP_FACTOR = 1.2;
   const DEFAULT_Y_FOR_BASS = 120;
-  const DEFAULT_TOP_FOR_HIGH = 68;
+  const DEFAULT_TOP_FOR_HIGH = 55;
 
   const handleLoad = (splineApp: Application) => {
     splineRef.current = splineApp;
@@ -206,7 +206,7 @@ const Orb = ({ className = "", rotationSpeed = -0.08, setId }: OrbProps) => {
         try {
           // Map to defaults plus a visible variation
           splineRef.current?.setVariable("yforbass", DEFAULT_Y_FOR_BASS + bassNorm * 80);
-          splineRef.current?.setVariable("topforhigh", DEFAULT_TOP_FOR_HIGH - highNorm * 300);
+          splineRef.current?.setVariable("topforhigh", highNorm * 25);
         } catch {}
       } else {
         // Fallback to defaults if analyser not available

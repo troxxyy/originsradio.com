@@ -637,6 +637,22 @@ html.homepage-locked {
   display: none;
 }
 
+/* Prevent flash of content before loading screen */
+body.loading {
+  overflow: hidden;
+}
+
+/* Ensure loading screen is always on top */
+.loading-screen {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 9999 !important;
+  background: #000 !important;
+}
+
 /* Blog navigation arrows */
 .blog-nav-arrow {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

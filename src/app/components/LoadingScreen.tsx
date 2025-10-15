@@ -49,7 +49,7 @@ const LoadingScreen = ({
 
   return (
     <div 
-      className="fixed inset-0 z-[9999] bg-background flex flex-col items-center justify-center transition-opacity duration-1000"
+      className="loading-screen flex flex-col items-center justify-center transition-opacity duration-1000"
       style={{ 
         opacity,
         pointerEvents: opacity > 0 ? 'auto' : 'none'

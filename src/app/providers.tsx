@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from "react"
+import { usePathname } from "next/navigation"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { Toaster } from "@/components/ui/toaster"
 import { Toaster as Sonner } from "@/components/ui/sonner"
@@ -15,22 +16,45 @@ const ONE_HOUR = 60 * 60 * 1000
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient())
-  const [isLoading, setIsLoading] = useState(() => {
-    if (typeof window === 'undefined') return false
-    const lastVisit = localStorage.getItem("lastVisit")
-    return !lastVisit || Date.now() - parseInt(lastVisit) > ONE_HOUR
-  })
+  const [isLoading, setIsLoading] = useState(true) // Always start with loading screen
+  const pathname = usePathname()
+  
+  // Check if we're on admin pages where MusicPlayer should be disabled
+  const isAdminPage = pathname?.startsWith('/artistcontrolsecret') || 
+                     pathname?.startsWith('/uploads') || 
+                     pathname?.startsWith('/originsradio/adminuploads')
 
   useEffect(() => {
-    console.log("App mounted, isLoading:", isLoading)
-    if (isLoading) {
-      localStorage.setItem("lastVisit", Date.now().toString())
+    // Add loading class to body to prevent flash
+    document.body.classList.add('loading')
+    
+    // Check if we should skip loading based on recent visit
+    if (typeof window !== 'undefined') {
+      const lastVisit = localStorage.getItem("lastVisit")
+      const shouldSkipLoading = lastVisit && Date.now() - parseInt(lastVisit) < ONE_HOUR
+      
+      if (shouldSkipLoading) {
+        // Skip loading screen for recent visits
+        setIsLoading(false)
+        document.body.classList.remove('loading')
+      } else {
+        // Show loading screen and mark visit
+        localStorage.setItem("lastVisit", Date.now().toString())
+      }
     }
-  }, [isLoading])
+    
+    return () => {
+      document.body.classList.remove('loading')
+    }
+  }, [])
 
   const handleLoadingComplete = () => {
     console.log("handleLoadingComplete called, setting isLoading to false")
-    setIsLoading(false)
+    // Small delay to ensure smooth transition
+    setTimeout(() => {
+      setIsLoading(false)
+      document.body.classList.remove('loading')
+    }, 100)
   }
 
   return (
@@ -48,7 +72,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
           {!isLoading && (
             <>
               <Navigation />
-              <MusicPlayer />
+              {/* Only render MusicPlayer on non-admin pages to avoid interference with admin functionality */}
+              {!isAdminPage && <MusicPlayer />}
               {children}
             </>
           )}
