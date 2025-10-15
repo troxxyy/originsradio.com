@@ -118,6 +118,9 @@ export default function AdminArtistsPage() {
       queryClient.invalidateQueries({ queryKey: ['artists'] });
       queryClient.invalidateQueries({ queryKey: ['artist-stats'] });
     },
+    onError: (error) => {
+      console.error('Add artist mutation error:', error);
+    },
   });
 
   const updateArtistMutation = useMutation({
@@ -125,6 +128,9 @@ export default function AdminArtistsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['artists'] });
       queryClient.invalidateQueries({ queryKey: ['artist-stats'] });
+    },
+    onError: (error) => {
+      console.error('Update artist mutation error:', error);
     },
   });
 
@@ -273,13 +279,24 @@ export default function AdminArtistsPage() {
   };
 
   const handleSaveArtist = async (isEdit: boolean) => {
+    // Prevent multiple simultaneous requests
+    if (updateArtistMutation.isPending || addArtistMutation.isPending) {
+      return;
+    }
+
+    // Basic validation
+    if (!formData.name.trim()) {
+      alert('Artist name is required');
+      return;
+    }
+
     try {
       if (isEdit && selectedArtist) {
         const updateData: ArtistUpdate = {
-          name: formData.name,
-          bio: formData.bio,
-          photo_url: formData.photo_url,
-          location: formData.location,
+          name: formData.name.trim(),
+          bio: formData.bio.trim(),
+          photo_url: formData.photo_url.trim(),
+          location: formData.location.trim(),
           genre: formData.genre,
           featured: formData.featured,
           social_links: formData.social_links,
@@ -292,14 +309,14 @@ export default function AdminArtistsPage() {
           setSelectedArtist(null);
           console.log('Edit Modal Closed. Body classes:', document.body.className);
         } else {
-          alert('Error updating artist');
+          alert('Error updating artist - please try again');
         }
       } else {
         const artistData: ArtistInsert = {
-          name: formData.name,
-          bio: formData.bio,
-          photo_url: formData.photo_url,
-          location: formData.location,
+          name: formData.name.trim(),
+          bio: formData.bio.trim(),
+          photo_url: formData.photo_url.trim(),
+          location: formData.location.trim(),
           genre: formData.genre,
           featured: formData.featured,
           social_links: formData.social_links,
@@ -311,12 +328,12 @@ export default function AdminArtistsPage() {
           setShowAddModal(false);
           console.log('Add Modal Closed. Body classes:', document.body.className);
         } else {
-          alert('Error adding artist');
+          alert('Error adding artist - please try again');
         }
       }
     } catch (error) {
       console.error('Error saving artist:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       alert(`Error saving artist: ${errorMessage}`);
     }
   };
@@ -802,6 +819,9 @@ export default function AdminArtistsPage() {
           <div
             className="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4"
             onClick={() => {
+              if (updateArtistMutation.isPending || addArtistMutation.isPending) {
+                return; // Don't allow closing while saving
+              }
               setShowAddModal(false);
               setShowEditModal(false);
             }}
@@ -819,10 +839,14 @@ export default function AdminArtistsPage() {
                 </h2>
                 <button
                   onClick={() => {
+                    if (updateArtistMutation.isPending || addArtistMutation.isPending) {
+                      return; // Don't allow closing while saving
+                    }
                     setShowAddModal(false);
                     setShowEditModal(false);
                   }}
-                  className="p-2 text-gray-400 hover:text-white transition-colors"
+                  disabled={updateArtistMutation.isPending || addArtistMutation.isPending}
+                  className="p-2 text-gray-400 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:text-gray-400"
                   title="Close modal"
                 >
                   <X className="w-5 h-5" />
@@ -1054,19 +1078,36 @@ export default function AdminArtistsPage() {
                   </div>
                 </div>
 
-                <div>
+                <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-300 mb-2">Resident Artist</label>
                   <div className="flex items-center gap-2">
                     <input
                       type="checkbox"
                       id="featured"
                       checked={formData.featured}
-                      onChange={(e) => setFormData(prev => ({ ...prev, featured: e.target.checked }))}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        setFormData(prev => ({ ...prev, featured: e.target.checked }));
+                      }}
                       className="rounded border-white/20 bg-white/10"
+                      style={{ pointerEvents: 'auto' }}
+                      title="Mark as resident artist"
+                      aria-label="Mark as resident artist"
                     />
-                    <label htmlFor="featured" className="text-sm text-gray-300">
+                    <span 
+                      className="text-sm text-gray-300 cursor-pointer select-none" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const checkbox = document.getElementById('featured') as HTMLInputElement;
+                        if (checkbox) {
+                          checkbox.checked = !checkbox.checked;
+                          setFormData(prev => ({ ...prev, featured: checkbox.checked }));
+                        }
+                      }}
+                      style={{ pointerEvents: 'auto' }}
+                    >
                       Mark as resident artist
-                    </label>
+                    </span>
                   </div>
                 </div>
 
@@ -1110,21 +1151,42 @@ export default function AdminArtistsPage() {
 
               </div>
 
-              <div className="flex gap-3 mt-6">
+              <div className="flex gap-3 mt-8 pt-4 border-t border-white/10">
                 <button
-                  onClick={() => handleSaveArtist(showEditModal)}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all flex items-center gap-2"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Update button clicked');
+                    handleSaveArtist(showEditModal);
+                  }}
+                  disabled={updateArtistMutation.isPending || addArtistMutation.isPending}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-500 relative z-10"
+                  style={{ pointerEvents: 'auto' }}
                 >
                   <Save className="w-4 h-4" />
-                  {showEditModal ? 'Update Artist' : 'Add Artist'}
+                  {updateArtistMutation.isPending || addArtistMutation.isPending ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      {showEditModal ? 'Updating...' : 'Adding...'}
+                    </>
+                  ) : (
+                    showEditModal ? 'Update Artist' : 'Add Artist'
+                  )}
                 </button>
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (updateArtistMutation.isPending || addArtistMutation.isPending) {
+                      return; // Don't allow closing while saving
+                    }
                     setShowAddModal(false);
                     setShowEditModal(false);
                     console.log('Add/Edit Modal Cancelled. Body classes:', document.body.className);
                   }}
-                  className="px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg hover:bg-white/20 transition-all"
+                  disabled={updateArtistMutation.isPending || addArtistMutation.isPending}
+                  className="px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg hover:bg-white/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white/10 relative z-10"
+                  style={{ pointerEvents: 'auto' }}
                 >
                   Cancel
                 </button>

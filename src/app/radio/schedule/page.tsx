@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import PageLayout from '@/components/layout/PageLayout'
 import { useWeeklyRadioSchedule, useCurrentRadioSlot } from '@/hooks/use-radio'
@@ -30,6 +30,17 @@ export default function RadioSchedule() {
   const [currentTime, setCurrentTime] = useState(getIstanbulTime())
   const { currentSlot } = useCurrentRadioSlot(5000)
 
+  // Touch handling for mobile swipe
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const [isScrolling, setIsScrolling] = useState(false)
+  const touchStartX = useRef<number>(0)
+  const touchStartY = useRef<number>(0)
+  const scrollStartX = useRef<number>(0)
+  const isDragging = useRef<boolean>(false)
+  const lastTouchTime = useRef<number>(0)
+  const velocityX = useRef<number>(0)
+  const lastTouchX = useRef<number>(0)
+
   // Update current time every minute (Istanbul time)
   useEffect(() => {
     const interval = setInterval(() => {
@@ -37,6 +48,185 @@ export default function RadioSchedule() {
     }, 60000) // Update every minute
     return () => clearInterval(interval)
   }, [])
+
+  // Global mouse event handlers for desktop
+  useEffect(() => {
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      if (isDragging.current) {
+        handleMouseMove(e as any)
+      }
+    }
+
+    const handleGlobalMouseUp = () => {
+      if (isDragging.current) {
+        handleMouseUp()
+      }
+    }
+
+    document.addEventListener('mousemove', handleGlobalMouseMove)
+    document.addEventListener('mouseup', handleGlobalMouseUp)
+
+    return () => {
+      document.removeEventListener('mousemove', handleGlobalMouseMove)
+      document.removeEventListener('mouseup', handleGlobalMouseUp)
+    }
+  }, [])
+
+  // Touch event handlers for smooth mobile scrolling
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!scrollContainerRef.current) return
+    
+    const touch = e.touches[0]
+    touchStartX.current = touch.clientX
+    touchStartY.current = touch.clientY
+    scrollStartX.current = scrollContainerRef.current.scrollLeft
+    isDragging.current = true
+    lastTouchTime.current = Date.now()
+    lastTouchX.current = touch.clientX
+    velocityX.current = 0
+    setIsScrolling(true)
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging.current || !scrollContainerRef.current) return
+    
+    const touch = e.touches[0]
+    const deltaX = touch.clientX - touchStartX.current
+    const deltaY = touch.clientY - touchStartY.current
+    
+    // Only prevent default if this is primarily a horizontal swipe
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      e.preventDefault()
+      
+      // Calculate velocity for momentum scrolling
+      const now = Date.now()
+      const timeDelta = now - lastTouchTime.current
+      if (timeDelta > 0) {
+        const distanceDelta = touch.clientX - lastTouchX.current
+        velocityX.current = distanceDelta / timeDelta
+        lastTouchTime.current = now
+        lastTouchX.current = touch.clientX
+      }
+      
+      // Apply the scroll with some resistance at the edges
+      const container = scrollContainerRef.current
+      const maxScroll = container.scrollWidth - container.clientWidth
+      const currentScroll = scrollStartX.current - deltaX
+      
+      // Add resistance at edges
+      let newScroll = currentScroll
+      if (currentScroll < 0) {
+        newScroll = currentScroll * 0.3 // Resistance when scrolling past start
+      } else if (currentScroll > maxScroll) {
+        newScroll = maxScroll + (currentScroll - maxScroll) * 0.3 // Resistance when scrolling past end
+      }
+      
+      container.scrollLeft = newScroll
+    }
+  }
+
+  const handleTouchEnd = () => {
+    if (!isDragging.current || !scrollContainerRef.current) return
+    
+    isDragging.current = false
+    setIsScrolling(false)
+    
+    // Apply momentum scrolling
+    if (Math.abs(velocityX.current) > 0.5) {
+      const container = scrollContainerRef.current
+      const maxScroll = container.scrollWidth - container.clientWidth
+      let targetScroll = container.scrollLeft + velocityX.current * 200 // Momentum multiplier
+      
+      // Clamp to bounds
+      targetScroll = Math.max(0, Math.min(targetScroll, maxScroll))
+      
+      // Smooth scroll to target
+      container.scrollTo({
+        left: targetScroll,
+        behavior: 'smooth'
+      })
+    }
+    
+    // Reset velocity
+    velocityX.current = 0
+  }
+
+  // Mouse event handlers for desktop testing
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!scrollContainerRef.current) return
+    
+    touchStartX.current = e.clientX
+    touchStartY.current = e.clientY
+    scrollStartX.current = scrollContainerRef.current.scrollLeft
+    isDragging.current = true
+    lastTouchTime.current = Date.now()
+    lastTouchX.current = e.clientX
+    velocityX.current = 0
+    setIsScrolling(true)
+  }
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging.current || !scrollContainerRef.current) return
+    
+    const deltaX = e.clientX - touchStartX.current
+    const deltaY = e.clientY - touchStartY.current
+    
+    // Only handle if this is primarily a horizontal drag
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      e.preventDefault()
+      
+      // Calculate velocity for momentum scrolling
+      const now = Date.now()
+      const timeDelta = now - lastTouchTime.current
+      if (timeDelta > 0) {
+        const distanceDelta = e.clientX - lastTouchX.current
+        velocityX.current = distanceDelta / timeDelta
+        lastTouchTime.current = now
+        lastTouchX.current = e.clientX
+      }
+      
+      // Apply the scroll with some resistance at the edges
+      const container = scrollContainerRef.current
+      const maxScroll = container.scrollWidth - container.clientWidth
+      const currentScroll = scrollStartX.current - deltaX
+      
+      // Add resistance at edges
+      let newScroll = currentScroll
+      if (currentScroll < 0) {
+        newScroll = currentScroll * 0.3 // Resistance when scrolling past start
+      } else if (currentScroll > maxScroll) {
+        newScroll = maxScroll + (currentScroll - maxScroll) * 0.3 // Resistance when scrolling past end
+      }
+      
+      container.scrollLeft = newScroll
+    }
+  }
+
+  const handleMouseUp = () => {
+    if (!isDragging.current || !scrollContainerRef.current) return
+    
+    isDragging.current = false
+    setIsScrolling(false)
+    
+    // Apply momentum scrolling
+    if (Math.abs(velocityX.current) > 0.5) {
+      const container = scrollContainerRef.current
+      const maxScroll = container.scrollWidth - container.clientWidth
+      let targetScroll = container.scrollLeft + velocityX.current * 200 // Momentum multiplier
+      
+      // Clamp to bounds
+      targetScroll = Math.max(0, Math.min(targetScroll, maxScroll))
+      
+      // Smooth scroll to target
+      container.scrollTo({
+        left: targetScroll,
+        behavior: 'smooth'
+      })
+    }
+    
+    // Reset velocity
+    velocityX.current = 0
+  }
 
   // Calculate current position in the schedule (Istanbul time)
   const currentPosition = useMemo(() => {
@@ -75,12 +265,33 @@ export default function RadioSchedule() {
           </div>
         )}
         <div className="w-full px-0 py-4">
+          {/* Mobile swipe hint */}
+          {isMobile && (
+            <div className="text-center text-gray-400 text-sm mb-2 px-4">
+              ← Swipe to see more days →
+            </div>
+          )}
           {isLoading ? (
             <div className="flex items-center justify-center h-[60vh]">Loading…</div>
           ) : error ? (
             <div className="text-red-400">Failed to load schedule</div>
           ) : (
-            <div className="relative overflow-x-auto overscroll-x-contain touch-pan-x snap-x snap-mandatory">
+            <div 
+              ref={scrollContainerRef}
+              className={`relative overflow-x-auto overscroll-x-contain touch-pan-x snap-x snap-mandatory ${isScrolling ? 'scroll-smooth' : ''}`}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+              style={{ 
+                touchAction: 'pan-x',
+                WebkitOverflowScrolling: 'touch',
+                scrollBehavior: isScrolling ? 'auto' : 'smooth'
+              }}
+            >
               <div
                 className="grid w-full"
                 style={{
