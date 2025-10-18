@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import PageLayout from "@/components/layout/PageLayout";
 import HomeHero from "@/components/home/HomeHero";
+import SocialBubbles from "@/components/social/SocialBubbles";
 
 export default function HomePage() {
   // Make homepage completely unscrollable and unswipable
@@ -101,6 +102,7 @@ export default function HomePage() {
   return (
     <PageLayout customBackground="bg-gradient-to-br from-[#040406] to-[#111726]" showFooter={false}>
       <HomeHero />
+      <SocialBubbles />
     </PageLayout>
   );
 }

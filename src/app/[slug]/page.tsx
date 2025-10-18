@@ -21,10 +21,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const artist = await getArtistBySlug(slug)
   if (!artist) return { robots: { index: false, follow: false } }
   const url = `https://origins.radio/${artist.slug}`
+  const canonicalUrl = `https://origins.radio/artists/${artist.slug}` // Point to /artists/ route as canonical
   return {
     title: `${artist.name} | Origins Radio`,
     description: artist.bio ? artist.bio.slice(0, 160) : undefined,
-    alternates: { canonical: url },
+    alternates: { canonical: canonicalUrl },
     openGraph: {
       url,
       title: `${artist.name} | Origins Radio`,

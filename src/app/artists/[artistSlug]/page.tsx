@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
+import { getAllArtistSlugs, getArtistSEOData } from '@/lib/artists';
 import { 
   ArrowLeft, 
   MapPin, 
@@ -499,9 +500,8 @@ export default function ArtistDetailPage() {
               <script
                 key={`structured-data-${index}`}
                 type="application/ld+json"
-              >
-                {JSON.stringify(data)}
-              </script>
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+              />
             ))}
             <meta property="og:title" content={seoData.ogData?.title} />
             <meta property="og:description" content={seoData.ogData?.description} />
@@ -964,4 +964,44 @@ export default function ArtistDetailPage() {
       </div>
     </PageLayout>
   );
-} 
+}
+
+// SEO metadata exports for server-side rendering
+export const revalidate = 86400 // 24h ISR
+
+export async function generateStaticParams() {
+  const slugs = await getAllArtistSlugs()
+  return slugs.map((slug) => ({ artistSlug: slug }))
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ artistSlug: string }> }) {
+  const { artistSlug } = await params
+  const seoData = await getArtistSEOData(artistSlug)
+  
+  if (!seoData) {
+    return { 
+      robots: { index: false, follow: false },
+      title: 'Artist Not Found | Origins Radio'
+    }
+  }
+
+  return {
+    title: seoData.metadata.title,
+    description: seoData.metadata.description,
+    keywords: seoData.metadata.keywords,
+    alternates: seoData.metadata.alternates,
+    openGraph: seoData.metadata.openGraph,
+    twitter: seoData.metadata.twitter,
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+  }
+}

@@ -89,7 +89,7 @@ const HomeHero: React.FC = () => {
   return (
     <section className="relative isolate w-full h-screen overflow-hidden bg-transparent">
       <div className="absolute inset-0 z-10">
-        <Orb className="w-full h-full pointer-events-auto" />
+        <Orb className="w-full h-full pointer-events-none" />
       </div>
 
       <div className="fixed top-3 right-3 sm:top-6 sm:right-6 z-[80] perspective-1000 pointer-events-auto">
@@ -104,7 +104,7 @@ const HomeHero: React.FC = () => {
         </Link>
       </div>
 
-      <div className="pointer-events-auto relative z-20 flex h-full w-full items-center">
+      <div className="pointer-events-auto relative z-30 flex h-full w-full items-center">
         <div className="pointer-events-auto w-full h-full px-8 md:px-12 lg:px-16 flex flex-col justify-start md:justify-center gap-10 pt-[25vh] md:pt-0 md:-mt-[400px]">
 
           <div className="w-full flex flex-col items-center gap-6 px-4 sm:px-8 md:hidden justify-center">

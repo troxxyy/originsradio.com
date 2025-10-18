@@ -1,16 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Youtube, Instagram, Cloud, Heart } from "lucide-react";
 
 const SocialBubbles = () => {
-  // State for random positions
-  const [positions, setPositions] = useState({
-    youtube: { top: "15%", left: "8%" },
-    instagram: { top: "65%", right: "12%" },
-    soundcloud: { top: "30%", right: "20%" },
-    coffee: { top: "80%", left: "6%" }
-  });
-
   // State to track popping animations
   const [poppingState, setPoppingState] = useState({
     youtube: false,
@@ -18,45 +10,6 @@ const SocialBubbles = () => {
     soundcloud: false,
     coffee: false
   });
-
-  // Generate random positions on component mount
-  useEffect(() => {
-    const generateRandomPositions = () => {
-      // Define safe zones for each bubble to avoid overlapping with content
-      // YouTube - left side of the screen
-      const youtubeTopOptions = ["15%", "25%", "35%"];
-      const youtubeLeftOptions = ["5%", "8%", "12%"];
-      const youtubeTop = youtubeTopOptions[Math.floor(Math.random() * youtubeTopOptions.length)];
-      const youtubeLeft = youtubeLeftOptions[Math.floor(Math.random() * youtubeLeftOptions.length)];
-      
-      // Instagram - right side of the screen
-      const instagramTopOptions = ["60%", "65%", "70%"];
-      const instagramRightOptions = ["8%", "12%", "15%"];
-      const instagramTop = instagramTopOptions[Math.floor(Math.random() * instagramTopOptions.length)];
-      const instagramRight = instagramRightOptions[Math.floor(Math.random() * instagramRightOptions.length)];
-      
-      // SoundCloud - top right area
-      const soundcloudTopOptions = ["20%", "25%", "30%"];
-      const soundcloudRightOptions = ["15%", "20%", "25%"];
-      const soundcloudTop = soundcloudTopOptions[Math.floor(Math.random() * soundcloudTopOptions.length)];
-      const soundcloudRight = soundcloudRightOptions[Math.floor(Math.random() * soundcloudRightOptions.length)];
-      
-      // Donation heart - bottom left area (better spacing)
-      const coffeeTopOptions = ["75%", "80%", "85%"];
-      const coffeeLeftOptions = ["3%", "6%", "9%"];
-      const coffeeTop = coffeeTopOptions[Math.floor(Math.random() * coffeeTopOptions.length)];
-      const coffeeLeft = coffeeLeftOptions[Math.floor(Math.random() * coffeeLeftOptions.length)];
-      
-      setPositions({
-        youtube: { top: youtubeTop, left: youtubeLeft },
-        instagram: { top: instagramTop, right: instagramRight },
-        soundcloud: { top: soundcloudTop, right: soundcloudRight },
-        coffee: { top: coffeeTop, left: coffeeLeft }
-      });
-    };
-    
-    generateRandomPositions();
-  }, []);
 
   // Handle bubble pop and navigation
   const handleBubblePop = (platform, url) => {
@@ -67,7 +20,7 @@ const SocialBubbles = () => {
       window.open(url, '_blank', 'noopener,noreferrer');
       // Reset popping state after redirection
       setPoppingState(prev => ({ ...prev, [platform]: false }));
-    }, 800);
+    }, 600);
   };
 
   // Create radiating lines
@@ -79,182 +32,96 @@ const SocialBubbles = () => {
         {lines.map((_, index) => (
           <motion.div
             key={index}
-            className="absolute w-12 bg-white bg-opacity-90"
+            className="absolute w-8 bg-white bg-opacity-90"
             style={{
-              height: '4px',
+              height: '3px',
               transformOrigin: 'center',
               rotate: `${index * 30}deg`,
             }}
             initial={{ opacity: 0, scale: 0 }}
             animate={{ 
-              opacity: 1, 
-              scale: 8,
-              transition: { duration: 0.4, delay: 0.2 }
+              opacity: [0, 1, 0], 
+              scale: [0, 6, 0],
+              transition: { duration: 0.6, delay: 0.1 }
             }}
-            exit={{ opacity: 0, transition: { duration: 0.2 } }}
           />
         ))}
       </div>
     );
   };
 
+  const socialBubbles = [
+    {
+      key: 'youtube',
+      icon: Youtube,
+      url: 'https://www.youtube.com/@originsradiotr',
+      color: 'red'
+    },
+    {
+      key: 'instagram',
+      icon: Instagram,
+      url: 'https://www.instagram.com/origins.radio/',
+      color: 'purple'
+    },
+    {
+      key: 'soundcloud',
+      icon: Cloud,
+      url: 'https://on.soundcloud.com/RAQQfrZ27sD539NXA',
+      color: 'orange'
+    },
+    {
+      key: 'coffee',
+      icon: Heart,
+      url: 'https://nowpayments.io/payment/?iid=5015396769&source=button',
+      color: 'red'
+    }
+  ];
+
   return (
-    <div className="fixed z-20 flex hidden md:block">
-      <AnimatePresence>
-        {!poppingState.youtube && (
-          <motion.div 
-            className="w-28 h-28 rounded-full glass-social flex items-center justify-center text-white/90 hover:text-white transition-all duration-300 hover:scale-110 hover:shadow-glow fixed cursor-pointer overflow-hidden"
-            style={{ top: positions.youtube.top, left: positions.youtube.left }}
-            initial={{ y: -50, opacity: 0 }}
-            animate={{ 
-              y: 0, 
-              opacity: 1,
-              x: [0, 30, 0, -30, 0],
-              rotate: [0, 5, 0, -5, 0],
-              transition: { 
-                y: { duration: 0.5 },
-                opacity: { duration: 0.5 },
-                x: { repeat: Infinity, duration: 6, ease: "easeInOut" },
-                rotate: { repeat: Infinity, duration: 6, ease: "easeInOut" }
-              }
-            }}
-            whileHover={{ rotate: 10, scale: 1.1 }}
-            onClick={() => handleBubblePop('youtube', 'https://www.youtube.com/@originsradiotr')}
-          >
-            <Youtube size={56} className="text-white" />
-          </motion.div>
-        )}
-        {poppingState.youtube && (
-          <motion.div
-            className="w-28 h-28 rounded-full fixed"
-            style={{ top: positions.youtube.top, left: positions.youtube.left }}
-            initial={{ scale: 1 }}
-            animate={{ 
-              scale: [1, 1.2, 0], 
-              transition: { duration: 0.5, times: [0, 0.2, 1] }
-            }}
-          >
-            <RadiatingLines color="red" />
-          </motion.div>
-        )}
-      </AnimatePresence>
-      
-      <AnimatePresence>
-        {!poppingState.instagram && (
-          <motion.div
-            className="w-28 h-28 rounded-full glass-social flex items-center justify-center text-white/90 hover:text-white transition-all duration-300 hover:scale-110 hover:shadow-glow fixed cursor-pointer overflow-hidden"
-            style={{ top: positions.instagram.top, right: positions.instagram.right }}
-            initial={{ x: 50, opacity: 0 }}
-            animate={{ 
-              x: 0, 
-              opacity: 1,
-              y: [0, 40, 0, -40, 0],
-              rotate: [0, -5, 0, 5, 0],
-              transition: { 
-                x: { duration: 0.5 },
-                opacity: { duration: 0.5 },
-                y: { repeat: Infinity, duration: 8, ease: "easeInOut" },
-                rotate: { repeat: Infinity, duration: 8, ease: "easeInOut" }
-              }
-            }}
-            whileHover={{ rotate: -10, scale: 1.1 }}
-            onClick={() => handleBubblePop('instagram', 'https://www.instagram.com/origins.radio/')}
-          >
-            <Instagram size={56} className="text-white" />
-          </motion.div>
-        )}
-        {poppingState.instagram && (
-          <motion.div
-            className="w-28 h-28 rounded-full fixed"
-            style={{ top: positions.instagram.top, right: positions.instagram.right }}
-            initial={{ scale: 1 }}
-            animate={{ 
-              scale: [1, 1.2, 0], 
-              transition: { duration: 0.5, times: [0, 0.2, 1] }
-            }}
-          >
-            <RadiatingLines color="purple" />
-          </motion.div>
-        )}
-      </AnimatePresence>
-      
-      <AnimatePresence>
-        {!poppingState.soundcloud && (
-          <motion.div 
-            className="w-28 h-28 rounded-full glass-social flex items-center justify-center text-white/90 hover:text-white transition-all duration-300 hover:scale-110 hover:shadow-glow fixed cursor-pointer overflow-hidden"
-            style={{ top: positions.soundcloud.top, right: positions.soundcloud.right }}
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ 
-              y: 0, 
-              opacity: 1,
-              x: [0, -40, 0, 40, 0],
-              rotate: [0, 7, 0, -7, 0],
-              transition: { 
-                y: { duration: 0.5 },
-                opacity: { duration: 0.5 },
-                x: { repeat: Infinity, duration: 10, ease: "easeInOut" },
-                rotate: { repeat: Infinity, duration: 10, ease: "easeInOut" }
-              }
-            }}
-            whileHover={{ rotate: 10, scale: 1.1 }}
-            onClick={() => handleBubblePop('soundcloud', 'https://on.soundcloud.com/RAQQfrZ27sD539NXA')}
-          >
-            <Cloud size={56} className="text-white" />
-          </motion.div>
-        )}
-        {poppingState.soundcloud && (
-          <motion.div
-            className="w-28 h-28 rounded-full fixed"
-            style={{ top: positions.soundcloud.top, right: positions.soundcloud.right }}
-            initial={{ scale: 1 }}
-            animate={{ 
-              scale: [1, 1.2, 0], 
-              transition: { duration: 0.5, times: [0, 0.2, 1] }
-            }}
-          >
-            <RadiatingLines color="orange" />
-          </motion.div>
-        )}
-      </AnimatePresence>
-      
-      <AnimatePresence>
-        {!poppingState.coffee && (
-          <motion.div 
-            className="w-28 h-28 rounded-full glass-social flex items-center justify-center text-white/90 hover:text-white transition-all duration-300 hover:scale-110 hover:shadow-glow fixed cursor-pointer overflow-hidden"
-            style={{ top: positions.coffee.top, left: positions.coffee.left }}
-            initial={{ x: -50, opacity: 0 }}
-            animate={{ 
-              x: 0, 
-              opacity: 1,
-              y: [0, -35, 0, 35, 0],
-              rotate: [0, 3, 0, -3, 0],
-              transition: { 
-                x: { duration: 0.5 },
-                opacity: { duration: 0.5 },
-                y: { repeat: Infinity, duration: 7, ease: "easeInOut" },
-                rotate: { repeat: Infinity, duration: 7, ease: "easeInOut" }
-              }
-            }}
-            whileHover={{ rotate: -8, scale: 1.1 }}
-            onClick={() => handleBubblePop('coffee', 'https://nowpayments.io/payment/?iid=5015396769&source=button')}
-          >
-            <Heart size={56} className="text-white" />
-          </motion.div>
-        )}
-        {poppingState.coffee && (
-          <motion.div
-            className="w-28 h-28 rounded-full fixed"
-            style={{ top: positions.coffee.top, left: positions.coffee.left }}
-            initial={{ scale: 1 }}
-            animate={{ 
-              scale: [1, 1.2, 0], 
-              transition: { duration: 0.5, times: [0, 0.2, 1] }
-            }}
-          >
-            <RadiatingLines color="red" />
-          </motion.div>
-        )}
-      </AnimatePresence>
+    <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-[50] pointer-events-none">
+      <div className="flex items-center gap-4">
+        {socialBubbles.map((bubble) => {
+          const IconComponent = bubble.icon;
+          const isPopping = poppingState[bubble.key];
+          
+          return (
+            <div key={bubble.key} className="relative w-16 h-16 flex items-center justify-center">
+              <AnimatePresence>
+                {!isPopping && (
+                  <motion.div 
+                    className="w-16 h-16 rounded-full glass-social flex items-center justify-center text-white/90 hover:text-white transition-all duration-300 hover:scale-110 hover:shadow-glow cursor-pointer overflow-hidden pointer-events-auto absolute"
+                    initial={{ y: -20, opacity: 0 }}
+                    animate={{ 
+                      y: [0, -5, 0, 5, 0],
+                      opacity: 1,
+                      transition: { 
+                        y: { repeat: Infinity, duration: 4, ease: "easeInOut" },
+                        opacity: { duration: 0.5 }
+                      }
+                    }}
+                    whileHover={{ scale: 1.1, rotate: 5 }}
+                    onClick={() => handleBubblePop(bubble.key, bubble.url)}
+                  >
+                    <IconComponent size={32} className="text-white" />
+                  </motion.div>
+                )}
+                {isPopping && (
+                  <motion.div
+                    className="w-16 h-16 rounded-full absolute top-0 left-0"
+                    initial={{ scale: 1 }}
+                    animate={{ 
+                      scale: [1, 1.3, 0], 
+                      transition: { duration: 0.5, times: [0, 0.2, 1] }
+                    }}
+                  >
+                    <RadiatingLines color={bubble.color} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };

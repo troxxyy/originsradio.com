@@ -85,4 +85,159 @@ export async function getArtistsForSitemap(): Promise<Array<{ slug: string; last
   }
 }
 
+export async function getArtistSEOData(slug: string): Promise<{
+  metadata: {
+    title: string
+    description: string
+    keywords: string
+    openGraph: {
+      title: string
+      description: string
+      url: string
+      images: Array<{ url: string }>
+      type: string
+    }
+    twitter: {
+      card: string
+      title: string
+      description: string
+      images: string[]
+    }
+    alternates: {
+      canonical: string
+    }
+  }
+  structuredData: Array<Record<string, any>>
+} | null> {
+  try {
+    const artist = await getArtistBySlug(slug)
+    if (!artist) return null
+
+    const artistName = artist.name
+    const artistBio = artist.bio || `Professional DJ and music producer ${artistName} from ${artist.location || 'Ankara'}.`
+    const artistGenres = artist.genre?.join(', ') || 'Electronic, House, Techno'
+    const artistLocation = artist.location || 'Ankara, Turkey'
+    const artistPhoto = artist.photo_url || '/placeholder.svg'
+    const currentUrl = `https://origins.radio/artists/${slug}`
+    
+    // Generate SEO-optimized title and description focusing on "DJ" keywords
+    const title = `${artistName} - DJ & Producer | Origins Radio Ankara`
+    const description = `Listen to DJ ${artistName}'s sets and tracks. ${artistGenres} music producer from ${artistLocation}. Book ${artistName} for events at Origins Radio.`
+    
+    // Generate comprehensive keywords
+    const keywords = [
+      artistName,
+      'DJ',
+      'music producer',
+      'electronic music',
+      ...artist.genre || [],
+      artistLocation,
+      'Origins Radio',
+      'Ankara',
+      'Turkey',
+      'underground music',
+      'techno',
+      'house music',
+      'DJ sets',
+      'music events',
+      'booking DJ'
+    ].join(', ')
+
+    // Structured Data for Rich Search Results
+    const structuredData = [
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": artistName,
+        "description": artistBio,
+        "image": artistPhoto,
+        "url": currentUrl,
+        "sameAs": artist.social_links ? Object.values(artist.social_links) : [],
+        "jobTitle": "DJ & Music Producer",
+        "worksFor": {
+          "@type": "Organization",
+          "name": "Origins Radio"
+        },
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": artistLocation.split(',')[0]?.trim() || "Ankara",
+          "addressCountry": "Turkey"
+        },
+        "knowsAbout": artist.genre || ["Electronic Music", "DJing", "Music Production"],
+        "hasOccupation": {
+          "@type": "Occupation",
+          "name": "DJ",
+          "description": `Professional DJ specializing in ${artistGenres}`
+        },
+        "alumniOf": {
+          "@type": "Organization",
+          "name": "Origins Radio"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://origins.radio"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Artists",
+            "item": "https://origins.radio/artists"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": artistName,
+            "item": currentUrl
+          }
+        ]
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "MusicGroup",
+        "name": artistName,
+        "url": currentUrl,
+        "image": artistPhoto,
+        "description": artistBio,
+        "genre": artist.genre || ["Electronic Music"],
+        "sameAs": artist.social_links ? Object.values(artist.social_links) : []
+      }
+    ]
+
+    return {
+      metadata: {
+        title,
+        description,
+        keywords,
+        openGraph: {
+          title: `${artistName} - DJ & Producer`,
+          description: description,
+          url: currentUrl,
+          images: [{ url: `/og/${slug}.png` }],
+          type: 'profile'
+        },
+        twitter: {
+          card: 'summary_large_image',
+          title: `${artistName} - DJ & Producer`,
+          description: description,
+          images: [`/og/${slug}.png`]
+        },
+        alternates: {
+          canonical: currentUrl
+        }
+      },
+      structuredData
+    }
+  } catch (error) {
+    console.error('Error in getArtistSEOData:', error)
+    return null
+  }
+}
+
 

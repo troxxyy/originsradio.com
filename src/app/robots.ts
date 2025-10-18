@@ -6,6 +6,12 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
+        disallow: [
+          '/artistcontrolsecret/',
+          '/originsradio/adminuploads',
+          '/_next/',
+          '/api/',
+        ],
       },
     ],
     sitemap: 'https://origins.radio/sitemap.xml',
