@@ -2,8 +2,8 @@ import ArtistDetailClient from './ArtistDetailClient'
 import type { Metadata } from 'next'
 import { getAllArtistSlugs, getArtistSEOData } from '../../../lib/artists'
 
-export default async function ArtistDetailPage({ params }: { params: { artistSlug: string } }) {
-  const { artistSlug } = params
+export default async function ArtistDetailPage({ params }: { params: Promise<{ artistSlug: string }> }) {
+  const { artistSlug } = await params
   return <ArtistDetailClient artistSlug={artistSlug} />
 }
 
@@ -14,8 +14,8 @@ export async function generateStaticParams() {
   return slugs.map((slug) => ({ artistSlug: slug }))
 }
 
-export async function generateMetadata({ params }: { params: { artistSlug: string } }): Promise<Metadata> {
-  const { artistSlug } = params
+export async function generateMetadata({ params }: { params: Promise<{ artistSlug: string }> }): Promise<Metadata> {
+  const { artistSlug } = await params
   const seoData = await getArtistSEOData(artistSlug)
   
   if (!seoData) {
