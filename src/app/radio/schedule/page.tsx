@@ -80,49 +80,67 @@ export default function RadioSchedule() {
     touchStartX.current = touch.clientX
     touchStartY.current = touch.clientY
     scrollStartX.current = scrollContainerRef.current.scrollLeft
-    isDragging.current = true
     lastTouchTime.current = Date.now()
     lastTouchX.current = touch.clientX
     velocityX.current = 0
-    setIsScrolling(true)
+    // Don't set isDragging yet - wait to determine swipe direction
   }
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging.current || !scrollContainerRef.current) return
+    if (!scrollContainerRef.current) return
     
     const touch = e.touches[0]
     const deltaX = touch.clientX - touchStartX.current
     const deltaY = touch.clientY - touchStartY.current
     
-    // Only prevent default if this is primarily a horizontal swipe
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      e.preventDefault()
-      
-      // Calculate velocity for momentum scrolling
-      const now = Date.now()
-      const timeDelta = now - lastTouchTime.current
-      if (timeDelta > 0) {
-        const distanceDelta = touch.clientX - lastTouchX.current
-        velocityX.current = distanceDelta / timeDelta
-        lastTouchTime.current = now
-        lastTouchX.current = touch.clientX
-      }
-      
-      // Apply the scroll with some resistance at the edges
-      const container = scrollContainerRef.current
-      const maxScroll = container.scrollWidth - container.clientWidth
-      const currentScroll = scrollStartX.current - deltaX
-      
-      // Add resistance at edges
-      let newScroll = currentScroll
-      if (currentScroll < 0) {
-        newScroll = currentScroll * 0.3 // Resistance when scrolling past start
-      } else if (currentScroll > maxScroll) {
-        newScroll = maxScroll + (currentScroll - maxScroll) * 0.3 // Resistance when scrolling past end
-      }
-      
-      container.scrollLeft = newScroll
+    // Movement threshold - require at least 10px movement before engaging
+    const movementThreshold = 10
+    const totalMovement = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
+    
+    if (totalMovement < movementThreshold) {
+      return // Not enough movement yet
     }
+    
+    // Determine swipe direction
+    const isHorizontalSwipe = Math.abs(deltaX) > Math.abs(deltaY)
+    
+    if (!isHorizontalSwipe) {
+      // This is a vertical swipe - let the browser handle it naturally
+      return
+    }
+    
+    // This is a horizontal swipe - engage custom scrolling
+    if (!isDragging.current) {
+      isDragging.current = true
+      setIsScrolling(true)
+    }
+    
+    e.preventDefault()
+    
+    // Calculate velocity for momentum scrolling
+    const now = Date.now()
+    const timeDelta = now - lastTouchTime.current
+    if (timeDelta > 0) {
+      const distanceDelta = touch.clientX - lastTouchX.current
+      velocityX.current = distanceDelta / timeDelta
+      lastTouchTime.current = now
+      lastTouchX.current = touch.clientX
+    }
+    
+    // Apply the scroll with some resistance at the edges
+    const container = scrollContainerRef.current
+    const maxScroll = container.scrollWidth - container.clientWidth
+    const currentScroll = scrollStartX.current - deltaX
+    
+    // Add resistance at edges
+    let newScroll = currentScroll
+    if (currentScroll < 0) {
+      newScroll = currentScroll * 0.3 // Resistance when scrolling past start
+    } else if (currentScroll > maxScroll) {
+      newScroll = maxScroll + (currentScroll - maxScroll) * 0.3 // Resistance when scrolling past end
+    }
+    
+    container.scrollLeft = newScroll
   }
 
   const handleTouchEnd = () => {

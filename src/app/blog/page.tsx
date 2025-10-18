@@ -24,10 +24,7 @@ export default function BlogPage() {
   const touchStartPos = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
 
   useEffect(() => {
-    console.log('Blog page mounted, Supabase available:', !!supabase);
-    
     if (!supabase) {
-      console.error('Supabase is not configured');
       setError('Database connection not configured. Please check environment variables.');
       setIsLoading(false);
       return;
@@ -45,7 +42,6 @@ export default function BlogPage() {
       const { blogs: fetchedBlogs } = await getPublishedBlogs(1, 1000);
       setBlogs(fetchedBlogs);
     } catch (err) {
-      console.error('Error loading blogs:', err);
       setError('Failed to load blog posts');
     } finally {
       setIsLoading(false);
@@ -119,7 +115,7 @@ export default function BlogPage() {
       </Helmet>
       
       <PageLayout showFooter={false}>
-        <div className="fixed inset-0" style={{ backgroundColor: 'rgb(29, 31, 42)' }}>
+        <div className="fixed inset-0 blog-page-bg">
           <ParticlesHeader />
           
           {/* Loading State */}

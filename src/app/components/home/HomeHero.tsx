@@ -114,7 +114,7 @@ const HomeHero: React.FC = () => {
               const isHovered = hoverStates[route.key as keyof typeof hoverStates];
 
               return (
-                <Link key={route.key} href={route.href} className={`${sectionClass} text-white group items-center`} style={{ perspective: "1000px" }}>
+                <Link key={route.key} href={route.href} className={`${sectionClass} text-white group items-center home-hero-link`}>
                   <div
                     className={textGroupClass}
                     onMouseEnter={() => handleHover(route.key, true)}
@@ -147,7 +147,7 @@ const HomeHero: React.FC = () => {
               const isHovered = hoverStates[route.key as keyof typeof hoverStates];
 
               return (
-                <Link key={route.key} href={route.href} className={`${sectionClass} text-white group items-center`} style={{ perspective: "1000px" }}>
+                <Link key={route.key} href={route.href} className={`${sectionClass} text-white group items-center home-hero-link`}>
                   <div className={textGroupClass} onMouseEnter={() => handleHover(route.key, true)} onMouseLeave={() => handleMouseLeave(route.key)}>
                     <div className="flex items-center gap-3 mb-2">
                       {route.key === "events" ? (
@@ -176,7 +176,7 @@ const HomeHero: React.FC = () => {
               const isHovered = hoverStates[route.key as keyof typeof hoverStates];
 
               return (
-                <Link key={route.key} href={route.href} className={`${sectionClass} text-white group items-center`} style={{ perspective: "1000px" }}>
+                <Link key={route.key} href={route.href} className={`${sectionClass} text-white group items-center home-hero-link`}>
                   <div className={textGroupClass} onMouseEnter={() => handleHover(route.key, true)} onMouseLeave={() => handleMouseLeave(route.key)}>
                     <div className="flex items-center gap-4 mb-2">
                       {route.key === "thisWeek" ? (

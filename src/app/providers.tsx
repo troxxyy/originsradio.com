@@ -49,7 +49,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }, [])
 
   const handleLoadingComplete = () => {
-    console.log("handleLoadingComplete called, setting isLoading to false")
     // Small delay to ensure smooth transition
     setTimeout(() => {
       setIsLoading(false)

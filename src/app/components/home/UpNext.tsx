@@ -155,12 +155,12 @@ export const ProgressBar = ({ progress, onSeek, className = "", thumbSize = "w-3
       onTouchStart={handleTouchStart}
     >
       <div 
-        className="absolute top-0 left-0 h-full bg-gradient-to-r from-[#383838] to-[#d1d1d1] transition-all duration-100"
-        style={{ width: `${progress}%` }}
+        className="absolute top-0 left-0 h-full bg-gradient-to-r from-[#383838] to-[#d1d1d1] transition-all duration-100 progress-bar-fill"
+        style={{ '--progress-width': `${progress}%` } as React.CSSProperties}
       />
       <div 
-        className={`absolute top-1/2 -translate-y-1/2 rounded-full bg-white shadow-[0_0_5px_rgba(255,255,255,0.5)] ${mobileThumbSize}`}
-        style={{ left: `${progress}%`, transform: 'translate(-50%, -50%)' }}
+        className={`absolute top-1/2 -translate-y-1/2 rounded-full bg-white shadow-[0_0_5px_rgba(255,255,255,0.5)] ${mobileThumbSize} progress-thumb`}
+        style={{ '--progress-width': `${progress}%` } as React.CSSProperties}
       />
     </div>
   );
@@ -348,7 +348,6 @@ const useAudioPlayer = () => {
             await audioRef.current.load();
             setAudioLoaded(prev => ({ ...prev, [trackIndex]: true }));
           } catch (error) {
-            console.error('Error loading audio:', error);
             return;
           }
         }
@@ -357,7 +356,7 @@ const useAudioPlayer = () => {
           await audioRef.current.play();
           setIsPlaying(true);
         } catch (error) {
-          console.error('Error playing audio:', error);
+          // Audio playback failed silently
         }
       }
     }
@@ -406,7 +405,6 @@ const useAudioPlayer = () => {
     };
 
     const handleError = (e: Event) => {
-      console.error('Audio error:', e);
       setIsPlaying(false);
       // setCurrentTrackIndex(null); // <-- Do not reset index on error
     };
@@ -493,7 +491,7 @@ const UpNextSection = ({ compact = false, maxItems, title }: UpNextSectionProps)
       {!compact && (
         <>
           <div className="absolute -top-10 -left-20 w-64 h-64 bg-[#363636]/20 rounded-full filter blur-3xl animate-slow-pulse"></div>
-          <div className="absolute -bottom-10 -right-20 w-128 h-128 bg-[#787878]/20 rounded-full filter blur-3xl animate-slow-pulse" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute -bottom-10 -right-20 w-128 h-128 bg-[#787878]/20 rounded-full filter blur-3xl animate-slow-pulse animate-delay-2s"></div>
         </>
       )}
       
