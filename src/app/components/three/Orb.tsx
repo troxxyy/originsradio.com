@@ -1,3 +1,5 @@
+"use client";
+
 import { Suspense, useEffect, useRef } from "react";
 import Spline from "@splinetool/react-spline";
 import type { Application } from "@splinetool/runtime";
