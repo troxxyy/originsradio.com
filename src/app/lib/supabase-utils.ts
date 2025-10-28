@@ -974,6 +974,7 @@ export const getWeeklyRadioSchedule = async (): Promise<RadioScheduleWeeklyRow[]
       )
     `)
     .eq('is_active', true)
+    .eq('content_type', 'set')
     .eq('week_start_date', currentWeekMonday)
     .order('day_of_week', { ascending: true })
 
@@ -1061,9 +1062,9 @@ export const upsertWeeklyRadioSchedule = async (row: Partial<RadioScheduleWeekly
     day_of_week: row.day_of_week,
     start_time_local: row.start_time_local,
     duration_minutes: row.duration_minutes ?? 60,
-    content_type: row.content_type,
+    content_type: 'set',
     set_id: row.set_id ?? null,
-    stream_url: row.stream_url ?? null,
+    stream_url: null,
     title: row.title ?? '',
     timezone: row.timezone ?? 'Europe/Istanbul',
     is_active: row.is_active ?? true,

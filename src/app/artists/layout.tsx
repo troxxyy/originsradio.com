@@ -1,13 +1,78 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Artists - Origins Radio | Electronic Music DJs in Ankara',
-  description: 'Meet the talented DJs and producers of Origins Radio. Discover resident artists, guest selectors, and emerging talent in Ankara\'s electronic music scene.',
-  openGraph: {
-    title: 'Artists - Origins Radio',
-    description: 'Meet the talented DJs and producers of Origins Radio',
-    type: 'website',
+  title: {
+    default: 'Artists & DJs - Origins Radio | Electronic Music in Ankara',
+    template: '%s | Origins Radio',
   },
+  description:
+    "Meet the talented DJs and producers of Origins Radio. Discover resident artists, guest selectors, and emerging talent in Ankara's electronic music scene.",
+  keywords: [
+    'Origins Radio',
+    'Ankara DJs',
+    'electronic music',
+    'techno',
+    'house',
+    'underground',
+    'Turkey music',
+    'radio artists',
+    'DJs and producers',
+    'Origins Radio',
+    'Ankara',
+    'Turkey',
+    'Electronic Music',
+    'Techno',
+    'House',
+    'Underground',
+    'Music Scene',
+    'DJ',
+    'Producer',
+    'Music',
+    'Events',
+    'Booking',
+    'Origins Radio',
+    'Ankara',
+    'Turkey',
+    'Electronic Music',
+  ],
+  alternates: {
+    canonical: '/artists',
+  },
+  openGraph: {
+    title: 'Artists & DJs - Origins Radio',
+    description:
+      "Discover resident and guest DJs of Origins Radio from Ankara's underground scene.",
+    type: 'website',
+    url: '/artists',
+    siteName: 'OriginsRadio',
+    images: [
+      {
+        url: '/originslogo.png',
+        width: 1200,
+        height: 630,
+        alt: 'Origins Radio Artists',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Artists & DJs - Origins Radio',
+    description:
+      "Discover resident and guest DJs of Origins Radio from Ankara's underground scene.",
+    images: ['/originslogo.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  category: 'Music',
 }
 
 export default function ArtistsLayout({

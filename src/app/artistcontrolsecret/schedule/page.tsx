@@ -100,6 +100,8 @@ export default function AdminRadioSchedule() {
   const byKey = useMemo(() => {
     const m = new Map<string, any>()
     for (const r of rows) {
+      // Only consider 'set' entries; ignore any legacy 'stream' rows
+      if (r.content_type && r.content_type !== 'set') continue
       const hour = parseInt((r.start_time_local || '0:00').split(':')[0], 10)
       if (hour >= 19 && hour <= 23) {
         m.set(`${r.day_of_week}-${hour}`, r)
@@ -186,18 +188,16 @@ export default function AdminRadioSchedule() {
 }
 
 function EditableRow({ dayIdx, hour, sets, existing, onSave, onDelete }: { dayIdx: number; hour: number; sets: any[]; existing?: any; onSave: (p: any) => Promise<void>; onDelete?: () => void }) {
-  const [contentType, setContentType] = useState<'set' | 'stream'>(existing?.content_type || 'set')
+  // Stream capability removed; content type is always 'set'
+  const [contentType] = useState<'set'>('set')
   const [setId, setSetId] = useState<string>(existing?.set_id || '')
   const [title, setTitle] = useState<string>(existing?.title || '')
-  const [streamUrl, setStreamUrl] = useState<string>(existing?.stream_url || '')
   const [active, setActive] = useState<boolean>(existing?.is_active ?? true)
 
   useEffect(() => {
     if (existing) {
-      setContentType(existing.content_type)
       setSetId(existing.set_id || '')
       setTitle(existing.title || '')
-      setStreamUrl(existing.stream_url || '')
       setActive(existing.is_active ?? true)
     }
   }, [existing])
@@ -209,9 +209,9 @@ function EditableRow({ dayIdx, hour, sets, existing, onSave, onDelete }: { dayId
       day_of_week: dayIdx,
       start_time_local: start,
       duration_minutes: 60,
-      content_type: contentType,
-      set_id: contentType === 'set' ? (setId || null) : null,
-      stream_url: contentType === 'stream' ? (streamUrl || null) : null,
+      content_type: 'set',
+      set_id: setId || null,
+      stream_url: null,
       title,
       timezone: 'Europe/Istanbul',
       is_active: active,
@@ -223,22 +223,15 @@ function EditableRow({ dayIdx, hour, sets, existing, onSave, onDelete }: { dayId
       <td className="px-3 py-2 text-gray-300">{DAYS[dayIdx]}</td>
       <td className="px-3 py-2">{String(hour).padStart(2, '0')}:00</td>
       <td className="px-3 py-2">
-        <select aria-label="Content type" title="Content type" value={contentType} onChange={(e) => setContentType(e.target.value as any)} className="bg-white/10 border border-white/20 rounded px-2 py-1">
-          <option value="set">Set</option>
-          <option value="stream">Stream</option>
-        </select>
+        <span className="text-gray-200">Set</span>
       </td>
       <td className="px-3 py-2">
-        {contentType === 'set' ? (
-          <select aria-label="Select set" title="Select set" value={setId} onChange={(e) => setSetId(e.target.value)} className="bg-white/10 border border-white/20 rounded px-2 py-1 max-w-[260px]">
-            <option value="">Select set…</option>
-            {sets.map((s) => (
-              <option key={s.id} value={s.id}>{s.artists?.name ? `${s.artists.name} — ` : ''}{s.title || s.id}</option>
-            ))}
-          </select>
-        ) : (
-          <input aria-label="Stream URL" title="Stream URL" value={streamUrl} onChange={(e) => setStreamUrl(e.target.value)} placeholder="https://stream…" className="bg-white/10 border border-white/20 rounded px-2 py-1 w-64" />
-        )}
+        <select aria-label="Select set" title="Select set" value={setId} onChange={(e) => setSetId(e.target.value)} className="bg-white/10 border border-white/20 rounded px-2 py-1 max-w-[260px]">
+          <option value="">Select set…</option>
+          {sets.map((s) => (
+            <option key={s.id} value={s.id}>{s.artists?.name ? `${s.artists.name} — ` : ''}{s.title || s.id}</option>
+          ))}
+        </select>
       </td>
       <td className="px-3 py-2">
         <input aria-label="Title" title="Title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" className="bg-white/10 border border-white/20 rounded px-2 py-1 w-64" />

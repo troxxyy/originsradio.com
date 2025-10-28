@@ -291,7 +291,7 @@ export default function RadioSchedule() {
             <div>Title: {currentSlot.item.title}</div>
             <div>Type: {currentSlot.item.contentType}</div>
             <div>Started: {currentSlot.startedAtUtc.toLocaleTimeString()}</div>
-            <div>Is Stream: {currentSlot.isLiveStream ? 'Yes' : 'No'}</div>
+            {/* Stream capability removed; always set-based */}
           </div>
         )}
         <div className="w-full px-0 py-4">

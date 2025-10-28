@@ -54,6 +54,7 @@ export function useWeeklyRadioSchedule() {
           )
         `)
         .eq('is_active', true)
+        .eq('content_type', 'set')
         .eq('week_start_date', currentWeekMonday)
         .order('day_of_week', { ascending: true })
         .order('start_time_local', { ascending: true })

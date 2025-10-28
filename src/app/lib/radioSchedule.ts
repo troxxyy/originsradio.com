@@ -1,7 +1,7 @@
 import { addMinutes, differenceInSeconds, startOfWeek } from 'date-fns'
 import { toZonedTime, fromZonedTime, formatInTimeZone } from 'date-fns-tz'
 
-export type ContentType = 'set' | 'stream'
+export type ContentType = 'set'
 
 export interface RadioScheduleRow {
   id: string
@@ -47,7 +47,7 @@ export function mapRowToItem(row: RadioScheduleRow): ScheduleItem {
     durationMinutes: row.duration_minutes,
     contentType: row.content_type,
     setId: row.set_id ?? null,
-    streamUrl: row.stream_url ?? null,
+    streamUrl: null,
     title: row.title,
     timezone: row.timezone || DEFAULT_TZ,
   }
@@ -93,7 +93,7 @@ export function resolveCurrentSlot<TExtra = unknown>(
         startedAtUtc: startUtc,
         secondsSinceStart,
         endsAtUtc: endUtc,
-        isLiveStream: item.contentType === 'stream',
+        isLiveStream: false,
       }
     }
   }

@@ -28,18 +28,14 @@ const MusicPlayer = () => {
     }
   };
 
-  const scheduledIsLive = currentSlot?.isLiveStream ?? false;
-  const scheduledUrl = scheduledIsLive
-    ? (currentSlot?.item.streamUrl ?? undefined)
-    : (currentSlot?.item && (currentSlot.item as any).set?.audio_url) ?? undefined;
-
-  const isLive = onDemandSetUrl ? false : scheduledIsLive;
+  const scheduledUrl = (currentSlot?.item && (currentSlot.item as any).set?.audio_url) ?? undefined;
+  const isLive = false;
   const rawStreamUrl = onDemandSetUrl || scheduledUrl;
   const streamUrl = rawStreamUrl ? buildProxiedUrl(rawStreamUrl) : undefined;
   const setDurationSeconds = onDemandSetUrl
     ? (latestSet as any)?.duration ?? undefined
     : ((currentSlot?.item as any)?.set?.duration ?? undefined);
-  const startOffsetSeconds = onDemandSetUrl ? 0 : (scheduledIsLive ? 0 : (currentSlot?.secondsSinceStart ?? 0));
+  const startOffsetSeconds = onDemandSetUrl ? 0 : (currentSlot?.secondsSinceStart ?? 0);
   const nowTitle = onDemandSetUrl ? onDemandTitle : (currentSlot?.item?.title ?? 'Radio');
   const nowArtist = onDemandSetUrl ? onDemandArtist : ((currentSlot?.item as any)?.set?.artists?.name ?? 'Origins Radio');
   const nowDate = onDemandSetUrl 
@@ -114,7 +110,7 @@ const MusicPlayer = () => {
             const clamped = dur ? Math.min(Math.max(0, startOffsetSeconds), Math.max(0, dur - 1)) : Math.max(0, startOffsetSeconds);
             audio.currentTime = clamped;
           }
-          // For streams, no seeking
+          // Streams removed; seeking is always allowed within set
         }
       } catch (e) {
         // no-op
