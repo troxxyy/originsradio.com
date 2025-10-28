@@ -49,26 +49,29 @@ export default function RadioSchedule() {
     return () => clearInterval(interval)
   }, [])
 
-  // Global mouse event handlers for desktop
+  // Global mouse event handlers for desktop only
   useEffect(() => {
-    const handleGlobalMouseMove = (e: MouseEvent) => {
-      if (isDragging.current) {
-        handleMouseMove(e as any)
+    // Only add mouse event listeners on non-touch devices
+    if (window.matchMedia('(pointer: fine)').matches) {
+      const handleGlobalMouseMove = (e: MouseEvent) => {
+        if (isDragging.current) {
+          handleMouseMove(e as any)
+        }
       }
-    }
 
-    const handleGlobalMouseUp = () => {
-      if (isDragging.current) {
-        handleMouseUp()
+      const handleGlobalMouseUp = () => {
+        if (isDragging.current) {
+          handleMouseUp()
+        }
       }
-    }
 
-    document.addEventListener('mousemove', handleGlobalMouseMove)
-    document.addEventListener('mouseup', handleGlobalMouseUp)
+      document.addEventListener('mousemove', handleGlobalMouseMove)
+      document.addEventListener('mouseup', handleGlobalMouseUp)
 
-    return () => {
-      document.removeEventListener('mousemove', handleGlobalMouseMove)
-      document.removeEventListener('mouseup', handleGlobalMouseUp)
+      return () => {
+        document.removeEventListener('mousemove', handleGlobalMouseMove)
+        document.removeEventListener('mouseup', handleGlobalMouseUp)
+      }
     }
   }, [])
 
@@ -169,8 +172,11 @@ export default function RadioSchedule() {
     velocityX.current = 0
   }
 
-  // Mouse event handlers for desktop testing
+  // Mouse event handlers for desktop only
   const handleMouseDown = (e: React.MouseEvent) => {
+    // Only handle mouse events on non-touch devices
+    if (!window.matchMedia('(pointer: fine)').matches) return
+    
     if (!scrollContainerRef.current) return
     
     touchStartX.current = e.clientX
@@ -184,6 +190,9 @@ export default function RadioSchedule() {
   }
 
   const handleMouseMove = (e: React.MouseEvent) => {
+    // Only handle mouse events on non-touch devices
+    if (!window.matchMedia('(pointer: fine)').matches) return
+    
     if (!isDragging.current || !scrollContainerRef.current) return
     
     const deltaX = e.clientX - touchStartX.current
@@ -221,6 +230,9 @@ export default function RadioSchedule() {
   }
 
   const handleMouseUp = () => {
+    // Only handle mouse events on non-touch devices
+    if (!window.matchMedia('(pointer: fine)').matches) return
+    
     if (!isDragging.current || !scrollContainerRef.current) return
     
     isDragging.current = false

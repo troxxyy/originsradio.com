@@ -532,7 +532,7 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
                   
                   {/* Action Buttons - Mobile Optimized */}
                   <div className="absolute top-4 sm:top-6 right-4 sm:right-6 flex gap-2 sm:gap-3">
-                    <div className="flex items.center gap-1 sm:gap-2">
+                    <div className="flex items-center gap-1 sm:gap-2">
                       <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
