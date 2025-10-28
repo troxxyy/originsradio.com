@@ -306,103 +306,147 @@ export default function RadioSchedule() {
           ) : error ? (
             <div className="text-red-400">Failed to load schedule</div>
           ) : (
-            <div 
-              ref={scrollContainerRef}
-              className={`relative overflow-x-auto overscroll-x-contain touch-pan-x snap-x snap-mandatory ${isScrolling ? 'scroll-smooth' : ''}`}
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-              style={{ 
-                touchAction: 'pan-x',
-                WebkitOverflowScrolling: 'touch',
-                scrollBehavior: isScrolling ? 'auto' : 'smooth'
-              }}
-            >
-              <div
-                className="grid w-full"
-                style={{
-                  gridTemplateColumns: `${TIME_COL_PX}px repeat(7, ${DAY_COL_PX}px)`,
-                  gridTemplateRows: `${HEADER_PX}px repeat(${HOURS.length}, ${ROW_PX}px)`,
-                  width: `${TIME_COL_PX + 7 * DAY_COL_PX}px`,
-                }}
-              >
-                {/* Header corner */}
-                <div className="sticky left-0 top-0 z-20 bg-black/40 backdrop-blur border-b border-white/10" />
-
-                {/* Day headers */}
-                {DAY_LABELS.map((label, i) => (
-                  <div
-                    key={label}
-                    className="sticky top-0 z-10 bg-black/40 backdrop-blur border-b border-white/10 flex items-center justify-center font-semibold text-sm"
-                    style={{ gridColumn: i + 2, gridRow: 1 }}
-                  >
-                    {label}
-                  </div>
-                ))}
-
-                {/* Time column */}
-                {HOURS.map((h, idx) => (
-                  <div
-                    key={h}
-                    className="sticky left-0 z-10 bg-black/40 backdrop-blur border-r border-white/10 flex items-center justify-end pr-3 text-gray-300"
-                    style={{ gridColumn: 1, gridRow: idx + 2 }}
-                  >
-                    {getHourLabel(h)}
-                  </div>
-                ))}
-
-                {/* Grid cells and items */}
-                {HOURS.map((h, rIdx) => (
-                  <div key={`row-${h}`} style={{ gridColumn: '2 / span 7', gridRow: rIdx + 2 }} className="grid grid-cols-7 gap-2 px-2">
-                    {Array.from({ length: 7 }).map((_, dayIdx) => {
-                      const key = `${dayIdx}-${h}`
-                      const item = itemsByKey.get(key)
-                      const isCurrent = currentPosition?.day === dayIdx && currentPosition?.hour === h
-                      return (
-                        <div key={dayIdx} className="relative p-2">
-                          <div className={`h-full w-full rounded-lg overflow-hidden shadow-lg border ${isCurrent ? 'border-red-500 border-2 ring-2 ring-red-500/50' : 'border-white/5'}`}>
-                            {item ? (
-                              <ArtistImageCard
-                                artistName={item.set?.artists?.name || item.title}
-                                photoUrl={item.set?.artists?.photo_url || ''}
-                                artistId={item.set?.artists?.id}
-                                onClick={() => {
-                                  if (item.set?.artists?.name) {
-                                    router.push(`/artists/${generateSlug(item.set.artists.name)}`)
-                                  }
-                                }}
-                              />
-                            ) : (
-                              <div className="h-full bg-black/40 flex items-center justify-center text-gray-600">&nbsp;</div>
-                            )}
-                          </div>
-                          {isCurrent && (
-                            <div className="absolute top-0 right-0 -mt-1 -mr-1 z-30">
-                              <div className="relative">
-                                <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-75" style={{ width: '24px', height: '24px' }} />
-                                <div className="relative bg-red-500 rounded-full p-1.5 shadow-lg">
-                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                  </svg>
-                                </div>
+            isMobile ? (
+              <div className="px-3 space-y-6">
+                {DAY_LABELS.map((label, dayIdx) => (
+                  <div key={label} className="space-y-3">
+                    <div className="sticky top-16 z-10 bg-black/60 backdrop-blur px-2 py-2 border-b border-white/10 font-semibold">
+                      {label}
+                    </div>
+                    <div className="space-y-3">
+                      {HOURS.map((h) => {
+                        const key = `${dayIdx}-${h}`
+                        const item = itemsByKey.get(key)
+                        const isCurrent = currentPosition?.day === dayIdx && currentPosition?.hour === h
+                        return (
+                          <div key={key} className={`rounded-lg border overflow-hidden ${isCurrent ? 'border-red-500 border-2 ring-2 ring-red-500/50' : 'border-white/5'}`}>
+                            <div className="flex items-stretch">
+                              <div className="w-16 shrink-0 flex items-center justify-center text-sm text-gray-300 border-r border-white/10 bg-black/40">
+                                {getHourLabel(h)}
+                              </div>
+                              <div className="flex-1 min-h-[120px]">
+                                {item ? (
+                                  <ArtistImageCard
+                                    artistName={item.set?.artists?.name || item.title}
+                                    photoUrl={item.set?.artists?.photo_url || ''}
+                                    artistId={item.set?.artists?.id}
+                                    onClick={() => {
+                                      if (item.set?.artists?.name) {
+                                        router.push(`/artists/${generateSlug(item.set.artists.name)}`)
+                                      }
+                                    }}
+                                  />
+                                ) : (
+                                  <div className="h-full w-full bg-black/40 flex items-center justify-center text-gray-600">&nbsp;</div>
+                                )}
                               </div>
                             </div>
-                          )}
-                        </div>
-                      )
-                    })}
+                          </div>
+                        )
+                      })}
+                    </div>
                   </div>
                 ))}
-
-                {/* 24:00 marker row */}
-               
               </div>
-            </div>
+            ) : (
+              <div 
+                ref={scrollContainerRef}
+                className={`relative overflow-x-auto overscroll-x-contain touch-pan-x snap-x snap-mandatory ${isScrolling ? 'scroll-smooth' : ''}`}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
+                style={{ 
+                  touchAction: 'pan-x',
+                  WebkitOverflowScrolling: 'touch',
+                  scrollBehavior: isScrolling ? 'auto' : 'smooth'
+                }}
+              >
+                <div
+                  className="grid w-full"
+                  style={{
+                    gridTemplateColumns: `${TIME_COL_PX}px repeat(7, ${DAY_COL_PX}px)`,
+                    gridTemplateRows: `${HEADER_PX}px repeat(${HOURS.length}, ${ROW_PX}px)`,
+                    width: `${TIME_COL_PX + 7 * DAY_COL_PX}px`,
+                  }}
+                >
+                  {/* Header corner */}
+                  <div className="sticky left-0 top-0 z-20 bg-black/40 backdrop-blur border-b border-white/10" />
+
+                  {/* Day headers */}
+                  {DAY_LABELS.map((label, i) => (
+                    <div
+                      key={label}
+                      className="sticky top-0 z-10 bg-black/40 backdrop-blur border-b border-white/10 flex items-center justify-center font-semibold text-sm"
+                      style={{ gridColumn: i + 2, gridRow: 1 }}
+                    >
+                      {label}
+                    </div>
+                  ))}
+
+                  {/* Time column */}
+                  {HOURS.map((h, idx) => (
+                    <div
+                      key={h}
+                      className="sticky left-0 z-10 bg-black/40 backdrop-blur border-r border-white/10 flex items-center justify-end pr-3 text-gray-300"
+                      style={{ gridColumn: 1, gridRow: idx + 2 }}
+                    >
+                      {getHourLabel(h)}
+                    </div>
+                  ))}
+
+                  {/* Grid cells and items */}
+                  {HOURS.map((h, rIdx) => (
+                    <div key={`row-${h}`} style={{ gridColumn: '2 / span 7', gridRow: rIdx + 2 }} className="grid grid-cols-7 gap-2 px-2">
+                      {Array.from({ length: 7 }).map((_, dayIdx) => {
+                        const key = `${dayIdx}-${h}`
+                        const item = itemsByKey.get(key)
+                        const isCurrent = currentPosition?.day === dayIdx && currentPosition?.hour === h
+                        return (
+                          <div key={dayIdx} className="relative p-2">
+                            <div className={`h-full w-full rounded-lg overflow-hidden shadow-lg border ${isCurrent ? 'border-red-500 border-2 ring-2 ring-red-500/50' : 'border-white/5'}`}>
+                              {item ? (
+                                <ArtistImageCard
+                                  artistName={item.set?.artists?.name || item.title}
+                                  photoUrl={item.set?.artists?.photo_url || ''}
+                                  artistId={item.set?.artists?.id}
+                                  onClick={() => {
+                                    if (item.set?.artists?.name) {
+                                      router.push(`/artists/${generateSlug(item.set.artists.name)}`)
+                                    }
+                                  }}
+                                />
+                              ) : (
+                                <div className="h-full bg-black/40 flex items-center justify-center text-gray-600">&nbsp;</div>
+                              )}
+                            </div>
+                            {isCurrent && (
+                              <div className="absolute top-0 right-0 -mt-1 -mr-1 z-30">
+                                <div className="relative">
+                                  <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-75" style={{ width: '24px', height: '24px' }} />
+                                  <div className="relative bg-red-500 rounded-full p-1.5 shadow-lg">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 111.314 0z" />
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  ))}
+
+                  {/* 24:00 marker row */}
+                 
+                </div>
+              </div>
+            )
           )}
         </div>
       </div>
