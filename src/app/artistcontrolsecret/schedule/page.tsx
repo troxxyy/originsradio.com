@@ -213,7 +213,18 @@ function EditableRow({ dayIdx, hour, sets, artists, existing, onSave, onDelete }
   // When artist changes, clear set selection
   useEffect(() => {
     setSetId('')
+    // Auto-set title to artist name when no set selected
+    const artistName = artists.find((a) => a.id === selectedArtistId)?.name || ''
+    if (artistName) setTitle(artistName)
   }, [selectedArtistId])
+
+  // When set is cleared manually, show artist name as title
+  useEffect(() => {
+    if (!setId) {
+      const artistName = artists.find((a) => a.id === selectedArtistId)?.name || ''
+      if (artistName) setTitle(artistName)
+    }
+  }, [setId, selectedArtistId, artists])
 
   useEffect(() => {
     if (existing) {
@@ -231,8 +242,11 @@ function EditableRow({ dayIdx, hour, sets, artists, existing, onSave, onDelete }
   }, [existing, sets])
 
   const handleSave = async () => {
-    if (!title.trim()) {
-      alert('Please enter a title')
+    // If no set selected, title should default to artist name
+    const artistName = artists.find((a) => a.id === selectedArtistId)?.name || ''
+    const finalTitle = setId ? (title || artistName || '') : (artistName || '')
+    if (!finalTitle.trim()) {
+      alert('Please select an artist')
       return
     }
     const start = `${String(hour).padStart(2, '0')}:00`
@@ -244,7 +258,7 @@ function EditableRow({ dayIdx, hour, sets, artists, existing, onSave, onDelete }
       content_type: 'set',
       set_id: setId || null, // Allow null for pending uploads
       stream_url: null,
-      title,
+      title: finalTitle,
       timezone: 'Europe/Istanbul',
       is_active: active,
     })
@@ -284,7 +298,13 @@ function EditableRow({ dayIdx, hour, sets, artists, existing, onSave, onDelete }
         </select>
       </td>
       <td className="px-3 py-2">
-        <input aria-label="Title" title="Title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title (e.g., Artist Name Set)" className="bg-white/10 border border-white/20 rounded px-2 py-1 w-64" />
+        {(!setId && selectedArtistId) ? (
+          <div className="text-gray-200 text-sm w-64 truncate" title={artists.find(a => a.id === selectedArtistId)?.name || ''}>
+            {artists.find(a => a.id === selectedArtistId)?.name || ''}
+          </div>
+        ) : (
+          <input aria-label="Title" title="Title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title (e.g., Artist Name Set)" className="bg-white/10 border border-white/20 rounded px-2 py-1 w-64" />
+        )}
       </td>
       <td className="px-3 py-2 text-center">
         <label className="inline-flex items-center gap-2">
