@@ -30,6 +30,10 @@ export default function RadioSchedule() {
   const [currentTime, setCurrentTime] = useState(getIstanbulTime())
   const { currentSlot } = useCurrentRadioSlot(5000)
 
+  // Mobile-specific state
+  const [selectedDay, setSelectedDay] = useState<number | null>(null)
+  const daySelectorRef = useRef<HTMLDivElement>(null)
+  
   // Touch handling for mobile swipe
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [isScrolling, setIsScrolling] = useState(false)
@@ -48,6 +52,17 @@ export default function RadioSchedule() {
     }, 60000) // Update every minute
     return () => clearInterval(interval)
   }, [])
+
+  // Auto-scroll day selector to current day on mobile
+  useEffect(() => {
+    if (isMobile && daySelectorRef.current) {
+      const currentDayIdx = (new Date().getDay() + 6) % 7
+      const targetButton = daySelectorRef.current.children[currentDayIdx] as HTMLElement
+      if (targetButton) {
+        targetButton.scrollIntoView({ behavior: 'smooth', inline: 'center' })
+      }
+    }
+  }, [isMobile])
 
   // Global mouse event handlers for desktop only
   useEffect(() => {
@@ -295,58 +310,170 @@ export default function RadioSchedule() {
           </div>
         )}
         <div className="w-full px-0 py-4">
-          {/* Mobile swipe hint */}
-          {isMobile && (
-            <div className="text-center text-gray-400 text-sm mb-2 px-4">
-              ← Swipe to see more days →
-            </div>
-          )}
           {isLoading ? (
             <div className="flex items-center justify-center h-[60vh]">Loading…</div>
           ) : error ? (
             <div className="text-red-400">Failed to load schedule</div>
           ) : (
             isMobile ? (
-              <div className="px-3 space-y-6">
-                {DAY_LABELS.map((label, dayIdx) => (
-                  <div key={label} className="space-y-3">
-                    <div className="sticky top-16 z-10 bg-black/60 backdrop-blur px-2 py-2 border-b border-white/10 font-semibold">
-                      {label}
-                    </div>
-                    <div className="space-y-3">
-                      {HOURS.map((h) => {
-                        const key = `${dayIdx}-${h}`
-                        const item = itemsByKey.get(key)
-                        const isCurrent = currentPosition?.day === dayIdx && currentPosition?.hour === h
-                        return (
-                          <div key={key} className={`rounded-lg border overflow-hidden ${isCurrent ? 'border-red-500 border-2 ring-2 ring-red-500/50' : 'border-white/5'}`}>
-                            <div className="flex items-stretch">
-                              <div className="w-16 shrink-0 flex items-center justify-center text-sm text-gray-300 border-r border-white/10 bg-black/40">
-                                {getHourLabel(h)}
-                              </div>
-                              <div className="flex-1 min-h-[120px]">
-                                {item ? (
-                                  <ArtistImageCard
-                                    artistName={item.set?.artists?.name || item.title}
-                                    photoUrl={item.set?.artists?.photo_url || ''}
-                                    artistId={item.set?.artists?.id}
-                                    onClick={() => {
-                                      if (item.set?.artists?.name) {
-                                        router.push(`/artists/${generateSlug(item.set.artists.name)}`)
-                                      }
-                                    }}
-                                  />
-                                ) : (
-                                  <div className="h-full w-full bg-black/40 flex items-center justify-center text-gray-600">&nbsp;</div>
-                                )}
-                              </div>
-                            </div>
+              <div className="h-full">
+                {/* Day selector header - only visible on mobile */}
+                <div className="sticky top-16 z-30 bg-black/95 backdrop-blur-sm border-b border-white/10 px-3 py-3">
+                  <div ref={daySelectorRef} className="flex justify-between items-center gap-2 overflow-x-auto scrollbar-hide">
+                    {DAY_LABELS.map((label, dayIdx) => {
+                      const currentDayIdx = (new Date().getDay() + 6) % 7
+                      const isToday = dayIdx === currentDayIdx
+                      const isSelected = selectedDay === dayIdx || (selectedDay === null && isToday)
+                      
+                      return (
+                        <button
+                          key={dayIdx}
+                          onClick={() => setSelectedDay(dayIdx)}
+                          className={`flex-shrink-0 px-4 py-2 rounded-xl font-medium text-sm transition-all ${
+                            isSelected
+                              ? 'bg-white text-black shadow-lg scale-105'
+                              : 'bg-white/10 text-white/70 hover:bg-white/20 hover:text-white'
+                          }`}
+                        >
+                          <div className="text-center">
+                            <div className="text-xs opacity-60">{label.slice(0, 3)}</div>
+                            <div className="font-bold">{label.slice(0, 3)}</div>
                           </div>
-                        )
-                      })}
-                    </div>
+                          {isToday && (
+                            <span className="ml-2 text-[10px] px-1.5 py-0.5 bg-red-500/30 rounded-full">LIVE</span>
+                          )}
+                        </button>
+                      )
+                    })}
                   </div>
-                ))}
+                </div>
+
+                {/* Schedule content */}
+                <div className="px-3 py-4">
+                  <div className="space-y-3">
+                    {DAY_LABELS.map((label, dayIdx) => {
+                      // Determine which day to show
+                      const currentDayIdx = currentPosition?.day ?? (new Date().getDay() + 6) % 7
+                      const dayToShow = selectedDay !== null ? selectedDay : currentDayIdx
+                      const shouldShow = dayIdx === dayToShow
+
+                      return (
+                        <div key={label} className={`transition-opacity duration-300 ${shouldShow ? 'block opacity-100' : 'hidden opacity-0'}`}>
+                        {/* Day header with today indicator */}
+                        <div className="flex items-center justify-between mb-3 px-2">
+                          <div className="flex items-center gap-2">
+                            <h2 className="text-xl font-bold">{label}</h2>
+                            {dayIdx === currentPosition?.day && (
+                              <span className="px-2 py-0.5 bg-red-500/20 text-red-400 text-xs rounded-full font-semibold animate-pulse">
+                                TODAY
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-xs text-gray-400">
+                            {HOURS[0]}:00 - {HOURS[HOURS.length - 1]}:00
+                          </div>
+                        </div>
+
+                        {/* Time slots */}
+                        <div className="space-y-2.5">
+                          {HOURS.map((h) => {
+                            const key = `${dayIdx}-${h}`
+                            const item = itemsByKey.get(key)
+                            const isCurrent = currentPosition?.day === dayIdx && currentPosition?.hour === h
+                            const isPast = currentPosition?.day === dayIdx && currentPosition?.hour && currentPosition.hour > h
+                            const isUpcoming = !isCurrent && !isPast
+                            
+                            return (
+                              <div
+                                key={key}
+                                className={`relative rounded-xl overflow-hidden transition-all ${
+                                  isCurrent
+                                    ? 'ring-2 ring-red-500/60 shadow-lg shadow-red-500/20 scale-[1.02]'
+                                    : 'border border-white/10 hover:border-white/20'
+                                } ${isPast ? 'opacity-50' : ''}`}
+                              >
+                                <div className="flex items-stretch min-h-[140px]">
+                                  {/* Time badge */}
+                                  <div className={`w-20 shrink-0 flex flex-col items-center justify-center ${
+                                    isCurrent ? 'bg-red-500/20' : 'bg-white/5'
+                                  }`}>
+                                    <div className={`text-xs font-bold ${
+                                      isCurrent ? 'text-red-400' : 'text-gray-400'
+                                    }`}>
+                                      {getHourLabel(h).split(':')[0]}
+                                    </div>
+                                    <div className={`text-[10px] ${
+                                      isCurrent ? 'text-red-400/80' : 'text-gray-500'
+                                    }`}>
+                                      {getHourLabel(h).split(':')[1]}
+                                    </div>
+                                    {isCurrent && (
+                                      <div className="mt-1 w-2 h-2 bg-red-500 rounded-full animate-ping" />
+                                    )}
+                                  </div>
+
+                                  {/* Content */}
+                                  <div className="flex-1 relative">
+                                    {item ? (
+                                      <div className="relative h-full min-h-[140px]">
+                                        <img 
+                                          src={item.set?.artists?.photo_url || 'https://via.placeholder.com/400?text=' + encodeURIComponent(item.title)} 
+                                          alt={item.set?.artists?.name || item.title}
+                                          className="absolute inset-0 w-full h-full object-cover"
+                                          onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400?text=No+Image' }}
+                                        />
+                                        
+                                        {/* Gradient overlay */}
+                                        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/80" />
+                                        
+                                        {/* Content */}
+                                        <div className="relative h-full flex flex-col justify-between p-4">
+                                          <div>
+                                            {isCurrent && (
+                                              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 mb-2 bg-red-500/30 backdrop-blur rounded-full">
+                                                <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
+                                                <span className="text-[10px] font-bold text-red-400 uppercase tracking-wide">
+                                                  LIVE NOW
+                                                </span>
+                                              </div>
+                                            )}
+                                          </div>
+                                          
+                                          <div onClick={() => {
+                                            if (item.set?.artists?.name) {
+                                              router.push(`/artists/${generateSlug(item.set.artists.name)}`)
+                                            }
+                                          }} className={item.set?.artists?.name ? 'cursor-pointer active:scale-95 transition-transform' : ''}>
+                                            <h3 className="text-lg font-bold text-white mb-1 line-clamp-1">
+                                              {item.set?.artists?.name || item.title}
+                                            </h3>
+                                            {item.title && item.set?.artists?.name && (
+                                              <p className="text-xs text-gray-300 line-clamp-1">
+                                                {item.title}
+                                              </p>
+                                            )}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <div className="h-full w-full bg-gradient-to-br from-gray-900/50 to-black/50 flex items-center justify-center min-h-[140px]">
+                                        <div className="text-center">
+                                          <div className="text-gray-600 text-sm mb-1">No show scheduled</div>
+                                          <div className="text-gray-700 text-xs">Next: {HOURS[HOURS.findIndex(x => x > h)] ? getHourLabel(HOURS.find(x => x > h) || HOURS[0]) : 'Tomorrow'}</div>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
               </div>
             ) : (
               <div 

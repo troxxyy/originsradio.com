@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import PageLayout from '@/components/layout/PageLayout'
-import { getAllWeeklyRadioSchedule, upsertWeeklyRadioSchedule, deleteWeeklyRadioSchedule, getSets, archiveOldRadioSchedules, copyScheduleToNextWeek, getCurrentWeekMonday } from '@/lib/supabase-utils'
+import { getAllWeeklyRadioSchedule, upsertWeeklyRadioSchedule, deleteWeeklyRadioSchedule, getSets, getArtists, archiveOldRadioSchedules, copyScheduleToNextWeek, getCurrentWeekMonday } from '@/lib/supabase-utils'
 
 const HOURS = [19,20,21,22,23]
 const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
@@ -12,6 +12,7 @@ export default function AdminRadioSchedule() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [sets, setSets] = useState<any[]>([])
+  const [artists, setArtists] = useState<any[]>([])
   const [currentWeek, setCurrentWeek] = useState('')
 
   useEffect(() => {
@@ -20,12 +21,14 @@ export default function AdminRadioSchedule() {
       try {
         const weekMonday = getCurrentWeekMonday()
         setCurrentWeek(weekMonday)
-        const [allRows, allSets] = await Promise.all([
+        const [allRows, allSets, allArtists] = await Promise.all([
           getAllWeeklyRadioSchedule(),
           getSets(),
+          getArtists(),
         ])
         setRows(allRows)
         setSets(allSets)
+        setArtists(allArtists)
       } finally {
         setLoading(false)
       }
@@ -152,7 +155,7 @@ export default function AdminRadioSchedule() {
                     <tr>
                       <th className="px-3 py-2">Day</th>
                       <th className="px-3 py-2">Start</th>
-                      <th className="px-3 py-2">Type</th>
+                      <th className="px-3 py-2">Artist</th>
                       <th className="px-3 py-2">Set</th>
                       <th className="px-3 py-2">Title</th>
                       <th className="px-3 py-2">Active</th>
@@ -169,6 +172,7 @@ export default function AdminRadioSchedule() {
                             dayIdx={dayIdx}
                             hour={hour}
                             sets={sets}
+                            artists={artists}
                             existing={existing}
                             onSave={handleUpsert}
                             onDelete={existing?.id ? () => handleDelete(existing.id) : undefined}
@@ -187,20 +191,44 @@ export default function AdminRadioSchedule() {
   )
 }
 
-function EditableRow({ dayIdx, hour, sets, existing, onSave, onDelete }: { dayIdx: number; hour: number; sets: any[]; existing?: any; onSave: (p: any) => Promise<void>; onDelete?: () => void }) {
+function EditableRow({ dayIdx, hour, sets, artists, existing, onSave, onDelete }: { dayIdx: number; hour: number; sets: any[]; artists: any[]; existing?: any; onSave: (p: any) => Promise<void>; onDelete?: () => void }) {
   // Stream capability removed; content type is always 'set'
   const [contentType] = useState<'set'>('set')
   const [setId, setSetId] = useState<string>(existing?.set_id || '')
+  const [selectedArtistId, setSelectedArtistId] = useState<string>(() => {
+    if (existing?.set_id) {
+      const existingSet = sets.find(s => s.id === existing.set_id)
+      return existingSet?.artist_id || ''
+    }
+    return ''
+  })
   const [title, setTitle] = useState<string>(existing?.title || '')
   const [active, setActive] = useState<boolean>(existing?.is_active ?? true)
+
+  // Filter sets by selected artist
+  const filteredSets = selectedArtistId
+    ? sets.filter(s => s.artist_id === selectedArtistId)
+    : sets
+
+  // When artist changes, clear set selection
+  useEffect(() => {
+    setSetId('')
+  }, [selectedArtistId])
 
   useEffect(() => {
     if (existing) {
       setSetId(existing.set_id || '')
       setTitle(existing.title || '')
       setActive(existing.is_active ?? true)
+      // Find the artist from the existing set
+      if (existing.set_id) {
+        const existingSet = sets.find(s => s.id === existing.set_id)
+        if (existingSet) {
+          setSelectedArtistId(existingSet.artist_id)
+        }
+      }
     }
-  }, [existing])
+  }, [existing, sets])
 
   const handleSave = async () => {
     if (!title.trim()) {
@@ -227,13 +255,31 @@ function EditableRow({ dayIdx, hour, sets, existing, onSave, onDelete }: { dayId
       <td className="px-3 py-2 text-gray-300">{DAYS[dayIdx]}</td>
       <td className="px-3 py-2">{String(hour).padStart(2, '0')}:00</td>
       <td className="px-3 py-2">
-        <span className="text-gray-200">Set</span>
+        <select aria-label="Select artist" title="Select artist" value={selectedArtistId} onChange={(e) => setSelectedArtistId(e.target.value)} className="bg-white/10 border border-white/20 rounded px-2 py-1 max-w-[200px]">
+          <option value="">Select artist…</option>
+          {artists.map((a) => (
+            <option key={a.id} value={a.id}>{a.name || a.id}</option>
+          ))}
+        </select>
       </td>
       <td className="px-3 py-2">
-        <select aria-label="Select set" title="Select set" value={setId} onChange={(e) => setSetId(e.target.value)} className="bg-white/10 border border-white/20 rounded px-2 py-1 max-w-[260px]">
-          <option value="">{existing?.set_id ? 'Change set…' : 'Upload coming…'}</option>
-          {sets.map((s) => (
-            <option key={s.id} value={s.id}>{s.artists?.name ? `${s.artists.name} — ` : ''}{s.title || s.id}</option>
+        <select 
+          aria-label="Select set" 
+          title="Select set" 
+          value={setId} 
+          onChange={(e) => setSetId(e.target.value)} 
+          disabled={!selectedArtistId}
+          className="bg-white/10 border border-white/20 rounded px-2 py-1 max-w-[260px] disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <option value="">
+            {!selectedArtistId 
+              ? 'Select artist first…' 
+              : existing?.set_id 
+                ? 'Change set…' 
+                : 'Upload coming…'}
+          </option>
+          {filteredSets.map((s) => (
+            <option key={s.id} value={s.id}>{s.title || s.id}</option>
           ))}
         </select>
       </td>
