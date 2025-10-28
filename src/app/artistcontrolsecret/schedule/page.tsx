@@ -299,8 +299,29 @@ function EditableRow({ dayIdx, hour, sets, artists, existing, onSave, onDelete }
       </td>
       <td className="px-3 py-2">
         {(!setId && selectedArtistId) ? (
-          <div className="text-gray-200 text-sm w-64 truncate" title={artists.find(a => a.id === selectedArtistId)?.name || ''}>
-            {artists.find(a => a.id === selectedArtistId)?.name || ''}
+          <div className="flex items-center gap-2">
+            {artists.find(a => a.id === selectedArtistId)?.photo_url && (
+              <img 
+                src={artists.find(a => a.id === selectedArtistId)?.photo_url} 
+                alt={artists.find(a => a.id === selectedArtistId)?.name || 'Artist'} 
+                className="w-8 h-8 rounded-full object-cover border border-white/20"
+                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+              />
+            )}
+            <button
+              onClick={() => {
+                const artist = artists.find(a => a.id === selectedArtistId)
+                if (artist) {
+                  import('@/lib/supabase-utils').then(({ generateSlug }) => {
+                    window.open(`/artists/${generateSlug(artist.name)}`, '_blank')
+                  })
+                }
+              }}
+              className="text-gray-200 text-sm w-64 truncate hover:text-white hover:underline"
+              title="Click to view artist profile"
+            >
+              {artists.find(a => a.id === selectedArtistId)?.name || ''}
+            </button>
           </div>
         ) : (
           <input aria-label="Title" title="Title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title (e.g., Artist Name Set)" className="bg-white/10 border border-white/20 rounded px-2 py-1 w-64" />

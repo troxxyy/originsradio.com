@@ -7,13 +7,14 @@ import { useWeeklyRadioSchedule, useCurrentRadioSlot } from '@/hooks/use-radio'
 import { generateSlug } from '@/lib/supabase-utils'
 
 const HOURS = [19,20,21,22,23]
-const DAY_LABELS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
-const isMobile = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(max-width: 430px)').matches
-const TIME_COL_PX = isMobile ? 50 : 70
-const DAY_COL_PX = isMobile ? 176 : 240
-const HEADER_PX = isMobile ? 48 : 68
-const ROW_PX = isMobile ? 176 : 240  // Match DAY_COL_PX for 1:1 aspect ratio
-const SLOT_GAP_PX = isMobile ? 8 : 12
+const DAY_LABELS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+const DAY_LABELS_SHORT = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+const isMobile = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(max-width: 768px)').matches
+const TIME_COL_PX = 70
+const DAY_COL_PX = 240
+const HEADER_PX = 68
+const ROW_PX = 240
+const SLOT_GAP_PX = 12
 
 function getHourLabel(h: number) {
   return `${String(h).padStart(2, '0')}:00`
