@@ -17,7 +17,7 @@ const Orb = ({ className = "", rotationSpeed = -0.08, setId }: OrbProps) => {
   const rotationSpeedRef = useRef<number>(rotationSpeed);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
-  const freqDataRef = useRef<Uint8Array<ArrayBuffer> | null>(null);
+  const freqDataRef = useRef<Uint8Array | null>(null);
   const teardownAudioRef = useRef<(() => void) | null>(null);
   const boundAudioElRef = useRef<HTMLAudioElement | null>(null);
   const mousePositionRef = useRef<{ x: number; y: number }>({ x: 0.5, y: 0.5 });
@@ -72,7 +72,7 @@ const Orb = ({ className = "", rotationSpeed = -0.08, setId }: OrbProps) => {
         source.connect(analyser);
         source.connect(audioCtx.destination);
 
-        const freqData = new Uint8Array(analyser.frequencyBinCount) as Uint8Array<ArrayBuffer>;
+        const freqData = new Uint8Array(analyser.frequencyBinCount);
         freqDataRef.current = freqData;
         audioContextRef.current = audioCtx;
         analyserRef.current = analyser;
@@ -138,11 +138,18 @@ const Orb = ({ className = "", rotationSpeed = -0.08, setId }: OrbProps) => {
       };
       document.addEventListener('play', onGlobalPlay, true);
 
-      // Extend teardown to also remove the listener
+      // Store cleanup for global play listener
+      const globalPlayCleanup = () => {
+        try { document.removeEventListener('play', onGlobalPlay, true); } catch {}
+      };
+      
+      // Extend teardown to also remove the listener, chaining with any existing teardown
       const prevTeardown = teardownAudioRef.current;
       teardownAudioRef.current = () => {
-        try { document.removeEventListener('play', onGlobalPlay, true); } catch {}
-        if (prevTeardown) prevTeardown();
+        if (prevTeardown) {
+          prevTeardown();
+        }
+        globalPlayCleanup();
       };
     };
 
@@ -239,7 +246,6 @@ const Orb = ({ className = "", rotationSpeed = -0.08, setId }: OrbProps) => {
       if (watermarkObserverRef.current) watermarkObserverRef.current.disconnect();
       if (mouseCleanupRef.current) mouseCleanupRef.current();
       if (teardownAudioRef.current) teardownAudioRef.current();
-      splineRef.current = null;
     };
   }, []);
   return (
