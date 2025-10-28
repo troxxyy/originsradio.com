@@ -203,6 +203,10 @@ function EditableRow({ dayIdx, hour, sets, existing, onSave, onDelete }: { dayId
   }, [existing])
 
   const handleSave = async () => {
+    if (!title.trim()) {
+      alert('Please enter a title')
+      return
+    }
     const start = `${String(hour).padStart(2, '0')}:00`
     await onSave({
       id: existing?.id,
@@ -210,7 +214,7 @@ function EditableRow({ dayIdx, hour, sets, existing, onSave, onDelete }: { dayId
       start_time_local: start,
       duration_minutes: 60,
       content_type: 'set',
-      set_id: setId || null,
+      set_id: setId || null, // Allow null for pending uploads
       stream_url: null,
       title,
       timezone: 'Europe/Istanbul',
@@ -227,20 +231,23 @@ function EditableRow({ dayIdx, hour, sets, existing, onSave, onDelete }: { dayId
       </td>
       <td className="px-3 py-2">
         <select aria-label="Select set" title="Select set" value={setId} onChange={(e) => setSetId(e.target.value)} className="bg-white/10 border border-white/20 rounded px-2 py-1 max-w-[260px]">
-          <option value="">Select set…</option>
+          <option value="">{existing?.set_id ? 'Change set…' : 'Upload coming…'}</option>
           {sets.map((s) => (
             <option key={s.id} value={s.id}>{s.artists?.name ? `${s.artists.name} — ` : ''}{s.title || s.id}</option>
           ))}
         </select>
       </td>
       <td className="px-3 py-2">
-        <input aria-label="Title" title="Title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" className="bg-white/10 border border-white/20 rounded px-2 py-1 w-64" />
+        <input aria-label="Title" title="Title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title (e.g., Artist Name Set)" className="bg-white/10 border border-white/20 rounded px-2 py-1 w-64" />
       </td>
       <td className="px-3 py-2 text-center">
         <label className="inline-flex items-center gap-2">
           <input aria-label="Active" title="Active" type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} />
           <span className="text-sm text-gray-300">Active</span>
         </label>
+        {title && !setId && (
+          <div className="text-xs text-yellow-400 mt-1">⚠️ Set pending upload</div>
+        )}
       </td>
       <td className="px-3 py-2 flex gap-2">
         <button onClick={handleSave} className="px-3 py-1 bg-blue-600 rounded">Save</button>
