@@ -5,22 +5,22 @@ import './index.css'
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://origins.radio'),
-  title: 'OriginsRadio - Ankara\'s Interactive Radio Station',
-  description: 'OriginsRadio - Ankara\'s premier interactive radio station featuring live shows, music, events, and cultural experiences.',
+  title: 'OriginsRadio - Interactive Radio Station',
+  description: 'OriginsRadio - Premier interactive radio station featuring live shows, music, events, and cultural experiences.',
   icons: {
     icon: '/favicon/favicon.ico',
     apple: '/favicon/apple-touch-icon.png',
   },
   openGraph: {
-    title: 'OriginsRadio - Ankara\'s Interactive Radio Station',
-    description: 'OriginsRadio - Ankara\'s premier interactive radio station featuring live shows, music, events, and cultural experiences.',
+    title: 'OriginsRadio - Interactive Radio Station',
+    description: 'OriginsRadio - Premier interactive radio station featuring live shows, music, events, and cultural experiences.',
     type: 'website',
     siteName: 'OriginsRadio',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'OriginsRadio - Ankara\'s Interactive Radio Station',
-    description: 'OriginsRadio - Ankara\'s premier interactive radio station featuring live shows, music, events, and cultural experiences.',
+    title: 'OriginsRadio - Interactive Radio Station',
+    description: 'OriginsRadio - Premier interactive radio station featuring live shows, music, events, and cultural experiences.',
   },
 }
 

@@ -62,14 +62,14 @@ export default function ArtistsPage() {
 
   // SEO Data
   const seoData = {
-    title: "Artists & DJs - Origins Radio | Ankara's Underground Music Scene",
-    description: "Discover talented DJs and music producers from Ankara's underground music scene. Listen to the latest tracks, sets, and performances from resident artists on Origins Radio.",
-    keywords: "DJs, music producers, Ankara, underground music, techno, house, electronic music, Origins Radio, Turkey, artists, musicians",
+    title: "Artists & DJs - Origins Radio | Underground Music Scene",
+    description: "Discover talented DJs and music producers from the underground music scene. Listen to the latest tracks, sets, and performances from resident artists on Origins Radio.",
+    keywords: "DJs, music producers, underground music, techno, house, electronic music, Origins Radio, artists, musicians",
     structuredData: {
       "@context": "https://schema.org",
       "@type": "ItemList",
       "name": "Artists & DJs",
-      "description": "Resident DJs and music producers from Ankara's underground music scene",
+      "description": "Resident DJs and music producers from the underground music scene",
       "url": "https://originsradio.com/artists",
       "numberOfItems": artists?.length || 0,
       "itemListElement": artists?.map((artist, index) => ({

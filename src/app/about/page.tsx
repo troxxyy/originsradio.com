@@ -56,7 +56,7 @@ export default function AboutPage() {
             <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
             <h2 className="text-4xl font-bold mb-8 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent relative">Our Mission</h2>
             <p className="text-gray-300 text-lg mb-6 leading-relaxed relative">
-              Origins Radio is Ankara's premier interactive radio station, dedicated to showcasing the rich diversity of music and culture in our city and beyond.
+              Origins Radio is a premier interactive radio station, dedicated to showcasing the rich diversity of music and culture.
             </p>
             <p className="text-gray-300 text-lg leading-relaxed relative">
               We believe in the power of music to connect people, transcend boundaries, and create meaningful experiences. Our mission is to provide a platform for emerging artists, celebrate local talent, and bring innovative sounds to our listeners.
@@ -67,7 +67,7 @@ export default function AboutPage() {
             <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-cyan-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
             <h2 className="text-4xl font-bold mb-8 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent relative">Our Story</h2>
             <p className="text-gray-300 text-lg mb-6 leading-relaxed relative">
-              Founded in 2023, Origins Radio began as a passion project by a group of music enthusiasts who saw the need for a more diverse and interactive radio experience in Ankara.
+              Founded in 2023, Origins Radio began as a passion project by a group of music enthusiasts who saw the need for a more diverse and interactive radio experience.
             </p>
             <p className="text-gray-300 text-lg leading-relaxed relative">
               What started as small streaming sessions from a makeshift studio has grown into a communitydriven platform that hosts events, supports local artists, and pushes the boundaries of traditional radio.
@@ -90,7 +90,7 @@ export default function AboutPage() {
             </div>
             <div className="p-6 rounded-xl bg-zinc-900/30 hover:bg-zinc-900/50 transition-colors duration-300 border border-transparent hover:border-white/10 hover:shadow-[0_10px_25px_-5px_rgba(59,130,246,0.2)]">
               <h3 className="text-2xl font-semibold mb-4">Local Focus</h3>
-              <p className="text-gray-300 leading-relaxed">We're deeply committed to Ankara's music scene, providing a platform for local artists to reach new audiences.</p>
+              <p className="text-gray-300 leading-relaxed">We're deeply committed to the music scene, providing a platform for local artists to reach new audiences.</p>
             </div>
             <div className="p-6 rounded-xl bg-zinc-900/30 hover:bg-zinc-900/50 transition-colors duration-300 border border-transparent hover:border-white/10 hover:shadow-[0_10px_25px_-5px_rgba(16,185,129,0.2)]">
               <h3 className="text-2xl font-semibold mb-4">Genre Diversity</h3>

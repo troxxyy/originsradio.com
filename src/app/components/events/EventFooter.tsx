@@ -25,11 +25,11 @@ const EventFooter = ({}: EventFooterProps) => {
               <h3 className="text-lg sm:text-xl font-semibold text-white">Origins Radio</h3>
             </div>
             <p className="text-sm sm:text-base text-white/80 leading-relaxed">
-              Ankara's premier interactive radio station bringing you the best in electronic music, live shows, and cultural experiences. We connect artists, music lovers, and the creative community.
+              Premier interactive radio station bringing you the best in electronic music, live shows, and cultural experiences. We connect artists, music lovers, and the creative community.
             </p>
             <div className="flex items-center gap-2 text-sm sm:text-base text-white/70">
               <MapPin className="h-4 w-4" />
-              <span>Ankara, Turkey</span>
+              <span>Turkey</span>
             </div>
           </div>
 
@@ -134,7 +134,7 @@ const EventFooter = ({}: EventFooterProps) => {
               © {currentYear} Origins Radio — All rights reserved.
             </div>
             <div className="text-xs sm:text-sm text-white/50">
-              Made with ♡ in Ankara
+              Made with ♡ by Origins Radio
             </div>
           </div>
         </div>

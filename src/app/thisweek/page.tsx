@@ -61,7 +61,7 @@ const getUpcomingFridayAndSaturday = () => {
   return { friday, saturday };
 };
 
-// Normalized assets mapping for known Ankara clubs
+// Normalized assets mapping for known clubs
 const clubAssetsByNormalizedName: Record<string, { id: ClubIdentifier; name: string; logoSrc: string }> = {
   "backyard secrets": { id: "backyardsecrets", name: "Backyard Secrets", logoSrc: "/clublogos/backyard_ankara.jpg" },
   "carbone": { id: "carbone", name: "Carbone", logoSrc: "/clublogos/carbone_ankara.png" },
@@ -119,16 +119,16 @@ function parseSheetDate(value: string | null): Date | null {
 }
 
 const baseClubs: ClubScheduleItem[] = [
-  { id: "backyardsecrets", name: "Backyard Secrets", location: "Ankara", logoSrc: "/clublogos/backyard_ankara.jpg" },
-  { id: "carbone", name: "Carbone", location: "Ankara", logoSrc: "/clublogos/carbone_ankara.png" },
-  { id: "pixel", name: "Pixel", location: "Ankara", logoSrc: "/clublogos/pixel_ankara.png" },
-  { id: "kite", name: "Kite", location: "Ankara", logoSrc: "/clublogos/kite_ankara.jpg" },
-  { id: "guushouse", name: "Guus House", location: "Ankara", logoSrc: "/clublogos/guus_ankara.jpeg" },
-  { id: "leporte", name: "Le Porte", location: "Ankara", logoSrc: "/clublogos/leporte_ankara.jpeg" },
-  { id: "amykitchen", name: "Amy Kitchen", location: "Ankara", logoSrc: "/clublogos/amy_ankara.jpeg" },
-  { id: "shades", name: "Shades", location: "Ankara", logoSrc: "/clublogos/shades_ankara.png" },
-  { id: "riff", name: "Riff", location: "Ankara", logoSrc: "/clublogos/riff_ankara.jpeg" },
-  { id: "stir", name: "Stir", location: "Ankara", logoSrc: "/clublogos/stir_ankara.jpg" },
+  { id: "backyardsecrets", name: "Backyard Secrets", location: "", logoSrc: "/clublogos/backyard_ankara.jpg" },
+  { id: "carbone", name: "Carbone", location: "", logoSrc: "/clublogos/carbone_ankara.png" },
+  { id: "pixel", name: "Pixel", location: "", logoSrc: "/clublogos/pixel_ankara.png" },
+  { id: "kite", name: "Kite", location: "", logoSrc: "/clublogos/kite_ankara.jpg" },
+  { id: "guushouse", name: "Guus House", location: "", logoSrc: "/clublogos/guus_ankara.jpeg" },
+  { id: "leporte", name: "Le Porte", location: "", logoSrc: "/clublogos/leporte_ankara.jpeg" },
+  { id: "amykitchen", name: "Amy Kitchen", location: "", logoSrc: "/clublogos/amy_ankara.jpeg" },
+  { id: "shades", name: "Shades", location: "", logoSrc: "/clublogos/shades_ankara.png" },
+  { id: "riff", name: "Riff", location: "", logoSrc: "/clublogos/riff_ankara.jpeg" },
+  { id: "stir", name: "Stir", location: "", logoSrc: "/clublogos/stir_ankara.jpg" },
 ];
 
 type CityKey = "ankara" | "istanbul" | "izmir" | "antalya";
@@ -184,7 +184,7 @@ export default function ThisWeekPage() {
         const item: ClubScheduleItem = {
           id: assets.id,
           name: assets.name,
-          location: "Ankara",
+          location: "",
           lineup: event.event_artist ? [event.event_artist] : undefined,
           estimatedPriceTry: Number.isFinite(priceNum as number) ? (priceNum as number) : undefined,
           logoSrc: assets.logoSrc,
@@ -227,7 +227,7 @@ export default function ThisWeekPage() {
         const item: ClubScheduleItem = {
           id: `our-event-${project.id}`,
           name: project.title,
-          location: (project as any).location || "Ankara",
+          location: (project as any).location || "",
           description: project.description as string,
           estimatedPriceTry: (project as any).price || 0,
           eventUrl: (project as any).ticket_url || (project as any).form_url || undefined,
@@ -303,7 +303,7 @@ export default function ThisWeekPage() {
             Updated weekly
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-3">This Week</h1>
-          <p className="text-gray-300 max-w-2xl mx-auto">Friday and Saturday events in Ankara.</p>
+          <p className="text-gray-300 max-w-2xl mx-auto">Friday and Saturday events.</p>
         </div>
 
         {/* City Tabs */}

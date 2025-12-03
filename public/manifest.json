@@ -1,7 +1,7 @@
 {
   "name": "OriginsRadio",
   "short_name": "Origins",
-  "description": "Ankara's premier interactive radio station",
+  "description": "Premier interactive radio station",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",

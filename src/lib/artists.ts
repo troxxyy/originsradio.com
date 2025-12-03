@@ -114,14 +114,14 @@ export async function getArtistSEOData(slug: string): Promise<{
     if (!artist) return null
 
     const artistName = artist.name
-    const artistBio = artist.bio || `Professional DJ and music producer ${artistName} from ${artist.location || 'Ankara'}.`
+    const artistBio = artist.bio || `Professional DJ and music producer ${artistName}${artist.location ? ` from ${artist.location}` : ''}.`
     const artistGenres = artist.genre?.join(', ') || 'Electronic, House, Techno'
-    const artistLocation = artist.location || 'Ankara, Turkey'
+    const artistLocation = artist.location || ''
     const artistPhoto = artist.photo_url || '/placeholder.svg'
     const currentUrl = `https://origins.radio/artists/${slug}`
     
     // Generate SEO-optimized title and description focusing on "DJ" keywords
-    const title = `${artistName} - DJ & Producer | Origins Radio Ankara`
+    const title = `${artistName} - DJ & Producer | Origins Radio`
     const description = `Listen to DJ ${artistName}'s sets and tracks. ${artistGenres} music producer from ${artistLocation}. Book ${artistName} for events at Origins Radio.`
     
     // Generate comprehensive keywords
@@ -131,17 +131,15 @@ export async function getArtistSEOData(slug: string): Promise<{
       'music producer',
       'electronic music',
       ...artist.genre || [],
-      artistLocation,
+      ...(artistLocation ? [artistLocation] : []),
       'Origins Radio',
-      'Ankara',
-      'Turkey',
       'underground music',
       'techno',
       'house music',
       'DJ sets',
       'music events',
       'booking DJ'
-    ].join(', ')
+    ].filter(Boolean).join(', ')
 
     // Structured Data for Rich Search Results
     const structuredData = [
@@ -158,11 +156,11 @@ export async function getArtistSEOData(slug: string): Promise<{
           "@type": "Organization",
           "name": "Origins Radio"
         },
-        "address": {
+        "address": artistLocation ? {
           "@type": "PostalAddress",
-          "addressLocality": artistLocation.split(',')[0]?.trim() || "Ankara",
-          "addressCountry": "Turkey"
-        },
+          "addressLocality": artistLocation.split(',')[0]?.trim(),
+          "addressCountry": artistLocation.includes('Turkey') ? "Turkey" : undefined
+        } : undefined,
         "knowsAbout": artist.genre || ["Electronic Music", "DJing", "Music Production"],
         "hasOccupation": {
           "@type": "Occupation",

@@ -54,7 +54,7 @@ export default function EventsClient({ initialEvents }: EventsClientProps) {
               Events
             </h1>
             <p className="mx-auto max-w-2xl text-lg text-gray-300">
-              Join us for unforgettable electronic music experiences in Ankara
+              Join us for unforgettable electronic music experiences
             </p>
           </motion.div>
 

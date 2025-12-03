@@ -78,7 +78,7 @@ const LoadingScreen = ({
         <h1 className="text-3xl font-bold bg-clip-text text-white">
           origins<span className="text-white">radio</span>
         </h1>
-        <p className="text-muted-foreground text-sm mt-2">Ankara's interactive radio station</p>
+        <p className="text-muted-foreground text-sm mt-2">Interactive radio station</p>
       </div>
     </div>
   );

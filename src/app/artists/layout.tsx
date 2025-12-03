@@ -2,24 +2,20 @@ import { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: {
-    default: 'Artists & DJs - Origins Radio | Electronic Music in Ankara',
+    default: 'Artists & DJs - Origins Radio | Electronic Music',
     template: '%s | Origins Radio',
   },
   description:
-    "Meet the talented DJs and producers of Origins Radio. Discover resident artists, guest selectors, and emerging talent in Ankara's electronic music scene.",
+    "Meet the talented DJs and producers of Origins Radio. Discover resident artists, guest selectors, and emerging talent in the electronic music scene.",
   keywords: [
     'Origins Radio',
-    'Ankara DJs',
+    'DJs',
     'electronic music',
     'techno',
     'house',
     'underground',
-    'Turkey music',
     'radio artists',
     'DJs and producers',
-    'Origins Radio',
-    'Ankara',
-    'Turkey',
     'Electronic Music',
     'Techno',
     'House',
@@ -30,10 +26,6 @@ export const metadata: Metadata = {
     'Music',
     'Events',
     'Booking',
-    'Origins Radio',
-    'Ankara',
-    'Turkey',
-    'Electronic Music',
   ],
   alternates: {
     canonical: '/artists',
@@ -41,7 +33,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Artists & DJs - Origins Radio',
     description:
-      "Discover resident and guest DJs of Origins Radio from Ankara's underground scene.",
+      "Discover resident and guest DJs of Origins Radio from the underground scene.",
     type: 'website',
     url: '/artists',
     siteName: 'OriginsRadio',
@@ -58,7 +50,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Artists & DJs - Origins Radio',
     description:
-      "Discover resident and guest DJs of Origins Radio from Ankara's underground scene.",
+      "Discover resident and guest DJs of Origins Radio from the underground scene.",
     images: ['/originslogo.png'],
   },
   robots: {

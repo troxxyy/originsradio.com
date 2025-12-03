@@ -48,7 +48,7 @@ const TicketPopup = () => {
         
         <img 
           src="/popup.jpg" 
-          alt="Eczodia Event at Pixel Ankara"
+          alt="Eczodia Event at Pixel"
           className="w-full h-auto cursor-pointer rounded-lg shadow-xl"
           onClick={handleImageClick}
         />

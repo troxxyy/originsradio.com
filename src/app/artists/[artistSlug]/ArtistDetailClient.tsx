@@ -123,9 +123,9 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
     if (!artist) return null
 
     const artistName = artist.name
-    const artistBio = artist.bio || `Professional DJ and music producer ${artistName} from ${artist.location || 'Ankara'}.`
+    const artistBio = artist.bio || `Professional DJ and music producer ${artistName}${artist.location ? ` from ${artist.location}` : ''}.`
     const artistGenres = artist.genre?.join(', ') || 'Electronic, House, Techno'
-    const artistLocation = artist.location || 'Ankara, Turkey'
+    const artistLocation = artist.location || ''
     const artistPhoto = artist.photo_url || '/placeholder.svg'
     const currentUrl = `https://originsradio.com/artists/${artistSlug}`
     
@@ -137,14 +137,12 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
       'music producer',
       'electronic music',
       ...artist.genre || [],
-      artistLocation,
+      ...(artistLocation ? [artistLocation] : []),
       'Origins Radio',
-      'Ankara',
-      'Turkey',
       'underground music',
       'techno',
       'house music'
-    ].join(', ')
+    ].filter(Boolean).join(', ')
 
     const structuredData = {
       "@context": "https://schema.org",
@@ -159,11 +157,11 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
         "@type": "Organization",
         "name": "Origins Radio"
       },
-      "address": {
+      "address": artistLocation ? {
         "@type": "PostalAddress",
-        "addressLocality": artistLocation.split(',')[0]?.trim() || "Ankara",
-        "addressCountry": "Turkey"
-      },
+        "addressLocality": artistLocation.split(',')[0]?.trim(),
+        "addressCountry": artistLocation.includes('Turkey') ? "Turkey" : undefined
+      } : undefined,
       "knowsAbout": artist.genre || ["Electronic Music", "DJing", "Music Production"],
       "hasOccupation": {
         "@type": "Occupation",

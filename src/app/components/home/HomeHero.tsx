@@ -1,9 +1,8 @@
 'use client'
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { Ticket, Users, Radio, Navigation, LogIn } from "lucide-react";
+import { Ticket, Users, Radio, Navigation, LogIn, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCurrentRadioSlot } from "@/hooks/use-radio";
 import Orb from "@/components/three/Orb";
@@ -13,191 +12,212 @@ type RouteKey = "events" | "fm" | "artists" | "thisWeek";
 type RouteItem = {
   key: RouteKey;
   href: string;
-  icon: any;
+  icon: React.ElementType;
   text: string;
-  description?: string;
-  position?: string;
+  description: string;
 };
 
-const ScrambleText: React.FC<{
-  text: string;
-  active: boolean;
-  className?: string;
-  onClick?: () => void;
-}> = ({ text, className, onClick }) => {
-  const combinedClass = `${className ?? ""} cursor-pointer`;
-  return (
-    <span className={combinedClass} aria-label={text} onClick={onClick}>
-      {text}
-    </span>
-  );
-};
-
-const initialHoverStates = {
-  events: false,
-  fm: false,
-  artists: false,
-  thisWeek: false,
-};
+const routes: RouteItem[] = [
+  { key: "events", href: "/events", icon: Ticket, text: "Events", description: "Exclusive experiences" },
+  { key: "fm", href: "/radio/schedule", icon: Radio, text: "Radio", description: "Weekly broadcasts" },
+  { key: "artists", href: "/artists", icon: Users, text: "Artists", description: "Join the collective" },
+  { key: "thisWeek", href: "/thisweek", icon: Navigation, text: "This Week", description: "Ankara nightlife" },
+];
 
 const HomeHero: React.FC = () => {
-  const [hoverStates, setHoverStates] = useState<typeof initialHoverStates>(initialHoverStates);
-
+  const [mounted, setMounted] = useState(false);
+  const [hoveredCard, setHoveredCard] = useState<RouteKey | null>(null);
   const { currentSlot } = useCurrentRadioSlot(5000);
   const isLive = !!currentSlot?.isLiveStream;
 
   useEffect(() => {
-    // ensure clean hover state on mount
-    setHoverStates(initialHoverStates);
+    const timer = setTimeout(() => setMounted(true), 100);
+    return () => clearTimeout(timer);
   }, []);
 
-  const headlineClass =
-    "font-black uppercase tracking-tight text-[clamp(3rem,6vw,6.5rem)] leading-[0.9] drop-shadow-[0_0_30px_rgba(59,72,255,0.45)] font-newake pointer-events-auto";
-
-  const sectionClass =
-    "flex flex-col pointer-events-auto cursor-pointer transition-all duration-500 ease-out transform-gpu perspective-1000";
-
-  const textGroupClass =
-    "transition-all duration-700 ease-out transform-gpu pointer-events-auto inline-flex flex-col gap-0 w-fit items-center md:items-start text-center md:text-left group-hover-container";
-
-  const mobileOrder = ["fm", "events", "artists", "thisWeek"] as const;
-
-  const router = useRouter();
-
-  const routes: RouteItem[] = [
-    { key: "events", href: "/events", icon: Ticket, text: "Events", description: "Our Exclusive", position: "top-left" },
-    { key: "fm", href: "/radio/schedule", icon: Radio, text: "Fm", description: "Timetable for Week", position: "top-right" },
-    { key: "artists", href: "/artists", icon: Users, text: "Artists", description: "Join Us", position: "bottom-left" },
-    { key: "thisWeek", href: "/thisweek", icon: Navigation, text: "This Week", description: "In Your City", position: "bottom-right" },
-  ];
-
-  const handleHover = (key: RouteKey, isHovering: boolean) => {
-    setHoverStates(prev => ({ ...prev, [key]: isHovering }));
-  };
-
-  const handleMouseLeave = (key: RouteKey) => {
-    setHoverStates(prev => ({ ...prev, [key]: false }));
-  };
-
-  const LiveStatus: React.FC = () => (
-    <div className="flex items-center gap-2 mt-1">
-      <span className={cn("w-2.5 h-2.5 rounded-full animate-pulse", isLive ? "bg-white" : "bg-red-500")} />
-      <span className="text-sm uppercase tracking-wide text-white/70">{isLive ? "live now" : "currently offline"}</span>
-    </div>
-  );
-
   return (
-    <section className="relative isolate w-full h-screen overflow-hidden bg-transparent">
-      <div className="absolute inset-0 z-10">
-        <Orb className="w-full h-full pointer-events-none" />
+    <section className="relative w-full h-screen overflow-hidden">
+      {/* Deep background */}
+      <div className="absolute inset-0 z-0 bg-[#050508]" />
+      
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 z-[1] bg-gradient-to-b from-transparent via-transparent to-[#050508]/80" />
+      
+      {/* Ambient light effects */}
+      <div className={cn(
+        "absolute w-[800px] h-[800px] rounded-full blur-[150px] transition-opacity duration-1000",
+        "bg-gradient-to-br from-cyan-500/8 to-teal-500/5",
+        "-top-[300px] -left-[300px]",
+        mounted ? "opacity-100" : "opacity-0"
+      )} />
+      <div className={cn(
+        "absolute w-[600px] h-[600px] rounded-full blur-[120px] transition-opacity duration-1000 delay-300",
+        "bg-gradient-to-br from-blue-500/6 to-indigo-500/4",
+        "-bottom-[200px] -right-[200px]",
+        mounted ? "opacity-100" : "opacity-0"
+      )} />
+
+      {/* 3D Orb */}
+      <div className="absolute inset-0 z-10 pointer-events-none">
+        <Orb className="w-full h-full" />
       </div>
 
-      <div className="fixed top-3 right-3 sm:top-6 sm:right-6 z-[80] perspective-1000 pointer-events-auto">
-        <Link
-          href="/artist/login"
-          className="artist-login-btn inline-flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 text-white transition-colors group"
-          aria-label="Artist Login"
-          title="Artist Login"
-        >
-          <LogIn className="w-3 h-3 sm:w-4 sm:h-4 group-hover:scale-110 transition-transform" />
-          <span className="text-xs sm:text-sm font-medium">Artist Login</span>
-        </Link>
-      </div>
+      {/* Artist Login */}
+      <Link
+        href="/artist/login"
+        className={cn(
+          "fixed top-4 right-4 sm:top-6 sm:right-6 z-[80]",
+          "inline-flex items-center gap-2 px-4 py-2.5",
+          "bg-white/[0.04] hover:bg-white/[0.08]",
+          "border border-white/[0.08] hover:border-white/[0.15]",
+          "rounded-full backdrop-blur-xl",
+          "text-white/70 hover:text-white text-sm",
+          "transition-all duration-300 group"
+        )}
+      >
+        <LogIn className="w-4 h-4" strokeWidth={1.5} />
+        <span className="font-medium tracking-wide">Login</span>
+      </Link>
 
-      <div className="pointer-events-auto relative z-30 flex h-full w-full items-center">
-        <div className="pointer-events-auto w-full h-full px-8 md:px-12 lg:px-16 flex flex-col justify-start md:justify-center gap-10 pt-[25vh] md:pt-0 md:-mt-[400px]">
-
-          <div className="w-full flex flex-col items-center gap-6 px-4 sm:px-8 md:hidden justify-center">
-            {mobileOrder.map((key) => {
-              const route = routes.find(r => r.key === key)!;
-              const IconComponent = route.icon;
-              const isHovered = hoverStates[route.key as keyof typeof hoverStates];
-
-              return (
-                <Link key={route.key} href={route.href} className={`${sectionClass} text-white group items-center home-hero-link`}>
-                  <div
-                    className={textGroupClass}
-                    onMouseEnter={() => handleHover(route.key, true)}
-                    onMouseLeave={() => handleMouseLeave(route.key)}
-                  >
-                    <div className="flex items-center gap-3 mb-2 justify-center">
-                      {route.key === "events" ? (
-                        <>
-                          <ScrambleText text={route.text} active={isHovered} className={`${headlineClass} block hover-3d-text`} onClick={() => router.push(route.href)} />
-                          <IconComponent className="w-8 h-8 text-white/80 group-hover:text-white transition-colors" />
-                        </>
-                      ) : (
-                        <>
-                          <ScrambleText text={route.text} active={isHovered} className={`${headlineClass} block hover-3d-text`} onClick={() => router.push(route.href)} />
-                          <IconComponent className="w-8 h-8 text-white/80 group-hover:text-white transition-colors" />
-                        </>
-                      )}
-                    </div>
-
-                    {route.key === "fm" && <LiveStatus />}
-                  </div>
-                </Link>
-              );
-            })}
+      {/* Main Content */}
+      <div className="absolute inset-0 z-[50] flex flex-col items-center justify-center px-4 sm:px-6">
+        {/* Hero Text */}
+        <div className={cn(
+          "text-center mb-12 sm:mb-16 transition-all duration-1000",
+          mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+        )}>
+          {/* Tagline */}
+          <p className={cn(
+            "text-[10px] sm:text-xs tracking-[0.4em] uppercase text-white/40 mb-4 transition-all duration-1000 delay-200",
+            mounted ? "opacity-100" : "opacity-0"
+          )}>
+            Underground Sound
+          </p>
+          
+          {/* Main Title */}
+          <h1 className="font-newake text-6xl sm:text-7xl md:text-8xl lg:text-9xl tracking-tight text-white uppercase leading-none">
+            Origins
+          </h1>
+          
+          {/* Subtitle with glow */}
+          <div className="relative mt-4">
+            <p className="text-sm sm:text-base tracking-[0.35em] uppercase text-white/50 font-light">
+              Radio Collective
+            </p>
+            <div className="absolute inset-0 blur-xl bg-white/5 -z-10" />
           </div>
 
-          <div className="w-full hidden md:flex items-center justify-between px-4 sm:px-8">
-            {routes.slice(0, 2).map((route) => {
-              const IconComponent = route.icon;
-              const isHovered = hoverStates[route.key as keyof typeof hoverStates];
-
-              return (
-                <Link key={route.key} href={route.href} className={`${sectionClass} text-white group items-center home-hero-link`}>
-                  <div className={textGroupClass} onMouseEnter={() => handleHover(route.key, true)} onMouseLeave={() => handleMouseLeave(route.key)}>
-                    <div className="flex items-center gap-3 mb-2">
-                      {route.key === "events" ? (
-                        <>
-                          <IconComponent className="w-8 h-8 text-white/80 group-hover:text-white transition-colors" />
-                          <ScrambleText text={route.text} active={isHovered} className={`${headlineClass} block hover-3d-text`} onClick={() => router.push(route.href)} />
-                        </>
-                      ) : (
-                        <>
-                          <ScrambleText text={route.text} active={isHovered} className={`${headlineClass} block hover-3d-text`} onClick={() => router.push(route.href)} />
-                          <IconComponent className="w-8 h-8 text-white/80 group-hover:text-white transition-colors" />
-                        </>
-                      )}
-                    </div>
-
-                    {route.key === "fm" && <LiveStatus />}
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-
-          <div className="w-full hidden md:flex items-center justify-between px-4 sm:px-8">
-            {routes.slice(2).reverse().map((route) => {
-              const IconComponent = route.icon;
-              const isHovered = hoverStates[route.key as keyof typeof hoverStates];
-
-              return (
-                <Link key={route.key} href={route.href} className={`${sectionClass} text-white group items-center home-hero-link`}>
-                  <div className={textGroupClass} onMouseEnter={() => handleHover(route.key, true)} onMouseLeave={() => handleMouseLeave(route.key)}>
-                    <div className="flex items-center gap-4 mb-2">
-                      {route.key === "thisWeek" ? (
-                        <>
-                          <IconComponent className="w-8 h-8 text-white/80 group-hover:text-white transition-colors" />
-                          <ScrambleText text={route.text} active={isHovered} className={`${headlineClass} block hover-3d-text`} />
-                        </>
-                      ) : (
-                        <>
-                          <ScrambleText text={route.text} active={isHovered} className={`${headlineClass} block hover-3d-text`} />
-                          <IconComponent className="w-8 h-8 text-white/80 group-hover:text-white transition-colors" />
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
+          {/* Live indicator */}
+          <div className={cn(
+            "inline-flex items-center gap-2 mt-6 px-4 py-2 rounded-full",
+            "bg-white/[0.03] border border-white/[0.06]",
+            "transition-all duration-1000 delay-500",
+            mounted ? "opacity-100" : "opacity-0"
+          )}>
+            <span className={cn(
+              "w-2 h-2 rounded-full animate-pulse",
+              isLive ? "bg-emerald-400" : "bg-white/30"
+            )} />
+            <span className="text-xs tracking-widest uppercase text-white/50">
+              {isLive ? "Now Live" : "Listen Soon"}
+            </span>
           </div>
         </div>
+
+        {/* Navigation Cards */}
+        <div className={cn(
+          "grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 w-full max-w-4xl transition-all duration-1000 delay-300",
+          mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
+        )}>
+          {routes.map((route, index) => {
+            const IconComponent = route.icon;
+            const isHovered = hoveredCard === route.key;
+            
+            return (
+              <Link
+                key={route.key}
+                href={route.href}
+                className="group relative"
+                onMouseEnter={() => setHoveredCard(route.key)}
+                onMouseLeave={() => setHoveredCard(null)}
+                style={{ 
+                  transitionDelay: mounted ? `${400 + index * 100}ms` : '0ms'
+                }}
+              >
+                {/* Card glow on hover */}
+                <div className={cn(
+                  "absolute -inset-1 rounded-3xl blur-xl transition-opacity duration-500",
+                  "bg-gradient-to-br from-white/10 to-white/5",
+                  isHovered ? "opacity-100" : "opacity-0"
+                )} />
+                
+                {/* Card */}
+                <div className={cn(
+                  "relative flex flex-col items-center justify-center text-center",
+                  "p-5 sm:p-6 lg:p-7 rounded-2xl sm:rounded-3xl",
+                  "bg-white/[0.02] hover:bg-white/[0.06]",
+                  "border border-white/[0.06] hover:border-white/[0.12]",
+                  "backdrop-blur-2xl",
+                  "transition-all duration-500 ease-out",
+                  "hover:scale-[1.03] hover:-translate-y-2",
+                  "overflow-hidden"
+                )}>
+                  {/* Shine effect */}
+                  <div className={cn(
+                    "absolute inset-0 bg-gradient-to-br from-white/[0.08] via-transparent to-transparent",
+                    "opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  )} />
+                  
+                  {/* Icon */}
+                  <div className={cn(
+                    "mb-4 p-3 rounded-2xl",
+                    "bg-white/[0.04] group-hover:bg-white/[0.08]",
+                    "border border-white/[0.06] group-hover:border-white/[0.1]",
+                    "transition-all duration-500",
+                    "group-hover:scale-110"
+                  )}>
+                    <IconComponent 
+                      className="w-5 h-5 sm:w-6 sm:h-6 text-white/60 group-hover:text-white/90 transition-colors duration-500" 
+                      strokeWidth={1.5} 
+                    />
+                  </div>
+                  
+                  {/* Title */}
+                  <h2 className="font-newake text-base sm:text-lg tracking-wide text-white/90 uppercase mb-1">
+                    {route.text}
+                  </h2>
+                  
+                  {/* Description */}
+                  <p className="text-[10px] sm:text-xs text-white/35 group-hover:text-white/50 tracking-wide transition-colors duration-500">
+                    {route.description}
+                  </p>
+
+                  {/* Arrow indicator */}
+                  <div className={cn(
+                    "absolute bottom-3 right-3 sm:bottom-4 sm:right-4",
+                    "opacity-0 group-hover:opacity-100 transition-all duration-500",
+                    "translate-x-2 group-hover:translate-x-0"
+                  )}>
+                    <ChevronRight className="w-4 h-4 text-white/40" strokeWidth={1.5} />
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Bottom text */}
+        <p className={cn(
+          "mt-12 sm:mt-16 text-[10px] sm:text-xs tracking-[0.25em] uppercase text-white/20",
+          "transition-all duration-1000 delay-700",
+          mounted ? "opacity-100" : "opacity-0"
+        )}>
+          Ankara • Istanbul • Underground
+        </p>
       </div>
+
+      {/* Bottom gradient fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#050508] to-transparent z-[45] pointer-events-none" />
     </section>
   );
 };

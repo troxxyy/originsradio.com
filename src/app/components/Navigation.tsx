@@ -4,10 +4,17 @@ import { Home, Info, Users, Ticket, Navigation as NavigationIcon, BookOpen } fro
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useState, useEffect } from "react";
 
 const Navigation = () => {
   const pathname = usePathname();
-  const isGoCrazyPage = pathname === "/gocrazy";
+  const isHomePage = pathname === "/";
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setMounted(true), 200);
+    return () => clearTimeout(timer);
+  }, []);
   
   const links = [
     { name: "", icon: Home, href: "/" },
@@ -15,50 +22,61 @@ const Navigation = () => {
     { name: "Artists", icon: Users, href: "/artists" },
     { name: "Blog", icon: BookOpen, href: "/blog" },
     { name: "About", icon: Info, href: "/about" },
-    { name: "This Week", icon: NavigationIcon, href: "/thisweek", iconClassName: "animate-red-glow" },
+    { name: "This Week", icon: NavigationIcon, href: "/thisweek" },
   ];
 
-  // Define styles based on current page
-  const navItemClass = isGoCrazyPage 
-    ? "bg-black border border-white/20 px-6 py-3 rounded-full"
-    : "glass px-6 py-3 rounded-full";
-
-  // Add responsive container class
-  const navContainerClass = "fixed top-3 sm:top-6 left-1/2 transform -translate-x-1/2 z-50 flex gap-2 w-auto max-w-[calc(100vw-16px)] px-2";
-
   return (
-    <nav className={navContainerClass}>
-      {/* Home button in its own bubble */}
-      <div className={cn(navItemClass, "px-4 sm:px-6")}>
-        <Link
-          href={links[0].href}
-          className="text-white/100 hover:text-white transition-colors group flex items-center nav-link"
-        >
-          {(() => {
-            const IconComponent = links[0].icon;
-            return <IconComponent className="w-5 h-5" />;
-          })()}
-          <span className="text-sm font-medium hidden group-hover:opacity-100 transition-opacity font-newake">
-            {links[0].name}
-          </span>
-        </Link>
-      </div>
+    <nav className={cn(
+      "fixed top-4 sm:top-6 left-1/2 -translate-x-1/2 z-[70]",
+      "flex items-center gap-1.5",
+      "transition-all duration-700",
+      mounted ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
+    )}>
+      {/* Home button */}
+      <Link
+        href="/"
+        className={cn(
+          "flex items-center justify-center w-10 h-10 rounded-full",
+          "bg-white/[0.04] hover:bg-white/[0.08]",
+          "border border-white/[0.06] hover:border-white/[0.12]",
+          "backdrop-blur-xl",
+          "transition-all duration-300",
+          "hover:scale-105",
+          pathname === "/" && "bg-white/[0.08] border-white/[0.12]"
+        )}
+      >
+        <Home className="w-4 h-4 text-white/70" strokeWidth={1.5} />
+      </Link>
 
-      {/* Other navigation links in a separate bubble */}
-      <div className={cn(navItemClass, "flex items-center gap-4 sm:gap-8 px-6 sm:px-6")}>
-        {links.slice(1).map((link) => (
-          <div key={link.name} className="relative">
+      {/* Other links */}
+      <div className={cn(
+        "flex items-center gap-1 px-2 py-1.5 rounded-full",
+        "bg-white/[0.03] border border-white/[0.05]",
+        "backdrop-blur-xl"
+      )}>
+        {links.slice(1).map((link) => {
+          const isActive = pathname === link.href;
+          
+          return (
             <Link
+              key={link.name}
               href={link.href}
-              className="text-white/100 hover:text-white transition-colors group flex items-center gap-2 px-1 nav-link"
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-2 rounded-full",
+                "transition-all duration-300",
+                "hover:bg-white/[0.06]",
+                isActive 
+                  ? "bg-white/[0.06] text-white/90" 
+                  : "text-white/50 hover:text-white/80"
+              )}
             >
-              {link.icon && <link.icon className={cn("w-5 h-5", (link as any).iconClassName)} />}
-              <span className="nav-label text-sm font-medium hidden sm:inline-block font-newake">
+              <link.icon className="w-4 h-4" strokeWidth={1.5} />
+              <span className="text-xs font-medium tracking-wide hidden sm:inline">
                 {link.name}
               </span>
             </Link>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </nav>
   );

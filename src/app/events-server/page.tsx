@@ -6,8 +6,8 @@ import { Metadata } from 'next'
 export const revalidate = 600
 
 export const metadata: Metadata = {
-  title: 'Events - Origins Radio | Ankara Electronic Music Events',
-  description: 'Discover upcoming electronic music events, shows, and parties in Ankara. Join Origins Radio for unforgettable music experiences.',
+  title: 'Events - Origins Radio | Electronic Music Events',
+  description: 'Discover upcoming electronic music events, shows, and parties. Join Origins Radio for unforgettable music experiences.',
 }
 
 export default async function EventsServerPage() {

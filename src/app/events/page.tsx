@@ -31,7 +31,7 @@ const staticProjects: ProjectUiModel[] = [
     tags: ["invite-only", "lounge"],
     date: "August 29, Friday — Doors 22:00",
     upcoming: true,
-    location: "Backyard Secrets, Ankara",
+    location: "Backyard Secrets",
     formUrl: "/invite/backyardsecretslounge"
   },
   {
@@ -41,7 +41,7 @@ const staticProjects: ProjectUiModel[] = [
     tags: [],
     date: "March 28, 2024",
     upcoming: false,
-    location: "Pixel, Ankara",
+    location: "Pixel",
     ticketUrl: "https://biletino.com/tr/e-126q/eczodia-originsradio-presents-pixel-ankara/",
     tiers: [
       { id: "early", name: "Early Bird", price: 350, currency: "TRY" },
@@ -60,7 +60,7 @@ const staticProjects: ProjectUiModel[] = [
   },
   {
     "title": "AIROD LIVE AT MILYON PERFORMANCE HALL",
-    "description": "On December 13, techno powerhouse AIROD delivered an earth-shattering performance at Milyon Performance Hall, presented by Culter Hot Cage. With a raw, industrial aesthetic and bone-shaking basslines, the event was a sonic explosion that resonated through the crowd. AIROD's signature style, blending deep techno with high-energy rave elements, left the audience in a trance-like state. The event was a landmark night for the Ankara electronic music scene, bringing together ravers from all over Turkey for an experience that felt both intimate and cinematic.",
+    "description": "On December 13, techno powerhouse AIROD delivered an earth-shattering performance at Milyon Performance Hall, presented by Culter Hot Cage. With a raw, industrial aesthetic and bone-shaking basslines, the event was a sonic explosion that resonated through the crowd. AIROD's signature style, blending deep techno with high-energy rave elements, left the audience in a trance-like state. The event was a landmark night for the electronic music scene, bringing together ravers from all over Turkey for an experience that felt both intimate and cinematic.",
     "imageUrl": "/ourwork/airod.PNG",
     "tags": [],
     "date": "December 13, 2024",
@@ -76,7 +76,7 @@ const staticProjects: ProjectUiModel[] = [
   },
   {
     title: "MAYFEST",
-    description: "Pixel Cabin hosted Mayfest Reckoning, a tradition that follows immediately after Mayfest, one of Ankara's oldest festivals, on the night of May 3rd, Friday! In this legendary night, featuring students and alumni of Bilkent University, attendees indulged in all genres of electronic music for 10 hours.",
+    description: "Pixel Cabin hosted Mayfest Reckoning, a tradition that follows immediately after Mayfest, one of the oldest festivals, on the night of May 3rd, Friday! In this legendary night, featuring students and alumni of Bilkent University, attendees indulged in all genres of electronic music for 10 hours.",
     imageUrl: "/ourwork/mayfest.jpeg",
     tags: [],
     date: "May 3, 2023",

@@ -117,7 +117,7 @@ const ConsumerDisclosureDialog = ({
         </p>
         <div className="text-gray-200 text-sm sm:text-base leading-relaxed ml-4">
           <p>Email: info@originsradio.com</p>
-          <p>Address: Origins Medya ve Teknoloji A.Ş., Ankara, Turkey</p>
+          <p>Address: Origins Medya ve Teknoloji A.Ş., Turkey</p>
         </div>
       </div>
     </div>
@@ -216,7 +216,7 @@ const ConsumerDisclosureDialog = ({
         </p>
         <div className="text-gray-200 text-sm sm:text-base leading-relaxed ml-4">
           <p>E-posta: info@originsradio.com</p>
-          <p>Adres: Origins Medya ve Teknoloji A.Ş., Ankara, Türkiye</p>
+          <p>Adres: Origins Medya ve Teknoloji A.Ş., Türkiye</p>
         </div>
       </div>
     </div>
