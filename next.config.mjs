@@ -4,9 +4,6 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   // Optimize for virtual environments and production builds
   output: 'standalone',
   experimental: {
@@ -22,6 +19,8 @@ const nextConfig = {
   },
   // Enable compression
   compress: true,
+  // Turbopack config (empty to silence warning, webpack config still needed for fallbacks)
+  turbopack: {},
   // Optimize bundle size
   webpack: (config, { isServer }) => {
     if (!isServer) {
