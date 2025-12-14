@@ -1,7 +1,7 @@
 'use client'
 
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Ticket, Users, Radio, Navigation, LogIn, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCurrentRadioSlot } from "@/hooks/use-radio";
@@ -31,6 +31,16 @@ const HomeHero: React.FC = () => {
   const { currentSlot } = useCurrentRadioSlot(5000);
   const isMobile = useIsMobile();
   const isLive = !!currentSlot?.isLiveStream;
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => {
+        // Handle autoplay error or user interaction requirement
+        console.log('Autoplay prevented');
+      });
+    }
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => setMounted(true), 50);
@@ -41,6 +51,7 @@ const HomeHero: React.FC = () => {
     <section className="relative w-full h-[100dvh] overflow-hidden bg-black">
       {/* Video Background */}
       <video
+        ref={videoRef}
         autoPlay
         loop
         muted
@@ -60,7 +71,7 @@ const HomeHero: React.FC = () => {
       </video>
       
       {/* Dark overlay for readability */}
-      <div className="absolute inset-0 z-[1] bg-black/42" />
+      <div className="absolute inset-0 z-[1] bg-black/60 sm:bg-black/40" />
       
       {/* Gradient overlay */}
       <div className="absolute inset-0 z-[2] bg-gradient-to-b from-transparent via-transparent to-[#050508]/80" />
@@ -178,8 +189,8 @@ const HomeHero: React.FC = () => {
                 {/* Card */}
                 <div className={cn(
                   "relative flex flex-row sm:flex-col items-center sm:justify-center text-left sm:text-center",
-                  "p-4 sm:p-6 lg:p-8 rounded-[20px] sm:rounded-[28px]",
-                  "liquid-glass-card transform-gpu"
+                  "p-4 sm:p-6 lg:p-8 rounded-[16px] sm:rounded-[28px]",
+                  "liquid-glass-card transform-gpu border border-white/5 sm:border-transparent"
                 )}>
                   {/* Animated light sweep on hover - Apple-style shimmer */}
                   <div className={cn(
