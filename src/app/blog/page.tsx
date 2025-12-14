@@ -12,6 +12,7 @@ import type { Swiper as SwiperType } from 'swiper';
 import 'swiper/css';
 import 'swiper/css/free-mode';
 import ParticlesHeader from '@/components/ui/ParticlesHeader';
+import NaturalBackground from '@/components/ui/NaturalBackground';
 
 export default function BlogPage() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
@@ -116,6 +117,7 @@ export default function BlogPage() {
       
       <PageLayout showFooter={false}>
         <div className="fixed inset-0 blog-page-bg">
+          <NaturalBackground />
           <ParticlesHeader />
           
           {/* Loading State */}

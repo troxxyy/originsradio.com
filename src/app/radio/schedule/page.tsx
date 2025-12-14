@@ -3,6 +3,7 @@
 import { useMemo, useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import PageLayout from '@/components/layout/PageLayout'
+import NaturalBackground from '@/components/ui/NaturalBackground'
 import { useWeeklyRadioSchedule, useCurrentRadioSlot } from '@/hooks/use-radio'
 import { generateSlug } from '@/lib/supabase-utils'
 
@@ -297,8 +298,11 @@ export default function RadioSchedule() {
   }, [data])
 
   return (
-    <PageLayout showFooter={false} customBackground="bg-black">
-      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black text-white">
+    <PageLayout showFooter={false}>
+      {/* Natural warm background */}
+      <NaturalBackground />
+      
+      <div className="min-h-screen text-white">
         {/* Debug info */}
         {currentSlot && (
           <div className="fixed top-20 right-4 z-50 bg-green-500/90 text-white p-4 rounded-lg text-xs max-w-xs">

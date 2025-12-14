@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useState, useEffect, useMemo } from "react";
 import { Calendar, MapPin } from "lucide-react";
 import PageLayout from "@/components/layout/PageLayout";
+import NaturalBackground from "@/components/ui/NaturalBackground";
 import { useOurWorkProjects } from "@/hooks/use-supabase";
 import type { TicketTier } from "@/components/events/TicketPurchaseModal";
 import Link from "next/link";
@@ -336,7 +337,10 @@ export default function EventsPage() {
   );
 
   return (
-    <PageLayout customBackground="bg-gradient-to-br from-black via-gray-900 to-black">
+    <PageLayout>
+      {/* Natural warm background */}
+      <NaturalBackground />
+      
       <div className={`min-h-screen ${isNavigating ? 'navigating' : ''}`}>
         {/* Hero Section */}
         <div className="relative py-20 px-4 sm:px-6 lg:px-8">

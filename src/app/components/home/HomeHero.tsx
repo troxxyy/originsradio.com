@@ -2,37 +2,47 @@
 
 import Link from "next/link";
 import React, { useEffect, useState, useRef } from "react";
-import { Ticket, Users, Radio, Navigation, LogIn, ChevronRight } from "lucide-react";
+import { Ticket, Users, Radio, Navigation, LogIn, BookOpen, Info, Youtube, Instagram, Cloud, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCurrentRadioSlot } from "@/hooks/use-radio";
 import Orb from "@/components/three/Orb";
 import { useIsMobile } from "../../hooks/use-mobile";
+import { useOrbActivation } from "@/contexts/OrbActivationContext";
 
-type RouteKey = "events" | "fm" | "artists" | "thisWeek";
+type RouteKey = "events" | "fm" | "artists" | "blog" | "about" | "thisWeek";
 
 type RouteItem = {
   key: RouteKey;
   href: string;
   icon: React.ElementType;
   text: string;
-  description: string;
+  isComingSoon?: boolean;
 };
 
 const routes: RouteItem[] = [
-  { key: "events", href: "/events", icon: Ticket, text: "Events", description: "Live experiences" },
-  { key: "fm", href: "/radio/schedule", icon: Radio, text: "Radio", description: "Weekly schedule" },
-  { key: "artists", href: "/artists", icon: Users, text: "Artists", description: "Our collective" },
-  { key: "thisWeek", href: "/thisweek", icon: Navigation, text: "This Week", description: "What's happening" },
+  { key: "events", href: "/events", icon: Ticket, text: "Events" },
+  { key: "fm", href: "/radio/schedule", icon: Radio, text: "Radio" },
+  { key: "artists", href: "/artists", icon: Users, text: "Artists" },
+  { key: "about", href: "/about", icon: Info, text: "About" },
+  { key: "thisWeek", href: "/thisweek", icon: Navigation, text: "This Week" },
+];
+
+const socialLinks = [
+  { key: 'youtube', icon: Youtube, url: 'https://www.youtube.com/@originsradiotr', label: 'YouTube' },
+  { key: 'instagram', icon: Instagram, url: 'https://www.instagram.com/origins.radio/', label: 'Instagram' },
+  { key: 'soundcloud', icon: Cloud, url: 'https://on.soundcloud.com/RAQQfrZ27sD539NXA', label: 'SoundCloud' },
+  { key: 'support', icon: Heart, url: 'https://nowpayments.io/payment/?iid=5015396769&source=button', label: 'Support' }
 ];
 
 const HomeHero: React.FC = () => {
   const [mounted, setMounted] = useState(false);
-  const [hoveredCard, setHoveredCard] = useState<RouteKey | null>(null);
+  const [hoveredRoute, setHoveredRoute] = useState<RouteKey | null>(null);
   const [videoOpacity, setVideoOpacity] = useState(0.7);
   const { currentSlot } = useCurrentRadioSlot(5000);
   const isMobile = useIsMobile();
   const isLive = !!currentSlot?.isLiveStream;
   const videoRef = useRef<HTMLVideoElement>(null);
+  const { isOrbActive } = useOrbActivation();
 
   useEffect(() => {
     if (videoRef.current) {
@@ -82,8 +92,8 @@ const HomeHero: React.FC = () => {
           video.volume = 0;
         }}
       >
-        <source src="/website-gif.mov" type="video/quicktime" />
-        <source src="/website-gif.mov" type="video/mp4" />
+        <source src="/website background.mov" type="video/quicktime" />
+        <source src="/website background.mov" type="video/mp4" />
       </video>
       
       {/* Dark overlay for readability */}
@@ -107,7 +117,8 @@ const HomeHero: React.FC = () => {
       )} />
 
       {/* 3D Orb - using mix-blend-mode to show video through */}
-      {!isMobile && (
+      {/* Activated when play or unmute button is pressed */}
+      {!isMobile && isOrbActive && (
         <div className="absolute inset-0 z-10 pointer-events-none mix-blend-screen brightness-[90%] saturate-125">
           <Orb className="w-full h-full" />
         </div>
@@ -134,7 +145,7 @@ const HomeHero: React.FC = () => {
       <div className="absolute inset-0 z-[50] flex flex-col items-center justify-center px-4 sm:px-6">
         {/* Hero Text */}
         <div className={cn(
-          "text-center mb-8 sm:mb-16 transition-all duration-700",
+          "text-center mb-10 sm:mb-16 transition-all duration-700",
           mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
         )}>
           {/* Tagline */}
@@ -175,82 +186,91 @@ const HomeHero: React.FC = () => {
           </div>
         </div>
 
-        {/* Navigation Cards */}
+        {/* Central Layout Container */}
         <div className={cn(
-          "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 w-full max-w-4xl transition-all duration-200 delay-100",
+          "flex flex-col items-center gap-6 sm:gap-8 w-full max-w-4xl mx-auto",
+          "transition-all duration-700 delay-200",
           mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
         )}>
-          {routes.map((route, index) => {
-            const IconComponent = route.icon;
-            const isHovered = hoveredCard === route.key;
-            
-            return (
-              <Link
-                key={route.key}
-                href={route.href}
-                className="group relative"
-                onMouseEnter={() => setHoveredCard(route.key)}
-                onMouseLeave={() => setHoveredCard(null)}
-                style={{ 
-                  transitionDelay: mounted ? `${200 + index * 75}ms` : '0ms'
-                }}
-              >
-                {/* Card */}
-                <div className={cn(
-                  "relative flex flex-row sm:flex-col items-center sm:justify-center text-left sm:text-center",
-                  "p-4 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl",
-                  "bg-white/[0.02] backdrop-blur-sm border border-white/[0.05]",
-                  "hover:bg-white/[0.04] hover:border-white/[0.08]",
-                  "transition-all duration-300 ease-out"
-                )}>
-                  {/* Icon container - minimal transparent */}
+          {/* Big Navigation Panel */}
+          <nav className={cn(
+            "flex flex-wrap items-center justify-center p-2 rounded-[2rem] sm:rounded-full",
+            "bg-white/[0.03] backdrop-blur-xl border border-white/[0.08]",
+            "shadow-2xl shadow-black/20",
+            "max-w-full"
+          )}>
+            {routes.map((route, index) => {
+              const IconComponent = route.icon;
+              const isHovered = hoveredRoute === route.key;
+              
+              return (
+                <Link
+                  key={route.key}
+                  href={route.href}
+                  className="group relative outline-none"
+                  onMouseEnter={() => setHoveredRoute(route.key)}
+                  onMouseLeave={() => setHoveredRoute(null)}
+                >
                   <div className={cn(
-                    "relative z-10 mr-4 sm:mr-0 sm:mb-4 p-3 sm:p-3.5 rounded-xl",
-                    "bg-white/[0.03] border border-white/[0.05]",
-                    "backdrop-blur-sm",
+                    "relative flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 rounded-full",
                     "transition-all duration-300 ease-out",
-                    "group-hover:bg-white/[0.06] group-hover:border-white/[0.1]"
+                    "hover:bg-white/[0.08]",
+                    "active:scale-95"
                   )}>
                     <IconComponent 
                       className={cn(
-                        "w-5 h-5 sm:w-6 sm:h-6 transition-all duration-300",
-                        "text-white/50 group-hover:text-white/80"
-                      )}
-                      strokeWidth={1.5} 
+                        "w-5 h-5 transition-colors duration-300",
+                        "text-white/50 group-hover:text-white"
+                      )} 
+                      strokeWidth={1.5}
                     />
-                  </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    {/* Title */}
-                    <h2 className="relative z-10 font-newake text-base sm:text-lg tracking-wide text-white/80 group-hover:text-white/95 uppercase mb-1 transition-colors duration-300">
+                    <span className={cn(
+                      "font-newake text-base sm:text-lg tracking-wide uppercase",
+                      "text-white/60 group-hover:text-white",
+                      "transition-colors duration-300"
+                    )}>
                       {route.text}
-                    </h2>
-                    
-                    {/* Description */}
-                    <p className="relative z-10 text-[10px] sm:text-xs leading-snug text-white/40 group-hover:text-white/60 tracking-wide transition-colors duration-300 truncate sm:whitespace-normal">
-                      {route.description}
-                    </p>
+                    </span>
                   </div>
+                </Link>
+              );
+            })}
+          </nav>
 
-                  {/* Arrow indicator - minimal reveal */}
-                  <div className={cn(
-                    "absolute bottom-3 right-3 sm:bottom-4 sm:right-4 z-10",
-                    "opacity-0 group-hover:opacity-60 transition-all duration-300 ease-out",
-                    "translate-x-1 group-hover:translate-x-0"
-                  )}>
-                    <ChevronRight className="w-4 h-4 text-white/40" strokeWidth={1.5} />
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
+          {/* Social Bubbles */}
+          <div className="flex items-center gap-3 sm:gap-4">
+            {socialLinks.map((link, index) => {
+              const IconComponent = link.icon;
+              return (
+                <a
+                  key={link.key}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cn(
+                    "flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full",
+                    "bg-white/[0.03] border border-white/[0.08] backdrop-blur-md",
+                    "hover:bg-white/[0.1] hover:scale-110 hover:-translate-y-1",
+                    "transition-all duration-300 ease-out",
+                    "group"
+                  )}
+                  aria-label={link.label}
+                >
+                  <IconComponent 
+                    className="w-4 h-4 sm:w-5 sm:h-5 text-white/40 group-hover:text-white transition-colors" 
+                    strokeWidth={1.5}
+                  />
+                </a>
+              );
+            })}
+          </div>
         </div>
 
         {/* Bottom text */}
         <p className={cn(
-          "mt-8 sm:mt-16 text-[10px] sm:text-xs tracking-[0.25em] uppercase text-white",
+          "mt-12 sm:mt-16 text-[10px] sm:text-xs tracking-[0.25em] uppercase text-white/30",
           "transition-all duration-700 delay-400",
-          mounted ? "opacity-100" : "opacity-100"
+          mounted ? "opacity-100" : "opacity-0"
         )}>
           Ankara • Istanbul • Bali
         </p>

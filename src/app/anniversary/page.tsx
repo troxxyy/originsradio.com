@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Helmet } from "react-helmet-async";
 import PageLayout from "@/components/layout/PageLayout";
 import Navigation from "@/components/Navigation";
+import NaturalBackground from "@/components/ui/NaturalBackground";
 import { Clock, Radio, Calendar, Music, Sparkles, Play } from "lucide-react";
 import ParticlesHeader from "@/components/ui/ParticlesHeader";
 
@@ -218,7 +219,8 @@ export default function AnniversaryPage() {
         <meta name="description" content="Experience our epic 24-hour anniversary celebration featuring amazing sets from our talented artists." />
       </Helmet>
       
-      <PageLayout customBackground="bg-gradient-to-br from-blue-950 via-gray-900 to-cyan-950">
+      <PageLayout>
+        <NaturalBackground />
         <ParticlesHeader />
         <Navigation />
         

@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { LogIn } from 'lucide-react';
 import PageLayout from '@/components/layout/PageLayout';
+import NaturalBackground from '@/components/ui/NaturalBackground';
 import { useArtists } from '@/hooks/use-supabase';
 import { generateSlug } from '@/lib/supabase-utils';
 import { cn } from '@/lib/utils';
@@ -93,7 +94,10 @@ export default function ArtistsPage() {
   };
 
   return (
-    <PageLayout customBackground="bg-gradient-to-br from-black via-gray-900 to-black">
+    <PageLayout>
+      {/* Natural warm background */}
+      <NaturalBackground />
+      
       {/* Artist Login button (fixed, top-right) */}
       <div className={cn(
         "fixed z-50",

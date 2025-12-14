@@ -12,6 +12,7 @@ import Navigation from "@/components/Navigation"
 import TicketPopup from "@/components/TicketPopup"
 import MusicPlayer from "@/components/music/MusicPlayer"
 import { AudioVisualizerProvider } from "@/contexts/AudioVisualizerContext"
+import { OrbActivationProvider } from "@/contexts/OrbActivationContext"
 
 const ONE_HOUR = 60 * 60 * 1000
 
@@ -62,9 +63,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <HelmetProvider>
         <TooltipProvider>
           <AudioVisualizerProvider>
-            <Toaster />
-            <Sonner />
-            <TicketPopup />
+            <OrbActivationProvider>
+              <Toaster />
+              <Sonner />
+              <TicketPopup />
 
             {/* Loading Screen */}
             {isLoading && <LoadingScreen onLoadingComplete={handleLoadingComplete} />}
@@ -72,12 +74,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
             {/* Main Content - Only render after loading */}
             {!isLoading && (
               <>
-                <Navigation />
+                {pathname !== "/" && <Navigation />}
                 {/* Only render MusicPlayer on non-admin pages to avoid interference with admin functionality */}
                 {!isAdminPage && <MusicPlayer />}
                 {children}
               </>
             )}
+            </OrbActivationProvider>
           </AudioVisualizerProvider>
         </TooltipProvider>
       </HelmetProvider>

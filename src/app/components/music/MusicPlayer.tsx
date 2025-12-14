@@ -6,10 +6,12 @@ import { useCurrentRadioSlot } from '@/hooks/use-radio';
 import { useSets } from '@/hooks/use-supabase';
 import { buildProxiedUrl } from '@/lib/audioProxy';
 import { useAudioVisualizer } from '@/contexts/AudioVisualizerContext';
+import { useOrbActivation } from '@/contexts/OrbActivationContext';
 
 const MusicPlayer = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const { registerAudioElement } = useAudioVisualizer();
+  const { activateOrb } = useOrbActivation();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isAudioLoading, setIsAudioLoading] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -156,6 +158,7 @@ const MusicPlayer = () => {
         setIsAudioLoading(true);
         await audio.play();
         setIsPlaying(true);
+        activateOrb(); // Activate orb when play is pressed
       }
     } catch (e) {
       // eslint-disable-next-line no-console
@@ -175,6 +178,10 @@ const MusicPlayer = () => {
     }
     setIsMuted(next);
     localStorage.setItem('or_player_muted', next ? '1' : '0');
+    // Activate orb when unmuting
+    if (!next) {
+      activateOrb();
+    }
   };
 
   // Apply source and initial position when the URL or slot changes
@@ -208,7 +215,10 @@ const MusicPlayer = () => {
              const dur = (isFinite(audio.duration) && audio.duration > 0) ? audio.duration : (setDurationSeconds ?? 0);
              const seekTime = dur > 0 ? (startOffsetSeconds % dur) : 0;
              audio.currentTime = seekTime;
-             audio.play().then(() => setIsPlaying(true)).catch(() => {});
+             audio.play().then(() => {
+               setIsPlaying(true);
+               activateOrb(); // Activate orb when live stream auto-plays
+             }).catch(() => {});
           } else {
             // On-demand playback
             const dur = isFinite(audio.duration) ? audio.duration : (setDurationSeconds ?? undefined);
@@ -240,7 +250,10 @@ const MusicPlayer = () => {
     
     // Ensure playing if live
     if (audio.paused && !isPlaying) {
-       audio.play().then(() => setIsPlaying(true)).catch(() => {});
+       audio.play().then(() => {
+         setIsPlaying(true);
+         activateOrb(); // Activate orb when live stream resumes
+       }).catch(() => {});
     }
   }, [isLive, startOffsetSeconds, setDurationSeconds, streamUrl, isPlaying]);
 
@@ -255,7 +268,7 @@ const MusicPlayer = () => {
       if (isLive) {
         // For live, loop back to start
         audio.currentTime = 0;
-        audio.play().catch(() => {});
+        audio.play().then(() => activateOrb()).catch(() => {});
       } else {
         setIsPlaying(false);
       }
@@ -313,115 +326,132 @@ const MusicPlayer = () => {
       {/* Floating Mini Player */}
       <div className="fixed left-0 right-0 bottom-2 sm:bottom-4 md:bottom-10 z-[200] flex justify-center pointer-events-auto px-2 sm:px-4 pb-[calc(env(safe-area-inset-bottom)+4px)] sm:pb-[calc(env(safe-area-inset-bottom)+8px)]">
         <div className="w-full sm:w-[768px] max-w-full">
-          <div className="relative glass rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.35)] h-12 sm:h-14 md:h-16 px-3 sm:px-4 md:px-6 grid items-center grid-cols-[auto_1fr_auto] gap-1 sm:gap-2 bg-white/[0.03] border-white/5">
-              {/* Left: Live Badge */}
-              <div className="flex items-center justify-self-start">
-                {isLive ? (
-                  <div className="flex items-center gap-1 bg-green-500/20 border border-green-500/50 rounded-full px-1.5 sm:px-2 py-0.5 sm:py-1 flex-shrink-0">
-                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                    <span className="text-green-400 text-[9px] sm:text-xs font-semibold uppercase tracking-wide whitespace-nowrap">Live</span>
-                  </div>
-                ) : (
+          <div className="relative glass rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.35)] bg-white/[0.03] border-white/5">
+            {/* Offline fallback content inside music bar */}
+            {!streamUrl && !isScheduleLoading ? (
+              <div className="h-12 sm:h-14 md:h-16 px-3 sm:px-4 md:px-6 grid items-center grid-cols-[auto_1fr_auto] gap-1 sm:gap-2">
+                {/* Left: Not Live Badge */}
+                <div className="flex items-center justify-self-start">
                   <div className="flex items-center gap-1 bg-transparent border border-white/20 rounded-full px-1.5 sm:px-2 py-0.5 sm:py-1 flex-shrink-0">
                     <span className="text-white/60 text-[9px] sm:text-xs font-semibold uppercase tracking-wide whitespace-nowrap">Not Live</span>
                   </div>
-                )}
-              </div>
+                </div>
 
-              {/* Center: Title + Artist */}
-              <div className="flex flex-col items-center justify-center leading-tight min-w-0 text-center">
-                {artistSlug ? (
-                  <Link
-                    href={`/artists/${artistSlug}`}
-                    className="text-white/90 text-xs sm:text-sm md:text-base truncate max-w-[calc(100vw-200px)] sm:max-w-[280px] md:max-w-[340px] hover:text-white underline-offset-4 hover:underline"
-                    title={`Go to ${nowArtist} profile`}
-                  >
-                    {nowArtist}
-                  </Link>
-                ) : (
-                  <span className="text-white/90 text-xs sm:text-sm md:text-base truncate max-w-[calc(100vw-200px)] sm:max-w-[280px] md:max-w-[340px]">
-                    {nowArtist}
-                  </span>
-                )}
-                {nowDate && (
-                  <span className="text-white/40 text-[9px] sm:text-[10px] md:text-xs truncate max-w-[calc(100vw-200px)] sm:max-w-[280px] md:max-w-[340px]">
-                    {nowDate}
-                  </span>
-                )}
-              </div>
-
-              {/* Right: Play (starts audio) / Mute (while playing) */}
-              <div className="flex items-center justify-center justify-self-end">
-                <button
-                  onClick={togglePlayPause}
-                  disabled={isPlayDisabled}
-                  className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/15 border border-white/10 flex items-center justify-center shadow-md disabled:opacity-50 touch-manipulation"
-                  aria-label={isPlaying ? (isMuted ? "Unmute" : "Mute") : "Play"}
-                  title={!streamUrl ? 'Go live or select a set to play' : undefined}
-                >
-                  {isAudioLoading ? (
-                    <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  ) : isPlaying ? (
-                    isMuted ? (
-                      <VolumeX size={16} className="sm:w-[18px] sm:h-[18px] text-white" />
-                    ) : (
-                      <Volume2 size={16} className="sm:w-[18px] sm:h-[18px] text-white" />
-                    )
+                {/* Center: Latest Set Info */}
+                <div className="flex flex-col items-center justify-center leading-tight min-w-0 text-center">
+                  {latestSet ? (
+                    <>
+                      <div className="text-white/90 text-xs sm:text-sm md:text-base truncate max-w-[calc(100vw-200px)] sm:max-w-[280px] md:max-w-[340px]">
+                        {(latestSet as any).title || 'Latest Set'}
+                      </div>
+                      <div className="text-white/60 text-[9px] sm:text-[10px] md:text-xs truncate max-w-[calc(100vw-200px)] sm:max-w-[280px] md:max-w-[340px]">
+                        {(latestSet as any).artists?.name || 'Origins Radio'}
+                      </div>
+                    </>
                   ) : (
-                    <Play size={16} className="sm:w-[18px] sm:h-[18px] text-white ml-0.5" />
+                    <div className="text-white/60 text-xs sm:text-sm">No sets available</div>
                   )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+                </div>
 
-      {/* Offline fallback: Not live with latest set option */}
-      {!streamUrl && !isScheduleLoading && (
-        <div className="fixed left-0 right-0 bottom-20 sm:bottom-28 z-[190] flex justify-center px-2 sm:px-4 pb-[calc(env(safe-area-inset-bottom)+4px)] sm:pb-[calc(env(safe-area-inset-bottom)+8px)]">
-          <div className="flex flex-col items-center justify-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-xl sm:rounded-2xl glass bg-white/[0.03] border-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.35)] max-w-[calc(100%-16px)] sm:max-w-md">
-            <div className="text-white/60 text-xs sm:text-sm font-semibold uppercase tracking-wide">Not Live</div>
-            <div className="text-white/80 text-center text-xs sm:text-sm px-1">
-              We’re off-air. You can play the latest uploaded set:
-            </div>
-            {latestSet ? (
-              <div className="w-full text-left bg-white/5 border border-white/10 rounded-lg sm:rounded-xl p-2.5 sm:p-3">
-                <div className="text-white/90 text-xs sm:text-sm truncate">{(latestSet as any).title || 'Latest Set'}</div>
-                <div className="text-white/60 text-[10px] sm:text-xs truncate">{(latestSet as any).artists?.name || 'Origins Radio'}</div>
-                <div className="text-white/40 text-[9px] sm:text-[10px] mt-1">{formatDate((latestSet as any).release_date)}</div>
+                {/* Right: Play Button */}
+                <div className="flex items-center justify-center justify-self-end">
+                  <button
+                    disabled={!latestSet || isSetsLoading}
+                    onClick={async () => {
+                      if (!latestSet) return;
+                      setOnDemandSetUrl(latestSet.audio_url);
+                      setOnDemandTitle((latestSet as any).title || 'Latest Set');
+                      const artistName = (latestSet as any).artists?.name || 'Origins Radio';
+                      setOnDemandArtist(artistName);
+                      setTimeout(async () => {
+                        const audio = audioRef.current;
+                        if (!audio) return;
+                        try {
+                          await audio.play();
+                          setIsPlaying(true);
+                          activateOrb(); // Activate orb when play is pressed
+                        } catch (e) {
+                          // eslint-disable-next-line no-console
+                          console.error('Failed to start latest set', e);
+                        }
+                      }, 0);
+                    }}
+                    className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/15 border border-white/10 flex items-center justify-center shadow-md disabled:opacity-50 touch-manipulation"
+                    aria-label="Play latest set"
+                  >
+                    {isSetsLoading ? (
+                      <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Play size={16} className="sm:w-[18px] sm:h-[18px] text-white ml-0.5" />
+                    )}
+                  </button>
+                </div>
               </div>
             ) : (
-              <div className="text-white/60 text-xs sm:text-sm">No sets available</div>
+              <div className="h-12 sm:h-14 md:h-16 px-3 sm:px-4 md:px-6 grid items-center grid-cols-[auto_1fr_auto] gap-1 sm:gap-2">
+                {/* Left: Live Badge */}
+                <div className="flex items-center justify-self-start">
+                  {isLive ? (
+                    <div className="flex items-center gap-1 bg-green-500/20 border border-green-500/50 rounded-full px-1.5 sm:px-2 py-0.5 sm:py-1 flex-shrink-0">
+                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                      <span className="text-green-400 text-[9px] sm:text-xs font-semibold uppercase tracking-wide whitespace-nowrap">Live</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1 bg-transparent border border-white/20 rounded-full px-1.5 sm:px-2 py-0.5 sm:py-1 flex-shrink-0">
+                      <span className="text-white/60 text-[9px] sm:text-xs font-semibold uppercase tracking-wide whitespace-nowrap">Not Live</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Center: Title + Artist */}
+                <div className="flex flex-col items-center justify-center leading-tight min-w-0 text-center">
+                  {artistSlug ? (
+                    <Link
+                      href={`/artists/${artistSlug}`}
+                      className="text-white/90 text-xs sm:text-sm md:text-base truncate max-w-[calc(100vw-200px)] sm:max-w-[280px] md:max-w-[340px] hover:text-white underline-offset-4 hover:underline"
+                      title={`Go to ${nowArtist} profile`}
+                    >
+                      {nowArtist}
+                    </Link>
+                  ) : (
+                    <span className="text-white/90 text-xs sm:text-sm md:text-base truncate max-w-[calc(100vw-200px)] sm:max-w-[280px] md:max-w-[340px]">
+                      {nowArtist}
+                    </span>
+                  )}
+                  {nowDate && (
+                    <span className="text-white/40 text-[9px] sm:text-[10px] md:text-xs truncate max-w-[calc(100vw-200px)] sm:max-w-[280px] md:max-w-[340px]">
+                      {nowDate}
+                    </span>
+                  )}
+                </div>
+
+                {/* Right: Play (starts audio) / Mute (while playing) */}
+                <div className="flex items-center justify-center justify-self-end">
+                  <button
+                    onClick={togglePlayPause}
+                    disabled={isPlayDisabled}
+                    className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/15 border border-white/10 flex items-center justify-center shadow-md disabled:opacity-50 touch-manipulation"
+                    aria-label={isPlaying ? (isMuted ? "Unmute" : "Mute") : "Play"}
+                    title={!streamUrl ? 'Go live or select a set to play' : undefined}
+                  >
+                    {isAudioLoading ? (
+                      <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : isPlaying ? (
+                      isMuted ? (
+                        <VolumeX size={16} className="sm:w-[18px] sm:h-[18px] text-white" />
+                      ) : (
+                        <Volume2 size={16} className="sm:w-[18px] sm:h-[18px] text-white" />
+                      )
+                    ) : (
+                      <Play size={16} className="sm:w-[18px] sm:h-[18px] text-white ml-0.5" />
+                    )}
+                  </button>
+                </div>
+              </div>
             )}
-            <button
-              disabled={!latestSet || isSetsLoading}
-              onClick={async () => {
-                if (!latestSet) return;
-                setOnDemandSetUrl(latestSet.audio_url);
-                setOnDemandTitle((latestSet as any).title || 'Latest Set');
-                // artists may be joined; fall back to 'Origins Radio'
-                const artistName = (latestSet as any).artists?.name || 'Origins Radio';
-                setOnDemandArtist(artistName);
-                // Small delay to ensure audio element binds new src
-                setTimeout(async () => {
-                  const audio = audioRef.current;
-                  if (!audio) return;
-                  try {
-                    await audio.play();
-                    setIsPlaying(true);
-                  } catch (e) {
-                    // eslint-disable-next-line no-console
-                    console.error('Failed to start latest set', e);
-                  }
-                }, 0);
-              }}
-              className="w-full sm:w-auto px-4 py-2 sm:py-2.5 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/15 border border-white/10 text-white/90 text-xs sm:text-sm disabled:opacity-50 touch-manipulation"
-            >
-              {isSetsLoading ? 'Loading latest set…' : latestSet ? 'Play latest set' : 'No sets available'}
-            </button>
           </div>
         </div>
-      )}
+      </div>
 
       <audio ref={audioRef} preload="auto" crossOrigin="anonymous" />
     </>

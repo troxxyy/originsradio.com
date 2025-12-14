@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Calendar, MapPin, Users, Ticket, Clock, Wrench } from "lucide-react";
 import PageLayout from "@/components/layout/PageLayout";
+import NaturalBackground from "@/components/ui/NaturalBackground";
 import { useThisWeekEventsByDate, useOurWorkProjects } from "@/hooks/use-supabase";
 
 type ClubIdentifier =
@@ -294,7 +295,10 @@ export default function ThisWeekPage() {
   );
 
   return (
-    <PageLayout customBackground="bg-gradient-to-br from-black via-gray-900 to-black">
+    <PageLayout>
+      {/* Natural warm background */}
+      <NaturalBackground />
+      
       <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
         {/* Hero */}
         <div className="text-center mb-12">

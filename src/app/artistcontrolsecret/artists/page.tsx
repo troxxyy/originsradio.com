@@ -1062,6 +1062,10 @@ export default function AdminArtistsPage() {
                       'UK Funky',
                       'UK Garage',
                       'Zouk',
+                      'Organic House',
+                      'Progressive House',
+                      'Bounce House',
+                      'Progressive Techno',
                     ].map(genre => (
                       <button
                         key={genre}

@@ -4,6 +4,7 @@ import { useMemo, useState, useEffect, type CSSProperties } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import PageLayout from "@/components/layout/PageLayout";
+import NaturalBackground from "@/components/ui/NaturalBackground";
 import { Calendar, MapPin, Ticket, ArrowLeft, Share2 } from "lucide-react";
 import TicketPurchaseModal, { TicketTier } from "@/components/events/TicketPurchaseModal";
 import EventRules from "@/components/events/EventRules";
@@ -271,9 +272,10 @@ export default function EventDetailPage() {
 
   return (
     <PageLayout
-      customBackground={bgStyle ? undefined : "bg-gradient-to-br from-black via-gray-900 to-black"}
       customBackgroundStyle={bgStyle}
     >
+      {/* Natural warm background (shows when no event image) */}
+      {!bgStyle && <NaturalBackground />}
       <div className="min-h-screen">
         {/* Top section with back button */}
         <div className="relative px-6 pt-28 sm:px-8 lg:px-12">

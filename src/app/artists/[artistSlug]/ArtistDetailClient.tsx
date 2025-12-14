@@ -21,6 +21,7 @@ import {
   Eye
 } from 'lucide-react'
 import PageLayout from '@/components/layout/PageLayout'
+import NaturalBackground from '@/components/ui/NaturalBackground'
 import { useArtistBySlug, useTracksByArtist, useEventsByArtist, useSetsByArtist, useArtistLikeCount, useArtistLikeStatus, useToggleArtistLike } from '@/hooks/use-supabase'
 import ArtistSetItem, { ArtistSetEvent } from '@/components/music/ArtistSetItem'
 import { getSupabaseClient } from '@/lib/supabase'
@@ -458,7 +459,10 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
   }
 
   return (
-    <PageLayout customBackground="bg-gradient-to-br from-black via-gray-900 to-black">
+    <PageLayout>
+      {/* Natural warm background */}
+      <NaturalBackground />
+      
       <Helmet>
         {seoData && (
           <>

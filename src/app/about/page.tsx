@@ -6,7 +6,39 @@ import Navigation from "@/components/Navigation";
 import SocialBubbles from "@/components/social/SocialBubbles";
 import TeamSection from "@/components/home/TeamSection";
 import { Rocket, Users, Radio, Globe, Music, Star, ChevronDown } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import Image from 'next/image';
+import NaturalBackground from '@/components/ui/NaturalBackground';
+
+// About page event photos
+const aboutImages = [
+  '/origins-aboutimage/567949539_18408359101190686_3706084319895230549_n.jpg',
+  '/origins-aboutimage/568018821_18408359083190686_6401480919082689231_n.jpg',
+  '/origins-aboutimage/568281291_18408359002190686_1332424567133244148_n.jpg',
+  '/origins-aboutimage/568406581_18408359056190686_2980302082904075963_n.jpg',
+  '/origins-aboutimage/568638018_18408359146190686_1706852911949315753_n.jpg',
+  '/origins-aboutimage/568673904_18408359137190686_223340303331738417_n.jpg',
+  '/origins-aboutimage/568696680_18408358981190686_6910519163900839445_n.jpg',
+  '/origins-aboutimage/568747590_18408359047190686_3590576891216392853_n.jpg',
+  '/origins-aboutimage/568906143_18408359011190686_8799830714360297345_n.jpg',
+  '/origins-aboutimage/569029709_18408359029190686_2025088144231072466_n.jpg',
+  '/origins-aboutimage/569066725_18408359128190686_2614623633597991346_n.jpg',
+];
+
+// Floating photo positions - distributed across the page
+const photoPositions = [
+  { top: '5%', left: '3%', rotate: -12, size: 'w-40 h-56 md:w-52 md:h-72' },
+  { top: '8%', right: '5%', rotate: 8, size: 'w-36 h-48 md:w-44 md:h-60' },
+  { top: '25%', left: '2%', rotate: 6, size: 'w-32 h-44 md:w-40 md:h-56' },
+  { top: '20%', right: '3%', rotate: -15, size: 'w-44 h-60 md:w-56 md:h-76' },
+  { top: '45%', left: '4%', rotate: -8, size: 'w-36 h-52 md:w-48 md:h-64' },
+  { top: '50%', right: '2%', rotate: 10, size: 'w-40 h-52 md:w-52 md:h-68' },
+  { top: '70%', left: '3%', rotate: 14, size: 'w-32 h-44 md:w-44 md:h-60' },
+  { top: '68%', right: '4%', rotate: -6, size: 'w-38 h-50 md:w-48 md:h-64' },
+  { top: '88%', left: '5%', rotate: -10, size: 'w-36 h-48 md:w-44 md:h-58' },
+  { top: '85%', right: '6%', rotate: 12, size: 'w-40 h-56 md:w-52 md:h-72' },
+  { top: '110%', left: '4%', rotate: 5, size: 'w-36 h-48 md:w-46 md:h-62' },
+];
 
 export default function AboutPage() {
   const [isRoadmapOpen, setIsRoadmapOpen] = useState(false);
@@ -16,13 +48,93 @@ export default function AboutPage() {
     window.scrollTo(0, 0);
   }, []);
 
+  // Memoize shuffled images to prevent re-shuffling on re-renders
+  const shuffledImages = useMemo(() => {
+    return [...aboutImages].sort(() => Math.random() - 0.5);
+  }, []);
+
   return (
     <PageLayout backgroundImage="/about-background.jpg">
-      {/* Simplified static background gradient */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/30 via-transparent to-blue-900/30"></div>
-        <div className="absolute right-0 bottom-0 w-1/2 h-1/2 rounded-full bg-gradient-to-r from-blue-600/10 to-cyan-600/10 blur-3xl transform-gpu"></div>
-        <div className="absolute left-0 top-0 w-1/2 h-1/2 rounded-full bg-gradient-to-r from-indigo-600/10 to-purple-600/10 blur-3xl transform-gpu"></div>
+      {/* Natural, warm atmospheric background */}
+      <NaturalBackground />
+
+      {/* Floating Photos Gallery Background */}
+      <div className="fixed inset-0 z-[1] pointer-events-none overflow-hidden hidden lg:block">
+        {shuffledImages.map((src, index) => {
+          const pos = photoPositions[index % photoPositions.length];
+          return (
+            <motion.div
+              key={src}
+              className={`absolute ${pos.size} rounded-2xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.6),0_0_40px_rgba(180,140,100,0.1)] border-2 border-white/10 hover:border-amber-400/20`}
+              style={{
+                top: pos.top,
+                left: pos.left,
+                right: pos.right,
+                rotate: pos.rotate,
+              }}
+              initial={{ opacity: 0, scale: 0.8, y: 50 }}
+              animate={{ 
+                opacity: 0.6,
+                scale: 1,
+                y: 0,
+              }}
+              transition={{ 
+                duration: 0.8, 
+                delay: index * 0.15,
+                ease: "easeOut"
+              }}
+              whileHover={{ 
+                opacity: 1, 
+                scale: 1.08,
+                zIndex: 50,
+                transition: { duration: 0.3 }
+              }}
+            >
+              {/* Warm gradient overlay for natural cohesive look */}
+              <div className="absolute inset-0 bg-gradient-to-t from-stone-950/70 via-amber-950/15 to-black/20 z-10" />
+              <Image
+                src={src}
+                alt={`Origins Radio event photo ${index + 1}`}
+                fill
+                className="object-cover pointer-events-auto cursor-pointer hover:scale-110 transition-transform duration-500"
+                sizes="(max-width: 768px) 150px, 250px"
+                loading="lazy"
+              />
+            </motion.div>
+          );
+        })}
+      </div>
+
+      {/* Mobile Photo Strip - horizontal scrolling gallery */}
+      <div className="lg:hidden fixed top-20 left-0 right-0 z-[1] overflow-hidden pointer-events-none">
+        <motion.div 
+          className="flex gap-4 px-4"
+          initial={{ x: 0 }}
+          animate={{ x: [0, -1000, 0] }}
+          transition={{ 
+            duration: 60, 
+            repeat: Infinity, 
+            ease: "linear" 
+          }}
+        >
+          {[...shuffledImages, ...shuffledImages].map((src, index) => (
+            <div
+              key={`mobile-${index}`}
+              className="relative flex-shrink-0 w-24 h-32 rounded-xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.5)] border border-white/10 opacity-40"
+              style={{ rotate: `${(index % 2 === 0 ? -1 : 1) * (5 + (index % 3) * 2)}deg` }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-stone-900/40 to-transparent z-10" />
+              <Image
+                src={src}
+                alt={`Origins Radio event ${index + 1}`}
+                fill
+                className="object-cover"
+                sizes="100px"
+                loading="lazy"
+              />
+            </div>
+          ))}
+        </motion.div>
       </div>
       
       <SocialBubbles />
