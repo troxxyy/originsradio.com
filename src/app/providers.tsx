@@ -24,6 +24,34 @@ export function Providers({ children }: { children: React.ReactNode }) {
                      pathname?.startsWith('/uploads') || 
                      pathname?.startsWith('/originsradio/adminuploads')
 
+  // #region agent log - debug instrumentation
+  const __orLog = (hypothesisId: string, location: string, message: string, data?: Record<string, unknown>) => {
+    try {
+      fetch("http://127.0.0.1:7242/ingest/d566a5c0-ce65-4742-a027-2a70ece3fc46", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId: "debug-session",
+          runId: "run1",
+          hypothesisId,
+          location,
+          message,
+          data,
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {});
+    } catch {}
+  };
+
+  useEffect(() => {
+    __orLog("C", "src/app/providers.tsx:pathname", "Providers observed route change", {
+      pathname,
+      isLoading,
+      isAdminPage,
+    });
+  }, [pathname]); // only on route changes
+  // #endregion agent log
+
   useEffect(() => {
     // Add loading class to body to prevent flash
     document.body.classList.add('loading')

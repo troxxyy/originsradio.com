@@ -29,8 +29,47 @@ const Orb = ({ className = "", rotationSpeed = -0.08, setId }: OrbProps) => {
   const DEFAULT_Y_FOR_BASS = 120;
   const DEFAULT_TOP_FOR_HIGH = 55;
 
+  // #region agent log - debug instrumentation
+  const __orLog = (hypothesisId: string, location: string, message: string, data?: Record<string, unknown>) => {
+    try {
+      fetch("http://127.0.0.1:7242/ingest/d566a5c0-ce65-4742-a027-2a70ece3fc46", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId: "debug-session",
+          runId: "run1",
+          hypothesisId,
+          location,
+          message,
+          data,
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {});
+    } catch {}
+  };
+
+  const __safeUrlInfo = (url: string | null | undefined) => {
+    if (!url) return null;
+    try {
+      const u = new URL(url, typeof window !== "undefined" ? window.location.href : "http://localhost");
+      const parts = u.pathname.split("/").filter(Boolean);
+      return { origin: u.origin, pathEnd: parts.slice(-2).join("/") || u.pathname };
+    } catch {
+      return { origin: null, pathEnd: String(url).slice(0, 60) };
+    }
+  };
+  // #endregion agent log
+
   const handleLoad = (splineApp: Application) => {
     splineRef.current = splineApp;
+    // #region agent log - debug instrumentation
+    __orLog("B", "src/app/components/three/Orb.tsx:handleLoad", "Spline loaded", {
+      rotationSpeed,
+      hasSpline: !!splineApp,
+      hasExistingAudioBinding: !!boundAudioElRef.current,
+      existingAudio: __safeUrlInfo(boundAudioElRef.current?.currentSrc ?? boundAudioElRef.current?.src ?? null),
+    });
+    // #endregion agent log
 
     // Initialize defaults immediately
     try {
@@ -50,6 +89,13 @@ const Orb = ({ className = "", rotationSpeed = -0.08, setId }: OrbProps) => {
         try { teardownAudioRef.current(); } catch {}
         teardownAudioRef.current = null;
       }
+      // #region agent log - debug instrumentation
+      __orLog("A", "src/app/components/three/Orb.tsx:setupAnalyserForElement", "Binding analyser to audio element", {
+        paused: audioEl.paused,
+        currentTime: Number.isFinite(audioEl.currentTime) ? Math.round(audioEl.currentTime * 1000) / 1000 : null,
+        src: __safeUrlInfo(audioEl.currentSrc || audioEl.src || null),
+      });
+      // #endregion agent log
       try {
         const AudioCtx =
           (window.AudioContext ||
@@ -67,10 +113,29 @@ const Orb = ({ className = "", rotationSpeed = -0.08, setId }: OrbProps) => {
         // Ensure CORS-safe when needed
         try { audioEl.crossOrigin = audioEl.crossOrigin || "anonymous"; } catch {}
 
-        const source = audioCtx.createMediaElementSource(audioEl);
-        // Split: one branch to analyser, one to speakers
+        /**
+         * IMPORTANT:
+         * Using createMediaElementSource() "hijacks" the element's audio output into the WebAudio graph.
+         * If we later tear down/close the graph (e.g. navigating away from the homepage orb), playback can go silent.
+         *
+         * To avoid breaking global playback across route transitions, prefer captureStream() and analyse that.
+         */
+        const capture =
+          (typeof (audioEl as any).captureStream === "function" ? (audioEl as any).captureStream() : null) ||
+          (typeof (audioEl as any).mozCaptureStream === "function" ? (audioEl as any).mozCaptureStream() : null);
+
+        if (!capture) {
+          // #region agent log - debug instrumentation
+          __orLog("A", "src/app/components/three/Orb.tsx:setupAnalyserForElement", "captureStream not available; skipping analyser to avoid affecting audio output", {
+            ua: typeof navigator !== "undefined" ? navigator.userAgent.slice(0, 120) : null,
+          });
+          // #endregion agent log
+          return;
+        }
+
+        const source = audioCtx.createMediaStreamSource(capture);
+        // Only analyse; DO NOT route to destination (the element itself is already audible)
         source.connect(analyser);
-        source.connect(audioCtx.destination);
 
         const freqData = new Uint8Array(analyser.frequencyBinCount) as Uint8Array<ArrayBuffer>;
         freqDataRef.current = freqData;
@@ -86,9 +151,25 @@ const Orb = ({ className = "", rotationSpeed = -0.08, setId }: OrbProps) => {
         audioEl.addEventListener("play", ensureRunning);
         // Also try to resume immediately in case audio already playing
         audioCtx.resume().catch(() => undefined);
+        
+        // Add global click handler to resume audio context (needed when video is present)
+        const resumeOnInteraction = () => {
+          if (audioCtx.state === "suspended") {
+            audioCtx.resume().catch(() => undefined);
+          }
+        };
+        document.addEventListener('click', resumeOnInteraction, { once: false });
+        document.addEventListener('touchstart', resumeOnInteraction, { once: false });
+        
+        // Store cleanup for interaction handlers
+        const cleanupInteraction = () => {
+          document.removeEventListener('click', resumeOnInteraction);
+          document.removeEventListener('touchstart', resumeOnInteraction);
+        };
 
         teardownAudioRef.current = () => {
           audioEl.removeEventListener("play", ensureRunning);
+          cleanupInteraction();
           try {
             source.disconnect();
             analyser.disconnect();
@@ -100,6 +181,14 @@ const Orb = ({ className = "", rotationSpeed = -0.08, setId }: OrbProps) => {
           analyserRef.current = null;
           audioContextRef.current = null;
           boundAudioElRef.current = null;
+          // #region agent log - debug instrumentation
+          __orLog("A", "src/app/components/three/Orb.tsx:teardownAudio", "Tore down audio analyser/context", {
+            audioWasPaused: audioEl.paused,
+            audioCurrentTime: Number.isFinite(audioEl.currentTime) ? Math.round(audioEl.currentTime * 1000) / 1000 : null,
+            audioSrc: __safeUrlInfo(audioEl.currentSrc || audioEl.src || null),
+            audioCtxState: audioCtx.state,
+          });
+          // #endregion agent log
         };
       } catch {
         // ignore setup errors
@@ -234,7 +323,24 @@ const Orb = ({ className = "", rotationSpeed = -0.08, setId }: OrbProps) => {
 
   // Disconnect observer when unmounting to avoid leaks
   useEffect(() => {
+    // #region agent log - debug instrumentation
+    __orLog("A", "src/app/components/three/Orb.tsx:useEffect(mount)", "Orb mounted", {
+      hasBoundAudio: !!boundAudioElRef.current,
+      boundAudio: __safeUrlInfo(boundAudioElRef.current?.currentSrc ?? boundAudioElRef.current?.src ?? null),
+    });
+    // #endregion agent log
     return () => {
+      // #region agent log - debug instrumentation
+      __orLog("A", "src/app/components/three/Orb.tsx:useEffect(unmount)", "Orb unmounting - about to teardown", {
+        hasBoundAudio: !!boundAudioElRef.current,
+        boundAudioPaused: boundAudioElRef.current?.paused,
+        boundAudioCurrentTime: boundAudioElRef.current && Number.isFinite(boundAudioElRef.current.currentTime)
+          ? Math.round(boundAudioElRef.current.currentTime * 1000) / 1000
+          : null,
+        boundAudio: __safeUrlInfo(boundAudioElRef.current?.currentSrc ?? boundAudioElRef.current?.src ?? null),
+        hasTeardownFn: !!teardownAudioRef.current,
+      });
+      // #endregion agent log
       if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
       if (watermarkObserverRef.current) watermarkObserverRef.current.disconnect();
       if (mouseCleanupRef.current) mouseCleanupRef.current();

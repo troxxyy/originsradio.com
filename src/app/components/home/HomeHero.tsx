@@ -37,28 +37,48 @@ const HomeHero: React.FC = () => {
 
   return (
     <section className="relative w-full h-screen overflow-hidden">
-      {/* Deep background */}
-      <div className="absolute inset-0 z-0 bg-[#050508]" />
+      {/* Video Background */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        disablePictureInPicture
+        preload="auto"
+        className="absolute inset-0 w-full h-full object-cover z-0"
+        // Prevent video from claiming audio context
+        onLoadedMetadata={(e) => {
+          const video = e.currentTarget;
+          video.muted = true;
+          video.volume = 0;
+        }}
+      >
+        <source src="/website-gif.mov" type="video/quicktime" />
+        <source src="/website-gif.mov" type="video/mp4" />
+      </video>
+      
+      {/* Dark overlay for readability */}
+      <div className="absolute inset-0 z-[1] bg-black/50" />
       
       {/* Gradient overlay */}
-      <div className="absolute inset-0 z-[1] bg-gradient-to-b from-transparent via-transparent to-[#050508]/80" />
+      <div className="absolute inset-0 z-[2] bg-gradient-to-b from-transparent via-transparent to-[#050508]/80" />
       
       {/* Ambient light effects */}
       <div className={cn(
         "absolute w-[800px] h-[800px] rounded-full blur-[150px] transition-opacity duration-1000",
         "bg-gradient-to-br from-cyan-500/8 to-teal-500/5",
-        "-top-[300px] -left-[300px]",
+        "-top-[300px] -left-[300px] z-[3]",
         mounted ? "opacity-100" : "opacity-0"
       )} />
       <div className={cn(
         "absolute w-[600px] h-[600px] rounded-full blur-[120px] transition-opacity duration-1000 delay-300",
         "bg-gradient-to-br from-blue-500/6 to-indigo-500/4",
-        "-bottom-[200px] -right-[200px]",
+        "-bottom-[200px] -right-[200px] z-[3]",
         mounted ? "opacity-100" : "opacity-0"
       )} />
 
-      {/* 3D Orb */}
-      <div className="absolute inset-0 z-10 pointer-events-none">
+      {/* 3D Orb - using mix-blend-mode to show video through */}
+      <div className="absolute inset-0 z-10 pointer-events-none mix-blend-screen">
         <Orb className="w-full h-full" />
       </div>
 
@@ -68,9 +88,7 @@ const HomeHero: React.FC = () => {
         className={cn(
           "fixed top-4 right-4 sm:top-6 sm:right-6 z-[80]",
           "inline-flex items-center gap-2 px-4 py-2.5",
-          "bg-white/[0.04] hover:bg-white/[0.08]",
-          "border border-white/[0.08] hover:border-white/[0.15]",
-          "rounded-full backdrop-blur-xl",
+          "liquid-glass-pill rounded-full",
           "text-white/70 hover:text-white text-sm",
           "transition-all duration-300 group"
         )}
@@ -155,11 +173,7 @@ const HomeHero: React.FC = () => {
                 <div className={cn(
                   "relative flex flex-col items-center justify-center text-center",
                   "p-5 sm:p-6 lg:p-7 rounded-2xl sm:rounded-3xl",
-                  "bg-white/[0.02] hover:bg-white/[0.06]",
-                  "border border-white/[0.06] hover:border-white/[0.12]",
-                  "backdrop-blur-2xl",
-                  "transition-all duration-500 ease-out",
-                  "hover:scale-[1.03] hover:-translate-y-2",
+                  "liquid-glass-card transform-gpu",
                   "overflow-hidden"
                 )}>
                   {/* Shine effect */}
@@ -188,7 +202,7 @@ const HomeHero: React.FC = () => {
                   </h2>
                   
                   {/* Description */}
-                  <p className="text-[10px] sm:text-xs text-white/35 group-hover:text-white/50 tracking-wide transition-colors duration-500">
+                  <p className="text-[10px] sm:text-xs leading-snug text-white/55 group-hover:text-white/70 tracking-wide transition-colors duration-500">
                     {route.description}
                   </p>
 

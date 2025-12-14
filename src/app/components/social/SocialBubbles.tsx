@@ -37,9 +37,7 @@ const SocialBubbles = () => {
               rel="noopener noreferrer"
               className={cn(
                 "flex items-center justify-center w-10 h-10 rounded-full",
-                "bg-white/[0.03] hover:bg-white/[0.08]",
-                "border border-white/[0.05] hover:border-white/[0.12]",
-                "backdrop-blur-xl",
+                "liquid-glass-pill liquid-glass-bubble",
                 "transition-all duration-300",
                 "hover:scale-110 hover:-translate-y-1",
                 "group"
