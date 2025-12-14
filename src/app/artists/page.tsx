@@ -10,6 +10,7 @@ import { LogIn } from 'lucide-react';
 import PageLayout from '@/components/layout/PageLayout';
 import { useArtists } from '@/hooks/use-supabase';
 import { generateSlug } from '@/lib/supabase-utils';
+import { cn } from '@/lib/utils';
 
 export default function ArtistsPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -94,7 +95,11 @@ export default function ArtistsPage() {
   return (
     <PageLayout customBackground="bg-gradient-to-br from-black via-gray-900 to-black">
       {/* Artist Login button (fixed, top-right) */}
-      <div className="fixed top-3 right-3 sm:top-6 sm:right-6 z-50">
+      <div className={cn(
+        "fixed z-50",
+        "top-[calc(0.75rem+env(safe-area-inset-top))] right-[calc(0.75rem+env(safe-area-inset-right))]",
+        "sm:top-[calc(1.5rem+env(safe-area-inset-top))] sm:right-[calc(1.5rem+env(safe-area-inset-right))]"
+      )}>
         <Link 
           href="/artist/login" 
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 text-white transition-colors group"

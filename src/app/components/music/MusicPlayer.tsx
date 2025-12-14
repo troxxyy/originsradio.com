@@ -4,9 +4,11 @@ import { Play, Pause, X, Radio } from 'lucide-react';
 import { useCurrentRadioSlot } from '@/hooks/use-radio';
 import { useSets } from '@/hooks/use-supabase';
 import { buildProxiedUrl } from '@/lib/audioProxy';
+import { useAudioVisualizer } from '@/contexts/AudioVisualizerContext';
 
 const MusicPlayer = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
+  const { registerAudioElement } = useAudioVisualizer();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFloatingHidden, setIsFloatingHidden] = useState(false);
   const [isAudioLoading, setIsAudioLoading] = useState(false);
@@ -81,6 +83,13 @@ const MusicPlayer = () => {
     const hidden = localStorage.getItem('or_player_hidden');
     if (hidden === '1') setIsFloatingHidden(true);
   }, []);
+
+  // Register audio element with visualizer context
+  useEffect(() => {
+    if (audioRef.current) {
+      registerAudioElement(audioRef.current);
+    }
+  }, [registerAudioElement]);
 
   // #region agent log - debug instrumentation
   useEffect(() => {

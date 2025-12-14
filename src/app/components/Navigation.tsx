@@ -56,6 +56,27 @@ const Navigation = () => {
       )}>
         {links.slice(1).map((link) => {
           const isActive = pathname === link.href;
+          const isBlog = link.name === "Blog";
+          
+          // Render Blog as disabled button
+          if (isBlog) {
+            return (
+              <div
+                key={link.name}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-2 rounded-full",
+                  "text-white/30 cursor-not-allowed",
+                  "opacity-50"
+                )}
+                title="Coming soon"
+              >
+                <link.icon className="w-4 h-4" strokeWidth={1.5} />
+                <span className="text-xs font-medium tracking-wide hidden sm:inline">
+                  {link.name}
+                </span>
+              </div>
+            );
+          }
           
           return (
             <Link

@@ -31,12 +31,12 @@ const HomeHero: React.FC = () => {
   const isLive = !!currentSlot?.isLiveStream;
 
   useEffect(() => {
-    const timer = setTimeout(() => setMounted(true), 100);
+    const timer = setTimeout(() => setMounted(true), 50);
     return () => clearTimeout(timer);
   }, []);
 
   return (
-    <section className="relative w-full h-screen overflow-hidden">
+    <section className="relative w-full h-screen overflow-hidden bg-black">
       {/* Video Background */}
       <video
         autoPlay
@@ -45,7 +45,7 @@ const HomeHero: React.FC = () => {
         playsInline
         disablePictureInPicture
         preload="auto"
-        className="absolute inset-0 w-full h-full object-cover z-0"
+        className="absolute inset-0 w-full h-full object-cover z-0 opacity-70"
         // Prevent video from claiming audio context
         onLoadedMetadata={(e) => {
           const video = e.currentTarget;
@@ -58,55 +58,57 @@ const HomeHero: React.FC = () => {
       </video>
       
       {/* Dark overlay for readability */}
-      <div className="absolute inset-0 z-[1] bg-black/50" />
+      <div className="absolute inset-0 z-[1] bg-black/42" />
       
       {/* Gradient overlay */}
       <div className="absolute inset-0 z-[2] bg-gradient-to-b from-transparent via-transparent to-[#050508]/80" />
       
       {/* Ambient light effects */}
       <div className={cn(
-        "absolute w-[800px] h-[800px] rounded-full blur-[150px] transition-opacity duration-1000",
+        "absolute w-[800px] h-[800px] rounded-full blur-[150px] transition-opacity duration-700",
         "bg-gradient-to-br from-cyan-500/8 to-teal-500/5",
         "-top-[300px] -left-[300px] z-[3]",
         mounted ? "opacity-100" : "opacity-0"
       )} />
       <div className={cn(
-        "absolute w-[600px] h-[600px] rounded-full blur-[120px] transition-opacity duration-1000 delay-300",
+        "absolute w-[600px] h-[600px] rounded-full blur-[120px] transition-opacity duration-700 delay-150",
         "bg-gradient-to-br from-blue-500/6 to-indigo-500/4",
         "-bottom-[200px] -right-[200px] z-[3]",
         mounted ? "opacity-100" : "opacity-0"
       )} />
 
       {/* 3D Orb - using mix-blend-mode to show video through */}
-      <div className="absolute inset-0 z-10 pointer-events-none mix-blend-screen">
+      <div className="absolute inset-0 z-10 pointer-events-none mix-blend-screen brightness-125 saturate-125">
         <Orb className="w-full h-full" />
       </div>
 
       {/* Artist Login */}
-      <Link
-        href="/artist/login"
-        className={cn(
-          "fixed top-4 right-4 sm:top-6 sm:right-6 z-[80]",
-          "inline-flex items-center gap-2 px-4 py-2.5",
-          "liquid-glass-pill rounded-full",
-          "text-white/70 hover:text-white text-sm",
-          "transition-all duration-300 group"
-        )}
-      >
-        <LogIn className="w-4 h-4" strokeWidth={1.5} />
-        <span className="font-medium tracking-wide">Login</span>
-      </Link>
+      <div className={cn(
+        "fixed z-50",
+        "top-[calc(0.75rem+env(safe-area-inset-top))] right-[calc(0.75rem+env(safe-area-inset-right))]",
+        "sm:top-[calc(1.5rem+env(safe-area-inset-top))] sm:right-[calc(1.5rem+env(safe-area-inset-right))]"
+      )}>
+        <Link 
+          href="/artist/login" 
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 text-white transition-colors group"
+          aria-label="Artist Login"
+          title="Artist Login"
+        >
+          <LogIn className="w-4 h-4 group-hover:scale-110 transition-transform" />
+          <span className="text-sm font-medium">Artist Login</span>
+        </Link>
+      </div>
 
       {/* Main Content */}
       <div className="absolute inset-0 z-[50] flex flex-col items-center justify-center px-4 sm:px-6">
         {/* Hero Text */}
         <div className={cn(
-          "text-center mb-12 sm:mb-16 transition-all duration-1000",
+          "text-center mb-12 sm:mb-16 transition-all duration-700",
           mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
         )}>
           {/* Tagline */}
           <p className={cn(
-            "text-[10px] sm:text-xs tracking-[0.4em] uppercase text-white/40 mb-4 transition-all duration-1000 delay-200",
+            "text-[10px] sm:text-xs tracking-[0.4em] uppercase text-white/40 mb-4 transition-all duration-700 delay-100",
             mounted ? "opacity-100" : "opacity-0"
           )}>
             Underground Sound
@@ -129,7 +131,7 @@ const HomeHero: React.FC = () => {
           <div className={cn(
             "inline-flex items-center gap-2 mt-6 px-4 py-2 rounded-full",
             "bg-white/[0.03] border border-white/[0.06]",
-            "transition-all duration-1000 delay-500",
+            "transition-all duration-700 delay-300",
             mounted ? "opacity-100" : "opacity-0"
           )}>
             <span className={cn(
@@ -144,7 +146,7 @@ const HomeHero: React.FC = () => {
 
         {/* Navigation Cards */}
         <div className={cn(
-          "grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 w-full max-w-4xl transition-all duration-1000 delay-300",
+          "grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 w-full max-w-4xl transition-all duration-200 delay-100",
           mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
         )}>
           {routes.map((route, index) => {
@@ -159,60 +161,76 @@ const HomeHero: React.FC = () => {
                 onMouseEnter={() => setHoveredCard(route.key)}
                 onMouseLeave={() => setHoveredCard(null)}
                 style={{ 
-                  transitionDelay: mounted ? `${400 + index * 100}ms` : '0ms'
+                  transitionDelay: mounted ? `${200 + index * 75}ms` : '0ms'
                 }}
               >
-                {/* Card glow on hover */}
+                {/* Ambient glow behind card - Apple style diffused */}
                 <div className={cn(
-                  "absolute -inset-1 rounded-3xl blur-xl transition-opacity duration-500",
-                  "bg-gradient-to-br from-white/10 to-white/5",
-                  isHovered ? "opacity-100" : "opacity-0"
+                  "absolute -inset-3 rounded-[28px] sm:rounded-[36px]  transition-all duration-200",
+                 
+                  isHovered ? "opacity-100 scale-105" : "opacity-0 scale-100"
                 )} />
                 
                 {/* Card */}
                 <div className={cn(
                   "relative flex flex-col items-center justify-center text-center",
-                  "p-5 sm:p-6 lg:p-7 rounded-2xl sm:rounded-3xl",
-                  "liquid-glass-card transform-gpu",
-                  "overflow-hidden"
+                  "p-5 sm:p-6 lg:p-8 rounded-[20px] sm:rounded-[28px]",
+                  "liquid-glass-card transform-gpu"
                 )}>
-                  {/* Shine effect */}
+                  {/* Animated light sweep on hover - Apple-style shimmer */}
                   <div className={cn(
-                    "absolute inset-0 bg-gradient-to-br from-white/[0.08] via-transparent to-transparent",
-                    "opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    "absolute inset-0 overflow-hidden rounded-[20px] sm:rounded-[28px] pointer-events-none"
+                  )}>
+                    <div className={cn(
+                      "absolute -inset-[100%] bg-gradient-to-r from-transparent via-white/[0.07] to-transparent",
+                      "rotate-[25deg] translate-x-[-200%] group-hover:translate-x-[200%]",
+                      "transition-transform duration-1000 ease-out"
+                    )} />
+                  </div>
+                  
+                  {/* Top edge highlight - like light hitting glass edge */}
+                  <div className={cn(
+                    "absolute top-0 left-[10%] right-[10%] h-[1px]",
+                    "bg-gradient-to-r from-transparent via-white/30 to-transparent",
+                    "opacity-60 group-hover:opacity-100 transition-opacity duration-500"
                   )} />
                   
-                  {/* Icon */}
+                  {/* Icon container - more organic glass bubble */}
                   <div className={cn(
-                    "mb-4 p-3 rounded-2xl",
-                    "bg-white/[0.04] group-hover:bg-white/[0.08]",
-                    "border border-white/[0.06] group-hover:border-white/[0.1]",
-                    "transition-all duration-500",
-                    "group-hover:scale-110"
+                    "relative z-10 mb-4 p-3.5 rounded-2xl",
+                    "bg-gradient-to-br from-white/[0.08] to-white/[0.02]",
+                    "border border-white/[0.08] group-hover:border-white/[0.15]",
+                    "shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]",
+                    "backdrop-blur-xl",
+                    "transition-all duration-500 ease-out",
+                    "group-hover:scale-110 group-hover:bg-gradient-to-br group-hover:from-white/[0.92] group-hover:to-white/[0.04]"
                   )}>
                     <IconComponent 
-                      className="w-5 h-5 sm:w-6 sm:h-6 text-white/60 group-hover:text-white/90 transition-colors duration-500" 
+                      className={cn(
+                        "w-5 h-5 sm:w-6 sm:h-6 transition-all duration-500",
+                        "text-white/60 group-hover:text-white"
+                      )}
                       strokeWidth={1.5} 
                     />
                   </div>
                   
                   {/* Title */}
-                  <h2 className="font-newake text-base sm:text-lg tracking-wide text-white/90 uppercase mb-1">
+                  <h2 className="relative z-10 font-newake text-base sm:text-lg tracking-wide text-white/90 group-hover:text-white uppercase mb-1 transition-colors duration-500">
                     {route.text}
                   </h2>
                   
                   {/* Description */}
-                  <p className="text-[10px] sm:text-xs leading-snug text-white/55 group-hover:text-white/70 tracking-wide transition-colors duration-500">
+                  <p className="relative z-10 text-[10px] sm:text-xs leading-snug text-white/50 group-hover:text-white/70 tracking-wide transition-colors duration-500">
                     {route.description}
                   </p>
 
-                  {/* Arrow indicator */}
+                  {/* Arrow indicator - smoother reveal */}
                   <div className={cn(
-                    "absolute bottom-3 right-3 sm:bottom-4 sm:right-4",
-                    "opacity-0 group-hover:opacity-100 transition-all duration-500",
-                    "translate-x-2 group-hover:translate-x-0"
+                    "absolute bottom-3 right-3 sm:bottom-4 sm:right-4 z-10",
+                    "opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out",
+                    "translate-x-2 translate-y-1 group-hover:translate-x-0 group-hover:translate-y-0"
                   )}>
-                    <ChevronRight className="w-4 h-4 text-white/40" strokeWidth={1.5} />
+                    <ChevronRight className="w-4 h-4 text-white/50" strokeWidth={1.5} />
                   </div>
                 </div>
               </Link>
@@ -222,11 +240,11 @@ const HomeHero: React.FC = () => {
 
         {/* Bottom text */}
         <p className={cn(
-          "mt-12 sm:mt-16 text-[10px] sm:text-xs tracking-[0.25em] uppercase text-white/20",
-          "transition-all duration-1000 delay-700",
-          mounted ? "opacity-100" : "opacity-0"
+          "mt-12 sm:mt-16 text-[10px] sm:text-xs tracking-[0.25em] uppercase text-white",
+          "transition-all duration-700 delay-400",
+          mounted ? "opacity-100" : "opacity-100"
         )}>
-          Ankara • Istanbul • Underground
+          Ankara • Istanbul • Bali
         </p>
       </div>
 

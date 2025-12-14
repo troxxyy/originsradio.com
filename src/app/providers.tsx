@@ -11,6 +11,7 @@ import LoadingScreen from "@/components/LoadingScreen"
 import Navigation from "@/components/Navigation"
 import TicketPopup from "@/components/TicketPopup"
 import MusicPlayer from "@/components/music/MusicPlayer"
+import { AudioVisualizerProvider } from "@/contexts/AudioVisualizerContext"
 
 const ONE_HOUR = 60 * 60 * 1000
 
@@ -23,34 +24,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const isAdminPage = pathname?.startsWith('/artistcontrolsecret') || 
                      pathname?.startsWith('/uploads') || 
                      pathname?.startsWith('/originsradio/adminuploads')
-
-  // #region agent log - debug instrumentation
-  const __orLog = (hypothesisId: string, location: string, message: string, data?: Record<string, unknown>) => {
-    try {
-      fetch("http://127.0.0.1:7242/ingest/d566a5c0-ce65-4742-a027-2a70ece3fc46", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sessionId: "debug-session",
-          runId: "run1",
-          hypothesisId,
-          location,
-          message,
-          data,
-          timestamp: Date.now(),
-        }),
-      }).catch(() => {});
-    } catch {}
-  };
-
-  useEffect(() => {
-    __orLog("C", "src/app/providers.tsx:pathname", "Providers observed route change", {
-      pathname,
-      isLoading,
-      isAdminPage,
-    });
-  }, [pathname]); // only on route changes
-  // #endregion agent log
 
   useEffect(() => {
     // Add loading class to body to prevent flash
@@ -88,22 +61,24 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <HelmetProvider>
         <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <TicketPopup />
+          <AudioVisualizerProvider>
+            <Toaster />
+            <Sonner />
+            <TicketPopup />
 
-          {/* Loading Screen */}
-          {isLoading && <LoadingScreen onLoadingComplete={handleLoadingComplete} />}
+            {/* Loading Screen */}
+            {isLoading && <LoadingScreen onLoadingComplete={handleLoadingComplete} />}
 
-          {/* Main Content - Only render after loading */}
-          {!isLoading && (
-            <>
-              <Navigation />
-              {/* Only render MusicPlayer on non-admin pages to avoid interference with admin functionality */}
-              {!isAdminPage && <MusicPlayer />}
-              {children}
-            </>
-          )}
+            {/* Main Content - Only render after loading */}
+            {!isLoading && (
+              <>
+                <Navigation />
+                {/* Only render MusicPlayer on non-admin pages to avoid interference with admin functionality */}
+                {!isAdminPage && <MusicPlayer />}
+                {children}
+              </>
+            )}
+          </AudioVisualizerProvider>
         </TooltipProvider>
       </HelmetProvider>
     </QueryClientProvider>
