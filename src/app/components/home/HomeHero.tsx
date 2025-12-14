@@ -105,12 +105,12 @@ const HomeHero: React.FC = () => {
       )}>
         <Link 
           href="/artist/login" 
-          className="inline-flex items-center gap-2 px-3 py-2 sm:px-4 rounded-full bg-white/[0.03] border border-white/[0.08] hover:bg-white/[0.06] hover:border-white/[0.12] text-white transition-all duration-300 group"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 text-white transition-colors group"
           aria-label="Artist Login"
           title="Artist Login"
         >
-          <LogIn className="w-4 h-4 sm:w-4 group-hover:scale-110 transition-transform" />
-          <span className="hidden sm:inline text-sm font-medium">Artist Login</span>
+          <LogIn className="w-4 h-4 group-hover:scale-110 transition-transform" />
+          <span className="text-sm font-medium">Artist Login</span>
         </Link>
       </div>
 
