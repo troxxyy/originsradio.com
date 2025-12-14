@@ -1,21 +1,19 @@
-import { useEffect, useState } from 'react'
+'use client'
+
 import { Radio, Play } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { motion } from 'framer-motion'
+import { useCurrentRadioSlot } from '@/hooks/use-radio'
 
 const LiveRadioStatus = () => {
-  const [isLive, setIsLive] = useState(false)
-  const [currentShow, setCurrentShow] = useState<string>('Origins Radio Mix')
-
-  // Simulate live status (you can replace with actual API call)
-  useEffect(() => {
-    // For demo purposes, randomly set live status
-    const interval = setInterval(() => {
-      setIsLive(Math.random() > 0.5)
-    }, 10000)
-    return () => clearInterval(interval)
-  }, [])
+  const { currentSlot, isLoading } = useCurrentRadioSlot(5000)
+  const isLive = !!currentSlot?.isLiveStream
+  const artistName = currentSlot?.item?.set?.artists?.name ?? null
+  const currentShow =
+    artistName && (currentSlot?.item?.title || '')
+      ? `${artistName} — ${currentSlot.item.title}`
+      : (currentSlot?.item?.title || 'Origins Radio')
 
   return (
     <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6">
@@ -50,13 +48,13 @@ const LiveRadioStatus = () => {
                 <div className="text-center sm:text-left">
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="text-xl sm:text-2xl font-bold text-white">
-                      {isLive ? 'Live Now' : 'Radio Status'}
+                      {isLoading ? 'Checking…' : isLive ? 'Live Now' : 'Off Air'}
                     </h3>
                     <Badge 
                       variant={isLive ? "default" : "outline"} 
                       className={`${isLive ? 'bg-white text-black hover:bg-white/90' : 'bg-white/10'} border-none`}
                     >
-                      {isLive ? 'LIVE' : 'OFF AIR'}
+                      {isLoading ? '...' : isLive ? 'LIVE' : 'OFF AIR'}
                     </Badge>
                   </div>
                   <p className="text-white/70 text-sm sm:text-base">

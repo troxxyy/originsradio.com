@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Play, Pause, X, Radio } from 'lucide-react';
+import { Play, X, Radio, VolumeX, Volume2 } from 'lucide-react';
 import { useCurrentRadioSlot } from '@/hooks/use-radio';
 import { useSets } from '@/hooks/use-supabase';
 import { buildProxiedUrl } from '@/lib/audioProxy';
@@ -12,6 +13,7 @@ const MusicPlayer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFloatingHidden, setIsFloatingHidden] = useState(false);
   const [isAudioLoading, setIsAudioLoading] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
   const { currentSlot, isLoading: isScheduleLoading } = useCurrentRadioSlot(5000);
   const { data: sets, isLoading: isSetsLoading } = useSets();
   const pathname = usePathname();
@@ -32,8 +34,17 @@ const MusicPlayer = () => {
     }
   };
 
-  const scheduledUrl = (currentSlot?.item && (currentSlot.item as any).set?.audio_url) ?? undefined;
-  const isLive = false;
+  // Check for both streamUrl (direct stream) and set.audio_url (scheduled set)
+  // Prioritize streamUrl over set.audio_url for live streams
+  const scheduledUrl = currentSlot?.item 
+    ? ((currentSlot.item.streamUrl && currentSlot.item.streamUrl.trim()) || (currentSlot.item as any).set?.audio_url)
+    : undefined;
+  // Live mode logic:
+  // 1. Must NOT be in "on demand" override mode
+  // 2. Must have a valid scheduled URL from current slot (either streamUrl or set.audio_url)
+  // 3. Current slot must actually be active (double check vs schedule loading)
+  // 4. Current slot must indicate it's a live stream
+  const isLive = !onDemandSetUrl && !!scheduledUrl && !isScheduleLoading && !!currentSlot?.isLiveStream;
   const rawStreamUrl = onDemandSetUrl || scheduledUrl;
   const streamUrl = rawStreamUrl ? buildProxiedUrl(rawStreamUrl) : undefined;
   const setDurationSeconds = onDemandSetUrl
@@ -46,6 +57,17 @@ const MusicPlayer = () => {
     ? formatDate((latestSet as any)?.release_date) 
     : (currentSlot?.startedAtUtc ? formatDate(currentSlot.startedAtUtc.toISOString()) : '');
   const isPlayDisabled = isAudioLoading || !streamUrl;
+
+  const artistSlug = useMemo(() => {
+    // Keep slug logic consistent with the rest of the app (see `generateSlug` in `supabase-utils.ts`)
+    const name = (nowArtist || '').trim()
+    if (!name || name.toLowerCase() === 'origins radio') return null
+    return name
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]+/g, '')
+      .replace(/\s+/g, '')
+      .trim() || null
+  }, [nowArtist]);
 
   // #region agent log - debug instrumentation
   const __orLog = (hypothesisId: string, location: string, message: string, data?: Record<string, unknown>) => {
@@ -83,6 +105,20 @@ const MusicPlayer = () => {
     const hidden = localStorage.getItem('or_player_hidden');
     if (hidden === '1') setIsFloatingHidden(true);
   }, []);
+
+  // Load mute state from localStorage
+  useEffect(() => {
+    const muted = localStorage.getItem('or_player_muted');
+    if (muted === '1') setIsMuted(true);
+  }, []);
+
+  // Apply mute state to the audio element
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.muted = isMuted;
+    audio.volume = isMuted ? 0 : 1;
+  }, [isMuted]);
 
   // Register audio element with visualizer context
   useEffect(() => {
@@ -130,9 +166,9 @@ const MusicPlayer = () => {
     const audio = audioRef.current;
     if (!audio) return;
     try {
+      // No pause UX: if already playing, toggle mute; otherwise start playback.
       if (isPlaying) {
-        audio.pause();
-        setIsPlaying(false);
+        toggleMute();
       } else {
         setIsAudioLoading(true);
         await audio.play();
@@ -144,6 +180,18 @@ const MusicPlayer = () => {
     } finally {
       setIsAudioLoading(false);
     }
+  };
+
+  const toggleMute = () => {
+    const audio = audioRef.current;
+    const next = audio ? !audio.muted : !isMuted;
+    // Some browsers can get "stuck" silent if volume is 0; keep both in sync.
+    if (audio) {
+      audio.muted = next;
+      audio.volume = next ? 0 : 1;
+    }
+    setIsMuted(next);
+    localStorage.setItem('or_player_muted', next ? '1' : '0');
   };
 
   // Apply source and initial position when the URL or slot changes
@@ -172,12 +220,18 @@ const MusicPlayer = () => {
         });
 
         if (!cancelled) {
-          if (!isLive) {
+          if (isLive) {
+             // Initial setup for live
+             const dur = (isFinite(audio.duration) && audio.duration > 0) ? audio.duration : (setDurationSeconds ?? 0);
+             const seekTime = dur > 0 ? (startOffsetSeconds % dur) : 0;
+             audio.currentTime = seekTime;
+             audio.play().then(() => setIsPlaying(true)).catch(() => {});
+          } else {
+            // On-demand playback
             const dur = isFinite(audio.duration) ? audio.duration : (setDurationSeconds ?? undefined);
             const clamped = dur ? Math.min(Math.max(0, startOffsetSeconds), Math.max(0, dur - 1)) : Math.max(0, startOffsetSeconds);
             audio.currentTime = clamped;
           }
-          // Streams removed; seeking is always allowed within set
         }
       } catch (e) {
         // no-op
@@ -186,7 +240,26 @@ const MusicPlayer = () => {
 
     setup();
     return () => { cancelled = true; };
-  }, [streamUrl, isLive, startOffsetSeconds, setDurationSeconds]);
+  }, [streamUrl]); // ONLY re-run setup if the URL changes. Time updates should be handled separately.
+
+  // Effect to handle time sync without reloading audio
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || !isLive || !streamUrl) return;
+
+    const dur = (isFinite(audio.duration) && audio.duration > 0) ? audio.duration : (setDurationSeconds ?? 0);
+    const seekTime = dur > 0 ? (startOffsetSeconds % dur) : 0;
+
+    // Sync time if drifted
+    if (Math.abs(audio.currentTime - seekTime) > 4) {
+       audio.currentTime = seekTime;
+    }
+    
+    // Ensure playing if live
+    if (audio.paused && !isPlaying) {
+       audio.play().then(() => setIsPlaying(true)).catch(() => {});
+    }
+  }, [isLive, startOffsetSeconds, setDurationSeconds, streamUrl, isPlaying]);
 
   // Attach media event listeners
   useEffect(() => {
@@ -197,8 +270,11 @@ const MusicPlayer = () => {
     const onPause = () => setIsPlaying(false);
     const onEnded = () => {
       if (isLive) {
-        // For live, try to restart
+        // For live, loop back to start
+        audio.currentTime = 0;
         audio.play().catch(() => {});
+      } else {
+        setIsPlaying(false);
       }
     };
     const onError = () => setIsAudioLoading(false);
@@ -269,9 +345,19 @@ const MusicPlayer = () => {
                   </div>
                 )}
                 <div className="flex flex-col leading-tight min-w-0">
-                  <span className="text-white/90 text-sm sm:text-base truncate max-w-[46vw] sm:max-w-[340px]">
-                    {nowArtist}
-                  </span>
+                  {artistSlug ? (
+                    <Link
+                      href={`/artists/${artistSlug}`}
+                      className="text-white/90 text-sm sm:text-base truncate max-w-[46vw] sm:max-w-[340px] hover:text-white underline-offset-4 hover:underline"
+                      title={`Go to ${nowArtist} profile`}
+                    >
+                      {nowArtist}
+                    </Link>
+                  ) : (
+                    <span className="text-white/90 text-sm sm:text-base truncate max-w-[46vw] sm:max-w-[340px]">
+                      {nowArtist}
+                    </span>
+                  )}
                   {nowDate && (
                     <span className="text-white/40 text-[10px] sm:text-xs truncate max-w-[46vw] sm:max-w-[340px]">
                       {nowDate}
@@ -280,19 +366,23 @@ const MusicPlayer = () => {
                 </div>
               </div>
 
-              {/* Center: Play/Pause */}
+              {/* Center: Play (starts audio) / Mute (while playing) */}
               <div className="flex items-center justify-center justify-self-center">
                 <button
                   onClick={togglePlayPause}
                   disabled={isPlayDisabled}
                   className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center shadow-md disabled:opacity-50"
-                  aria-label={isPlaying ? "Pause" : "Play"}
+                  aria-label={isPlaying ? (isMuted ? "Unmute" : "Mute") : "Play"}
                   title={!streamUrl ? 'Go live or select a set to play' : undefined}
                 >
                   {isAudioLoading ? (
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   ) : isPlaying ? (
-                    <Pause size={18} className="text-white" />
+                    isMuted ? (
+                      <VolumeX size={18} className="text-white" />
+                    ) : (
+                      <Volume2 size={18} className="text-white" />
+                    )
                   ) : (
                     <Play size={18} className="text-white ml-0.5" />
                   )}

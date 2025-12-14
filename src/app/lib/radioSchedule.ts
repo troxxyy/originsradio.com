@@ -1,7 +1,7 @@
-import { addMinutes, differenceInSeconds, startOfWeek } from 'date-fns'
+import { addMinutes, differenceInSeconds } from 'date-fns'
 import { toZonedTime, fromZonedTime, formatInTimeZone } from 'date-fns-tz'
 
-export type ContentType = 'set'
+export type ContentType = 'set' | 'stream'
 
 export interface RadioScheduleRow {
   id: string
@@ -27,6 +27,7 @@ export interface ScheduleItem {
   streamUrl?: string | null
   title: string
   timezone: string
+  weekStartDate?: string | null // YYYY-MM-DD (Monday) for weekly schedules
 }
 
 export interface CurrentSlot<TExtra = unknown> {
@@ -47,9 +48,10 @@ export function mapRowToItem(row: RadioScheduleRow): ScheduleItem {
     durationMinutes: row.duration_minutes,
     contentType: row.content_type,
     setId: row.set_id ?? null,
-    streamUrl: null,
+    streamUrl: row.stream_url ?? null,
     title: row.title,
     timezone: row.timezone || DEFAULT_TZ,
+    weekStartDate: row.week_start_date ?? null,
   }
 }
 
@@ -61,55 +63,89 @@ export function resolveCurrentSlot<TExtra = unknown>(
 ): CurrentSlot<Partial<TExtra>> | null {
   if (!items || items.length === 0) return null
 
-  // Assume all items share the same timezone; if mixed, prefer each item's tz.
-  // We'll evaluate each item in its own timezone.
+  // Multiple items can match "now" if schedule rows overlap (e.g. bad duration values).
+  // In that case, prefer the most recently started slot.
+  let best: CurrentSlot<Partial<TExtra>> | null = null
 
   for (const item of items) {
     const tz = item.timezone || DEFAULT_TZ
-    const nowZoned = toZonedTime(now, tz)
+    // Prefer using the explicit week_start_date from the row when provided.
+    // This avoids mismatches between DB week boundaries (often UTC) and "local" week boundaries.
+    const weekStartYmd = item.weekStartDate?.trim()
+      ? item.weekStartDate.trim()
+      : getWeekStartYmdForNow(now, tz)
 
-    // Week start Monday in the target timezone
-    const weekStartZoned = startOfWeek(nowZoned, { weekStartsOn: 1 })
-
-    // Compute the zoned start date for the given dayOfWeek (0=Mon..6=Sun)
-    const startDateZoned = addDaysSafe(weekStartZoned, item.dayOfWeek)
-
-    // Build a local date-time string in tz for the slot start
-    const dateStr = formatInTimeZone(startDateZoned, tz, 'yyyy-MM-dd')
-    const startLocalIso = `${dateStr}T${normalizeHHmm(item.startTimeLocal)}:00`
+    // dayOfWeek is 0=Mon..6=Sun, and weekStartYmd is Monday (yyyy-MM-dd)
+    const dayYmd = addDaysToYmd(weekStartYmd, item.dayOfWeek)
+    const startLocalIso = `${dayYmd}T${normalizeHHmm(item.startTimeLocal)}:00`
 
     // Convert the intended local start time to UTC
     const startUtc = fromZonedTime(startLocalIso, tz)
 
     // Compute end in UTC by adding duration in the same local timeline
+    // Use zoned time calculation to handle DST correctly
     const startZoned = toZonedTime(startUtc, tz)
     const endZoned = addMinutes(startZoned, item.durationMinutes)
     const endUtc = fromZonedTime(endZoned, tz)
 
-    if (now >= startUtc && now < endUtc) {
+    // Allow 2-minute buffer for cross-fading or clock skew
+    // This helps "catch" the slot if we are just a few seconds late or early
+    const bufferMs = 2 * 60 * 1000
+    // Check if NOW is within [Start - Buffer, End + Buffer)
+    // We check if (now + buffer) >= start and (now - buffer) < end
+    const nowTime = now.getTime()
+    
+    if (nowTime + bufferMs >= startUtc.getTime() && nowTime - bufferMs < endUtc.getTime()) {
       const secondsSinceStart = Math.max(0, differenceInSeconds(now, startUtc))
-      return {
+      // Determine if this is a live stream: either has streamUrl or has a set with audio_url
+      const hasStreamUrl = !!(item.streamUrl && item.streamUrl.trim())
+      const setAudioUrl =
+        (item as Partial<{ set?: { audio_url?: string | null } | null }>).set?.audio_url ?? null
+      const hasSetAudio = !!(typeof setAudioUrl === 'string' ? setAudioUrl.trim() : setAudioUrl)
+      const isLiveStream = hasStreamUrl || hasSetAudio
+      
+      const candidate: CurrentSlot<Partial<TExtra>> = {
         item,
         startedAtUtc: startUtc,
         secondsSinceStart,
         endsAtUtc: endUtc,
-        isLiveStream: false,
+        isLiveStream,
+      }
+
+      if (!best || candidate.startedAtUtc.getTime() > best.startedAtUtc.getTime()) {
+        best = candidate
       }
     }
   }
 
-  return null
+  return best
 }
 
-function addDaysSafe(date: Date, days: number): Date {
-  const result = new Date(date)
-  result.setDate(date.getDate() + days)
-  return result
+function getWeekStartYmdForNow(now: Date, tz: string): string {
+  // ISO day of week: 1=Mon..7=Sun
+  const isoDow = parseInt(formatInTimeZone(now, tz, 'i'), 10) || 1
+  const todayYmd = formatInTimeZone(now, tz, 'yyyy-MM-dd')
+  return addDaysToYmd(todayYmd, -(isoDow - 1))
+}
+
+function addDaysToYmd(ymd: string, days: number): string {
+  // Treat YYYY-MM-DD as a calendar date (no timezone), and do arithmetic in UTC
+  const m = /^\s*(\d{4})-(\d{2})-(\d{2})\s*$/.exec(ymd)
+  if (!m) return ymd.trim()
+  const y = parseInt(m[1], 10)
+  const mo = parseInt(m[2], 10)
+  const d = parseInt(m[3], 10)
+  const dt = new Date(Date.UTC(y, mo - 1, d))
+  dt.setUTCDate(dt.getUTCDate() + days)
+  const yy = dt.getUTCFullYear()
+  const mm = String(dt.getUTCMonth() + 1).padStart(2, '0')
+  const dd = String(dt.getUTCDate()).padStart(2, '0')
+  return `${yy}-${mm}-${dd}`
 }
 
 function normalizeHHmm(value: string): string {
-  // Ensure HH:mm format
-  const m = /^\s*(\d{1,2}):(\d{1,2})\s*$/.exec(value)
+  // Ensure HH:mm format (accept HH:mm or HH:mm:ss)
+  const m = /^\s*(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?\s*$/.exec(value)
   if (!m) return '00:00'
   const hh = String(Math.min(23, Math.max(0, parseInt(m[1], 10)))).padStart(2, '0')
   const mm = String(Math.min(59, Math.max(0, parseInt(m[2], 10)))).padStart(2, '0')

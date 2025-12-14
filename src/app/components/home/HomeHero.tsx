@@ -28,6 +28,7 @@ const routes: RouteItem[] = [
 const HomeHero: React.FC = () => {
   const [mounted, setMounted] = useState(false);
   const [hoveredCard, setHoveredCard] = useState<RouteKey | null>(null);
+  const [videoOpacity, setVideoOpacity] = useState(0.7);
   const { currentSlot } = useCurrentRadioSlot(5000);
   const isMobile = useIsMobile();
   const isLive = !!currentSlot?.isLiveStream;
@@ -47,6 +48,20 @@ const HomeHero: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  // Fade out video after 30 seconds when radio is live
+  useEffect(() => {
+    if (isLive) {
+      const fadeTimer = setTimeout(() => {
+        setVideoOpacity(0);
+      }, 30000); // 30 seconds
+
+      return () => clearTimeout(fadeTimer);
+    } else {
+      // Reset opacity when not live
+      setVideoOpacity(0.7);
+    }
+  }, [isLive]);
+
   return (
     <section className="relative w-full h-[100dvh] overflow-hidden bg-black">
       {/* Video Background */}
@@ -58,7 +73,8 @@ const HomeHero: React.FC = () => {
         playsInline
         disablePictureInPicture
         preload="auto"
-        className="absolute inset-0 w-full h-full object-cover z-0 opacity-70"
+        className="absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-1000 ease-out"
+        style={{ opacity: videoOpacity }}
         // Prevent video from claiming audio context
         onLoadedMetadata={(e) => {
           const video = e.currentTarget;
@@ -92,7 +108,7 @@ const HomeHero: React.FC = () => {
 
       {/* 3D Orb - using mix-blend-mode to show video through */}
       {!isMobile && (
-        <div className="absolute inset-0 z-10 pointer-events-none mix-blend-screen brightness-125 saturate-125">
+        <div className="absolute inset-0 z-10 pointer-events-none mix-blend-screen brightness-[90%] saturate-125">
           <Orb className="w-full h-full" />
         </div>
       )}

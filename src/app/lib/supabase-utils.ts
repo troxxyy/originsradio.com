@@ -931,11 +931,18 @@ export const deleteThisWeekEvent = async (id: string): Promise<void> => {
 // Get the Monday of the current week in YYYY-MM-DD format
 export const getCurrentWeekMonday = (): string => {
   const now = new Date()
-  const day = now.getDay()
-  const diff = now.getDate() - day + (day === 0 ? -6 : 1) // adjust when day is Sunday
-  const monday = new Date(now.setDate(diff))
+  // Use Istanbul time to determine the current day of the week
+  // This handles the edge case where it's Monday in Istanbul but still Sunday in UTC
+  const istanbulTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Istanbul' }))
   
-  // Format as YYYY-MM-DD using local time components to avoid timezone shifts
+  const day = istanbulTime.getDay()
+  const diff = istanbulTime.getDate() - day + (day === 0 ? -6 : 1) // adjust when day is Sunday
+  
+  // Create date object for the Monday in Istanbul time
+  const monday = new Date(istanbulTime)
+  monday.setDate(diff)
+  
+  // Format as YYYY-MM-DD using local time components of the calculated Monday
   const year = monday.getFullYear()
   const month = String(monday.getMonth() + 1).padStart(2, '0')
   const date = String(monday.getDate()).padStart(2, '0')

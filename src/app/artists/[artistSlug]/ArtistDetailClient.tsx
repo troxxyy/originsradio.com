@@ -511,7 +511,7 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
               className="relative"
             >
               <div className="glass backdrop-blur-sm rounded-3xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.1)] transform-gpu">
-                <div className="relative h-64 sm:h-80 lg:h-96 overflow-hidden">
+                <div className="relative w-full h-[500px] sm:h-[600px] lg:h-[700px] overflow-hidden bg-black">
                   <motion.img
                     initial={{ scale: 1.1 }}
                     animate={{ scale: 1 }}
@@ -519,14 +519,13 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
                     src={artist.photo_url || '/placeholder.svg'}
                     alt={artist.name}
                     className="w-full h-full object-cover"
-                    style={{ objectPosition: 'center 15%' }}
+                    style={{ objectPosition: 'center center' }}
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = '/placeholder.svg'
                     }}
                   />
                   
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-200/20 to-blue-500/20" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                   
                   {/* Action Buttons - Mobile Optimized */}
                   <div className="absolute top-4 sm:top-6 right-4 sm:right-6 flex gap-2 sm:gap-3">
