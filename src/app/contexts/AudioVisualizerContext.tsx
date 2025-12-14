@@ -23,80 +23,109 @@ export function AudioVisualizerProvider({ children }: { children: React.ReactNod
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
+  
+  // Track the source node and connected element to manage connections
   const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
+  const connectedElementRef = useRef<HTMLAudioElement | null>(null);
 
+  // 1. Initialize AudioContext and Analyser (Once)
   useEffect(() => {
-    if (!audioElement) return;
+    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioCtx) return;
 
-    // Initialize Web Audio API
-    let ctx = audioContext;
-    if (!ctx) {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-      if (!AudioCtx) return;
-      ctx = new AudioCtx();
-      setAudioContext(ctx);
-    }
+    const ctx = new AudioCtx();
+    const node = ctx.createAnalyser();
+    node.fftSize = 2048;
+    node.smoothingTimeConstant = 0.85;
+    node.minDecibels = -80;
+    node.maxDecibels = -10;
 
-    if (!analyser && ctx) {
-      const node = ctx.createAnalyser();
-      node.fftSize = 2048;
-      node.smoothingTimeConstant = 0.85;
-      node.minDecibels = -80;
-      node.maxDecibels = -10;
-      setAnalyser(node);
-    }
+    setAudioContext(ctx);
+    setAnalyser(node);
 
-    // Connect Source -> Analyser -> Destination
-    if (ctx && analyser && !sourceRef.current) {
-      try {
-        // Ensure CORS is set on element (though it should be by consumer)
+    return () => {
+      if (ctx.state !== 'closed') {
+        ctx.close().catch(() => {});
+      }
+    };
+  }, []);
+
+  // 2. Connect Audio Element
+  useEffect(() => {
+    if (!audioContext || !analyser || !audioElement) return;
+    
+    // Avoid reconnecting the same element
+    if (connectedElementRef.current === audioElement) return;
+
+    try {
+        // If we have a previous source, disconnect it from the graph
+        if (sourceRef.current) {
+            try {
+                sourceRef.current.disconnect();
+            } catch (e) {
+                // ignore disconnect errors
+            }
+        }
+
+        // Ensure CORS is set (crucial for Web Audio with external sources)
         if (!audioElement.crossOrigin) {
           audioElement.crossOrigin = "anonymous";
         }
+
+        // Create new source
+        const source = audioContext.createMediaElementSource(audioElement);
         
-        const source = ctx.createMediaElementSource(audioElement);
-        sourceRef.current = source;
+        // Connect: Source -> Analyser -> Destination (Speakers)
         source.connect(analyser);
-        source.connect(ctx.destination);
-      } catch (e) {
-        console.warn("AudioVisualizer: Failed to create MediaElementSource", e);
-      }
+        source.connect(audioContext.destination);
+        
+        sourceRef.current = source;
+        connectedElementRef.current = audioElement;
+        
+        // Ensure context is running when this element plays
+        const ensureRunning = () => {
+            if (audioContext.state === 'suspended') {
+                audioContext.resume().catch(err => console.warn('Audio resume failed', err));
+            }
+        };
+        
+        audioElement.addEventListener('play', ensureRunning);
+        
+        // Cleanup listener only when element changes
+        return () => {
+            audioElement.removeEventListener('play', ensureRunning);
+        };
+
+    } catch (e) {
+        console.error("AudioVisualizer connection error:", e);
     }
+  }, [audioContext, analyser, audioElement]);
 
-    // Handle User Interaction to Resume Context
-    const resumeContext = () => {
-      if (ctx?.state === 'suspended') {
-        ctx.resume().catch(() => {});
-      }
-    };
+  // 3. Global Resume Handlers to unlock AudioContext
+  useEffect(() => {
+      if (!audioContext) return;
 
-    audioElement.addEventListener('play', resumeContext);
-    const cleanupInteraction = () => {
-        document.removeEventListener('click', resumeContext);
-        document.removeEventListener('touchstart', resumeContext);
-        document.removeEventListener('keydown', resumeContext);
-    }
-    document.addEventListener('click', resumeContext);
-    document.addEventListener('touchstart', resumeContext);
-    document.addEventListener('keydown', resumeContext);
+      const resume = () => {
+          if (audioContext.state === 'suspended') {
+              audioContext.resume().catch(() => {});
+          }
+      };
 
-    return () => {
-      audioElement.removeEventListener('play', resumeContext);
-      cleanupInteraction();
-      // Note: We do NOT close the AudioContext or disconnect the source here.
-      // This is because the audio element continues to exist and play even if
-      // this provider re-renders (though it shouldn't if it's at root).
-      // However, if the element changes, we might have an issue.
-      // But in this app, the element is provided by MusicPlayer which is a singleton sibling.
-    };
-  }, [audioElement, audioContext, analyser]);
+      // Add listeners to common interaction events
+      const events = ['click', 'touchstart', 'keydown', 'mousedown'];
+      events.forEach(event => document.addEventListener(event, resume));
+
+      return () => {
+          events.forEach(event => document.removeEventListener(event, resume));
+      };
+  }, [audioContext]);
 
   return (
     <AudioVisualizerContext.Provider value={{
       audioContext,
       analyser,
       registerAudioElement: setAudioElement,
-      isReady: !!(audioContext && analyser && sourceRef.current)
+      isReady: !!(audioContext && analyser && audioElement)
     }}>
       {children}
     </AudioVisualizerContext.Provider>
