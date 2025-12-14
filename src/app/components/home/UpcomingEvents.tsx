@@ -78,7 +78,7 @@ const UpcomingEvents = ({ compact = false, maxItems, title }: UpcomingEventsProp
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: idx * 0.05 }}
-              className="group rounded-2xl overflow-hidden border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
+              className="group rounded-xl sm:rounded-2xl overflow-hidden border border-white/[0.05] bg-white/[0.015] hover:bg-white/[0.03] hover:border-white/[0.08] transition-all duration-300"
             >
               <Link href={p.slug ? `/events/${p.slug}` : '/events'} className="block h-full">
                 <div className={`relative ${compact ? 'h-36' : 'h-44'} w-full overflow-hidden`}>

@@ -19,10 +19,10 @@ type RouteItem = {
 };
 
 const routes: RouteItem[] = [
-  { key: "events", href: "/events", icon: Ticket, text: "Events", description: "Exclusive experiences" },
-  { key: "fm", href: "/radio/schedule", icon: Radio, text: "Radio", description: "Weekly broadcasts" },
-  { key: "artists", href: "/artists", icon: Users, text: "Artists", description: "Join the collective" },
-  { key: "thisWeek", href: "/thisweek", icon: Navigation, text: "This Week", description: "Ankara nightlife" },
+  { key: "events", href: "/events", icon: Ticket, text: "Events", description: "Live experiences" },
+  { key: "fm", href: "/radio/schedule", icon: Radio, text: "Radio", description: "Weekly schedule" },
+  { key: "artists", href: "/artists", icon: Users, text: "Artists", description: "Our collective" },
+  { key: "thisWeek", href: "/thisweek", icon: Navigation, text: "This Week", description: "What's happening" },
 ];
 
 const HomeHero: React.FC = () => {
@@ -179,51 +179,26 @@ const HomeHero: React.FC = () => {
                   transitionDelay: mounted ? `${200 + index * 75}ms` : '0ms'
                 }}
               >
-                {/* Ambient glow behind card - Apple style diffused */}
-                <div className={cn(
-                  "absolute -inset-3 rounded-[28px] sm:rounded-[36px]  transition-all duration-200",
-                 
-                  isHovered ? "opacity-100 scale-105" : "opacity-0 scale-100"
-                )} />
-                
                 {/* Card */}
                 <div className={cn(
                   "relative flex flex-row sm:flex-col items-center sm:justify-center text-left sm:text-center",
-                  "p-4 sm:p-6 lg:p-8 rounded-[16px] sm:rounded-[28px]",
-                  "liquid-glass-card transform-gpu border border-white/5 sm:border-transparent"
+                  "p-4 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl",
+                  "bg-white/[0.02] backdrop-blur-sm border border-white/[0.05]",
+                  "hover:bg-white/[0.04] hover:border-white/[0.08]",
+                  "transition-all duration-300 ease-out"
                 )}>
-                  {/* Animated light sweep on hover - Apple-style shimmer */}
+                  {/* Icon container - minimal transparent */}
                   <div className={cn(
-                    "absolute inset-0 overflow-hidden rounded-[20px] sm:rounded-[28px] pointer-events-none"
-                  )}>
-                    <div className={cn(
-                      "absolute -inset-[100%] bg-gradient-to-r from-transparent via-white/[0.07] to-transparent",
-                      "rotate-[25deg] translate-x-[-200%] group-hover:translate-x-[200%]",
-                      "transition-transform duration-1000 ease-out"
-                    )} />
-                  </div>
-                  
-                  {/* Top edge highlight - like light hitting glass edge */}
-                  <div className={cn(
-                    "absolute top-0 left-[10%] right-[10%] h-[1px]",
-                    "bg-gradient-to-r from-transparent via-white/30 to-transparent",
-                    "opacity-60 group-hover:opacity-100 transition-opacity duration-500"
-                  )} />
-                  
-                  {/* Icon container - more organic glass bubble */}
-                  <div className={cn(
-                    "relative z-10 mr-4 sm:mr-0 sm:mb-4 p-3.5 rounded-2xl",
-                    "bg-gradient-to-br from-white/[0.08] to-white/[0.02]",
-                    "border border-white/[0.08] group-hover:border-white/[0.15]",
-                    "shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]",
-                    "backdrop-blur-xl",
-                    "transition-all duration-500 ease-out",
-                    "group-hover:scale-110 group-hover:bg-gradient-to-br group-hover:from-white/[0.92] group-hover:to-white/[0.04]"
+                    "relative z-10 mr-4 sm:mr-0 sm:mb-4 p-3 sm:p-3.5 rounded-xl",
+                    "bg-white/[0.03] border border-white/[0.05]",
+                    "backdrop-blur-sm",
+                    "transition-all duration-300 ease-out",
+                    "group-hover:bg-white/[0.06] group-hover:border-white/[0.1]"
                   )}>
                     <IconComponent 
                       className={cn(
-                        "w-5 h-5 sm:w-6 sm:h-6 transition-all duration-500",
-                        "text-white/60 group-hover:text-white"
+                        "w-5 h-5 sm:w-6 sm:h-6 transition-all duration-300",
+                        "text-white/50 group-hover:text-white/80"
                       )}
                       strokeWidth={1.5} 
                     />
@@ -231,23 +206,23 @@ const HomeHero: React.FC = () => {
                   
                   <div className="flex-1 min-w-0">
                     {/* Title */}
-                    <h2 className="relative z-10 font-newake text-base sm:text-lg tracking-wide text-white/90 group-hover:text-white uppercase mb-1 transition-colors duration-500">
+                    <h2 className="relative z-10 font-newake text-base sm:text-lg tracking-wide text-white/80 group-hover:text-white/95 uppercase mb-1 transition-colors duration-300">
                       {route.text}
                     </h2>
                     
                     {/* Description */}
-                    <p className="relative z-10 text-[10px] sm:text-xs leading-snug text-white/50 group-hover:text-white/70 tracking-wide transition-colors duration-500 truncate sm:whitespace-normal">
+                    <p className="relative z-10 text-[10px] sm:text-xs leading-snug text-white/40 group-hover:text-white/60 tracking-wide transition-colors duration-300 truncate sm:whitespace-normal">
                       {route.description}
                     </p>
                   </div>
 
-                  {/* Arrow indicator - smoother reveal */}
+                  {/* Arrow indicator - minimal reveal */}
                   <div className={cn(
                     "absolute bottom-3 right-3 sm:bottom-4 sm:right-4 z-10",
-                    "opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out",
-                    "translate-x-2 translate-y-1 group-hover:translate-x-0 group-hover:translate-y-0"
+                    "opacity-0 group-hover:opacity-60 transition-all duration-300 ease-out",
+                    "translate-x-1 group-hover:translate-x-0"
                   )}>
-                    <ChevronRight className="w-4 h-4 text-white/50" strokeWidth={1.5} />
+                    <ChevronRight className="w-4 h-4 text-white/40" strokeWidth={1.5} />
                   </div>
                 </div>
               </Link>

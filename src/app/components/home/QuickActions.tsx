@@ -12,28 +12,28 @@ const QuickActions = () => {
       href: '/events',
       icon: Calendar,
       gradient: 'from-white/20 to-white/10',
-      description: 'Check upcoming shows'
+      description: 'Upcoming shows'
     },
     {
       label: 'Our Artists',
       href: '/artists',
       icon: Users,
       gradient: 'from-white/20 to-white/10',
-      description: 'Meet the selectors'
+      description: 'Meet the DJs'
     },
     {
       label: 'Live Radio',
       href: '#upnext',
       icon: Radio,
       gradient: 'from-white/20 to-white/10',
-      description: 'Listen to sets'
+      description: 'Listen now'
     },
     {
       label: 'Anniversary',
       href: '/anniversary',
       icon: Music,
       gradient: 'from-white/20 to-white/10',
-      description: 'Celebrate with us'
+      description: 'Special event'
     },
   ]
 
@@ -65,15 +65,15 @@ const QuickActions = () => {
             transition={{ duration: 0.4, delay: idx * 0.05 }}
           >
             <Link href={action.href}>
-              <Card className="border-white/10 bg-white/[0.03] backdrop-blur-sm hover:bg-white/[0.08] transition-all duration-300 group cursor-pointer h-full">
+              <Card className="border-white/[0.05] bg-white/[0.015] backdrop-blur-sm hover:bg-white/[0.03] hover:border-white/[0.08] transition-all duration-300 group cursor-pointer h-full">
                 <CardContent className="p-4 sm:p-5 text-center">
-                  <div className={`inline-flex p-3 sm:p-4 rounded-2xl bg-white/10 mb-3 group-hover:scale-110 group-hover:bg-white/15 transition-all duration-300`}>
-                    <action.icon className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                  <div className={`inline-flex p-3 sm:p-4 rounded-xl bg-white/[0.03] border border-white/[0.05] mb-3 group-hover:bg-white/[0.06] group-hover:border-white/[0.1] transition-all duration-300`}>
+                    <action.icon className="w-6 h-6 sm:w-7 sm:h-7 text-white/60 group-hover:text-white/80 transition-colors duration-300" />
                   </div>
-                  <h3 className="text-sm sm:text-base font-semibold text-white mb-1">
+                  <h3 className="text-sm sm:text-base font-semibold text-white/80 group-hover:text-white/95 mb-1 transition-colors duration-300">
                     {action.label}
                   </h3>
-                  <p className="text-xs text-white/60">
+                  <p className="text-xs text-white/40 group-hover:text-white/60 transition-colors duration-300">
                     {action.description}
                   </p>
                 </CardContent>
@@ -93,7 +93,7 @@ const QuickActions = () => {
             rel="noopener noreferrer"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white text-sm font-medium hover:bg-white/20 transition-all duration-300`}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.03] border border-white/[0.08] text-white/80 text-sm font-medium hover:bg-white/[0.06] hover:border-white/[0.12] hover:text-white/95 transition-all duration-300`}
           >
             <social.icon className="w-4 h-4" />
             <span className="hidden sm:inline">{social.label}</span>

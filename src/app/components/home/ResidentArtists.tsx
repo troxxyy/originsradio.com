@@ -53,7 +53,7 @@ const ResidentArtists = ({ compact = false, maxItems, title }: ResidentArtistsPr
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: idx * 0.05 }}
-              className="group text-left rounded-2xl overflow-hidden border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
+              className="group text-left rounded-xl sm:rounded-2xl overflow-hidden border border-white/[0.05] bg-white/[0.015] hover:bg-white/[0.03] hover:border-white/[0.08] transition-all duration-300"
             >
               <div className={`relative ${compact ? 'h-36' : 'h-56'} w-full overflow-hidden`}>
                 <img
@@ -79,7 +79,7 @@ const ResidentArtists = ({ compact = false, maxItems, title }: ResidentArtistsPr
                 {Array.isArray(a.genre) && a.genre.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-2">
                     {a.genre.slice(0, 3).map((g, i) => (
-                      <span key={i} className="px-2 py-1 bg-white/10 rounded-full text-xs text-gray-300 border border-white/20">
+                      <span key={i} className="px-2 py-1 bg-white/[0.03] rounded-full text-xs text-white/50 border border-white/[0.08]">
                         {g}
                       </span>
                     ))}

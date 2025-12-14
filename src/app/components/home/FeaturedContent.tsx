@@ -33,9 +33,7 @@ const FeaturedContent = () => {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <Card className="border-white/20 bg-gradient-to-br from-white/[0.1] to-white/[0.03] backdrop-blur-md overflow-hidden group relative">
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-white/5 opacity-50"></div>
+        <Card className="border-white/[0.08] bg-white/[0.02] backdrop-blur-sm overflow-hidden group relative hover:bg-white/[0.03] hover:border-white/[0.12] transition-all duration-300">
           
           <CardContent className="p-0 relative z-10">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -78,7 +76,7 @@ const FeaturedContent = () => {
 
                 {featuredSet.set_number && (
                   <div className="mb-4">
-                    <Badge variant="outline" className="bg-white/10 border-white/20">
+                    <Badge variant="outline" className="bg-white/[0.03] border-white/[0.08] text-white/60">
                       Set #{featuredSet.set_number}
                     </Badge>
                   </div>
@@ -96,7 +94,7 @@ const FeaturedContent = () => {
                       href={featuredSet.artists.instagram}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-white/20 bg-white/5 text-white font-semibold hover:bg-white/10 transition-colors"
+                      className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-white/[0.08] bg-white/[0.03] text-white/80 font-semibold hover:bg-white/[0.06] hover:border-white/[0.12] hover:text-white/95 transition-all duration-300"
                     >
                       <span>Follow Artist</span>
                       <ExternalLink className="w-4 h-4" />

@@ -182,8 +182,47 @@ export default function EventsPage() {
       return new Date('2099-12-31'); // Put recurring events at the top
     }
     
-    // Try to parse various date formats
-    const date = new Date(dateStr);
+    // Parse formats like "April 2, 2023", "March 28, 2024", "August 29, Friday — Doors 22:00"
+    // Extract the date part before any "—" or extra text
+    const cleanDateStr = dateStr.split('—')[0].split('-')[0].trim();
+    
+    // Try to match month name, day, year pattern
+    const monthNames = ['january', 'february', 'march', 'april', 'may', 'june', 
+                       'july', 'august', 'september', 'october', 'november', 'december'];
+    
+    const monthAbbr = ['jan', 'feb', 'mar', 'apr', 'may', 'jun',
+                      'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+    
+    const lowerDateStr = cleanDateStr.toLowerCase();
+    
+    // Find month index
+    let monthIndex = -1;
+    for (let i = 0; i < monthNames.length; i++) {
+      if (lowerDateStr.includes(monthNames[i]) || lowerDateStr.includes(monthAbbr[i])) {
+        monthIndex = i;
+        break;
+      }
+    }
+    
+    if (monthIndex !== -1) {
+      // Extract day and year using regex
+      const dayMatch = cleanDateStr.match(/\b(\d{1,2})\b/);
+      const yearMatch = cleanDateStr.match(/\b(20\d{2})\b/);
+      
+      if (dayMatch && yearMatch) {
+        const day = parseInt(dayMatch[1], 10);
+        const year = parseInt(yearMatch[1], 10);
+        return new Date(year, monthIndex, day);
+      } else if (dayMatch) {
+        // If no year found, assume current year or a default
+        const day = parseInt(dayMatch[1], 10);
+        const currentYear = new Date().getFullYear();
+        return new Date(currentYear, monthIndex, day);
+      }
+    }
+    
+    // Fallback: Try to parse with native Date constructor
+    const date = new Date(cleanDateStr);
     if (!isNaN(date.getTime())) {
       return date;
     }
@@ -192,20 +231,20 @@ export default function EventsPage() {
     return new Date('1900-01-01');
   };
 
-  // Sort events by date
+  // Sort events by date - latest to oldest
   const sortedUpcomingEvents = useMemo(() => {
-    return upcomingEvents.sort((a, b) => {
+    return [...upcomingEvents].sort((a, b) => {
       if (a.date && b.date) {
         const dateA = parseDate(a.date);
         const dateB = parseDate(b.date);
-        return dateA.getTime() - dateB.getTime(); // Earliest first for upcoming
+        return dateB.getTime() - dateA.getTime(); // Latest first for upcoming
       }
       return 0;
     });
   }, [upcomingEvents]);
 
   const sortedPastEvents = useMemo(() => {
-    return pastEvents.sort((a, b) => {
+    return [...pastEvents].sort((a, b) => {
       if (a.date && b.date) {
         const dateA = parseDate(a.date);
         const dateB = parseDate(b.date);

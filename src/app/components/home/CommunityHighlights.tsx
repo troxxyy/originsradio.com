@@ -59,7 +59,7 @@ const CommunityHighlights = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: idx * 0.1 }}
           >
-            <Card className="border-white/10 bg-white/[0.03] backdrop-blur-sm hover:bg-white/[0.06] transition-all duration-300 overflow-hidden group">
+            <Card className="border-white/[0.05] bg-white/[0.015] backdrop-blur-sm hover:bg-white/[0.03] hover:border-white/[0.08] transition-all duration-300 overflow-hidden group">
               <CardContent className="p-0">
                 {/* Image */}
                 <div className="relative h-48 overflow-hidden">
@@ -69,7 +69,7 @@ const CommunityHighlights = () => {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                  <Badge className="absolute top-3 right-3 bg-white/10 hover:bg-white/20 border border-white/20">
+                  <Badge className="absolute top-3 right-3 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.08] hover:border-white/[0.12]">
                     <Instagram className="w-3 h-3 mr-1" />
                     Instagram
                   </Badge>

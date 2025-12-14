@@ -21,28 +21,28 @@ const HomeStats = () => {
         value: totalSets,
         icon: Music4,
         gradient: 'from-white/20 to-white/10',
-        description: 'Exclusive mixes'
+        description: 'Available mixes'
       },
       {
         label: 'Upcoming Events',
         value: totalEvents,
         icon: Calendar,
         gradient: 'from-white/20 to-white/10',
-        description: 'On the calendar'
+        description: 'On schedule'
       },
       {
         label: 'Artists',
         value: totalArtists,
         icon: Users,
         gradient: 'from-white/20 to-white/10',
-        description: 'In our roster'
+        description: 'In the roster'
       },
       {
         label: 'Resident DJs',
         value: residentArtists,
         icon: Headphones,
         gradient: 'from-white/20 to-white/10',
-        description: 'Core selectors'
+        description: 'Core members'
       },
     ]
   }, [sets, projects, artists])
@@ -57,22 +57,21 @@ const HomeStats = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: idx * 0.1 }}
           >
-            <Card className="border-white/10 bg-white/[0.03] backdrop-blur-sm hover:bg-white/[0.06] transition-all duration-300 group overflow-hidden relative">
-              <div className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-20 transition-opacity duration-300`}></div>
+            <Card className="border-white/[0.05] bg-white/[0.015] backdrop-blur-sm hover:bg-white/[0.03] hover:border-white/[0.08] transition-all duration-300 group overflow-hidden relative">
               <CardContent className="p-4 sm:p-6 relative z-10">
                 <div className="flex items-start justify-between mb-3">
-                  <div className={`p-2 sm:p-3 rounded-xl bg-white/10`}>
-                    <stat.icon className={`w-5 h-5 sm:w-6 sm:h-6 text-white`} />
+                  <div className={`p-2 sm:p-3 rounded-lg bg-white/[0.03] border border-white/[0.05] group-hover:bg-white/[0.05] transition-all duration-300`}>
+                    <stat.icon className={`w-5 h-5 sm:w-6 sm:h-6 text-white/60 group-hover:text-white/80 transition-colors duration-300`} />
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-2xl sm:text-3xl font-bold text-white tabular-nums">
+                  <p className="text-2xl sm:text-3xl font-bold text-white/90 tabular-nums">
                     {stat.value}
                   </p>
-                  <p className="text-xs sm:text-sm font-medium text-white/70">
+                  <p className="text-xs sm:text-sm font-medium text-white/60">
                     {stat.label}
                   </p>
-                  <p className="text-xs text-white/50">
+                  <p className="text-xs text-white/40">
                     {stat.description}
                   </p>
                 </div>

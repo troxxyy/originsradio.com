@@ -68,7 +68,7 @@ const RecentActivity = () => {
     <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Recent Activity */}
-        <Card className="border-white/10 bg-white/[0.03] backdrop-blur-sm lg:col-span-2">
+        <Card className="border-white/[0.05] bg-white/[0.015] backdrop-blur-sm hover:bg-white/[0.02] hover:border-white/[0.08] transition-all duration-300 lg:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-white">
               <Activity className="w-5 h-5" />
@@ -84,13 +84,13 @@ const RecentActivity = () => {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.3, delay: idx * 0.05 }}
-                    className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] transition-colors border border-white/5"
+                    className="flex items-start gap-3 p-3 rounded-lg bg-white/[0.01] hover:bg-white/[0.03] transition-all duration-300 border border-white/[0.05] hover:border-white/[0.08]"
                   >
-                    <Avatar className="w-12 h-12 border-2 border-white/10">
+                    <Avatar className="w-12 h-12 border-2 border-white/[0.08]">
                       {activity.image && (
                         <AvatarImage src={activity.image} alt={activity.title} />
                       )}
-                      <AvatarFallback className="bg-white/10">
+                      <AvatarFallback className="bg-white/[0.03]">
                         <activity.icon className="w-5 h-5 text-white/70" />
                       </AvatarFallback>
                     </Avatar>
@@ -107,7 +107,7 @@ const RecentActivity = () => {
                       </p>
                     </div>
 
-                    <div className={`px-2 py-1 rounded-full text-xs font-medium bg-white/10 text-white/70`}>
+                    <div className={`px-2 py-1 rounded-full text-xs font-medium bg-white/[0.03] border border-white/[0.05] text-white/50`}>
                       {activity.type}
                     </div>
                   </motion.div>
@@ -118,7 +118,7 @@ const RecentActivity = () => {
         </Card>
 
         {/* Quick Stats */}
-        <Card className="border-white/10 bg-white/[0.03] backdrop-blur-sm">
+        <Card className="border-white/[0.05] bg-white/[0.015] backdrop-blur-sm hover:bg-white/[0.02] hover:border-white/[0.08] transition-all duration-300">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-white">
               <TrendingUp className="w-5 h-5" />
@@ -127,7 +127,7 @@ const RecentActivity = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+              <div className="p-4 rounded-lg bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.08] transition-all duration-300">
                 <div className="flex items-center justify-between mb-2">
                   <Music className="w-5 h-5 text-white/70" />
                   <span className="text-2xl font-bold text-white">
@@ -137,7 +137,7 @@ const RecentActivity = () => {
                 <p className="text-sm text-white/70">Total Sets</p>
               </div>
 
-              <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+              <div className="p-4 rounded-lg bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.08] transition-all duration-300">
                 <div className="flex items-center justify-between mb-2">
                   <Calendar className="w-5 h-5 text-white/70" />
                   <span className="text-2xl font-bold text-white">
@@ -147,7 +147,7 @@ const RecentActivity = () => {
                 <p className="text-sm text-white/70">Upcoming Events</p>
               </div>
 
-              <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+              <div className="p-4 rounded-lg bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.08] transition-all duration-300">
                 <div className="flex items-center justify-between mb-2">
                   <Users className="w-5 h-5 text-white/70" />
                   <span className="text-2xl font-bold text-white">Active</span>

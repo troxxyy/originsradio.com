@@ -67,10 +67,10 @@ const HomeOverview = () => {
         {/* Latest Set */}
         <Link
           href="#upnext"
-          className="group rounded-2xl overflow-hidden border border-white/10 bg-white/[0.04] hover:bg-white/[0.06] transition-colors"
+          className="group rounded-xl sm:rounded-2xl overflow-hidden border border-white/[0.05] bg-white/[0.015] hover:bg-white/[0.03] hover:border-white/[0.08] transition-all duration-300"
         >
           <div className="p-4 flex items-center gap-4">
-            <div className="w-16 h-16 rounded-xl overflow-hidden bg-white/10 border border-white/10 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-lg overflow-hidden bg-white/[0.03] border border-white/[0.05] flex items-center justify-center">
               {latestSet?.artists?.photo_url ? (
                 <img
                   src={latestSet.artists.photo_url}
@@ -99,10 +99,10 @@ const HomeOverview = () => {
             <Link
               key={p?.slug || `evt-${i}`}
               href={p?.slug ? `/events/${p.slug}` : '/events'}
-              className="group rounded-2xl overflow-hidden border border-white/10 bg-white/[0.04] hover:bg-white/[0.06] transition-colors"
+              className="group rounded-xl sm:rounded-2xl overflow-hidden border border-white/[0.05] bg-white/[0.015] hover:bg-white/[0.03] hover:border-white/[0.08] transition-all duration-300"
             >
               <div className="flex gap-4 p-4">
-                <div className="w-16 h-16 rounded-xl overflow-hidden bg-white/10 border border-white/10 flex-shrink-0">
+                <div className="w-16 h-16 rounded-lg overflow-hidden bg-white/[0.03] border border-white/[0.05] flex-shrink-0">
                   {p ? (
                     <img
                       src={p.image_url || '/placeholder.svg'}
@@ -140,7 +140,7 @@ const HomeOverview = () => {
               key={a?.id || `ra-${i}`}
               type="button"
               onClick={() => a?.name && openArtist(a.name)}
-              className="group rounded-2xl overflow-hidden border border-white/10 bg-white/[0.04] hover:bg-white/[0.06] transition-colors text-left"
+              className="group rounded-xl sm:rounded-2xl overflow-hidden border border-white/[0.05] bg-white/[0.015] hover:bg-white/[0.03] hover:border-white/[0.08] transition-all duration-300 text-left"
             >
               <div className="relative h-24 w-full">
                 {a ? (
