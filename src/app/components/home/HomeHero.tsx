@@ -6,6 +6,7 @@ import { Ticket, Users, Radio, Navigation, LogIn, ChevronRight } from "lucide-re
 import { cn } from "@/lib/utils";
 import { useCurrentRadioSlot } from "@/hooks/use-radio";
 import Orb from "@/components/three/Orb";
+import { useIsMobile } from "../../hooks/use-mobile";
 
 type RouteKey = "events" | "fm" | "artists" | "thisWeek";
 
@@ -28,6 +29,7 @@ const HomeHero: React.FC = () => {
   const [mounted, setMounted] = useState(false);
   const [hoveredCard, setHoveredCard] = useState<RouteKey | null>(null);
   const { currentSlot } = useCurrentRadioSlot(5000);
+  const isMobile = useIsMobile();
   const isLive = !!currentSlot?.isLiveStream;
 
   useEffect(() => {
@@ -36,7 +38,7 @@ const HomeHero: React.FC = () => {
   }, []);
 
   return (
-    <section className="relative w-full h-screen overflow-hidden bg-black">
+    <section className="relative w-full h-[100dvh] overflow-hidden bg-black">
       {/* Video Background */}
       <video
         autoPlay
@@ -78,9 +80,11 @@ const HomeHero: React.FC = () => {
       )} />
 
       {/* 3D Orb - using mix-blend-mode to show video through */}
-      <div className="absolute inset-0 z-10 pointer-events-none mix-blend-screen brightness-125 saturate-125">
-        <Orb className="w-full h-full" />
-      </div>
+      {!isMobile && (
+        <div className="absolute inset-0 z-10 pointer-events-none mix-blend-screen brightness-125 saturate-125">
+          <Orb className="w-full h-full" />
+        </div>
+      )}
 
       {/* Artist Login */}
       <div className={cn(
@@ -103,7 +107,7 @@ const HomeHero: React.FC = () => {
       <div className="absolute inset-0 z-[50] flex flex-col items-center justify-center px-4 sm:px-6">
         {/* Hero Text */}
         <div className={cn(
-          "text-center mb-12 sm:mb-16 transition-all duration-700",
+          "text-center mb-8 sm:mb-16 transition-all duration-700",
           mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
         )}>
           {/* Tagline */}
@@ -146,7 +150,7 @@ const HomeHero: React.FC = () => {
 
         {/* Navigation Cards */}
         <div className={cn(
-          "grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 w-full max-w-4xl transition-all duration-200 delay-100",
+          "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 w-full max-w-4xl transition-all duration-200 delay-100",
           mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
         )}>
           {routes.map((route, index) => {
@@ -173,8 +177,8 @@ const HomeHero: React.FC = () => {
                 
                 {/* Card */}
                 <div className={cn(
-                  "relative flex flex-col items-center justify-center text-center",
-                  "p-5 sm:p-6 lg:p-8 rounded-[20px] sm:rounded-[28px]",
+                  "relative flex flex-row sm:flex-col items-center sm:justify-center text-left sm:text-center",
+                  "p-4 sm:p-6 lg:p-8 rounded-[20px] sm:rounded-[28px]",
                   "liquid-glass-card transform-gpu"
                 )}>
                   {/* Animated light sweep on hover - Apple-style shimmer */}
@@ -197,7 +201,7 @@ const HomeHero: React.FC = () => {
                   
                   {/* Icon container - more organic glass bubble */}
                   <div className={cn(
-                    "relative z-10 mb-4 p-3.5 rounded-2xl",
+                    "relative z-10 mr-4 sm:mr-0 sm:mb-4 p-3.5 rounded-2xl",
                     "bg-gradient-to-br from-white/[0.08] to-white/[0.02]",
                     "border border-white/[0.08] group-hover:border-white/[0.15]",
                     "shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]",
@@ -214,15 +218,17 @@ const HomeHero: React.FC = () => {
                     />
                   </div>
                   
-                  {/* Title */}
-                  <h2 className="relative z-10 font-newake text-base sm:text-lg tracking-wide text-white/90 group-hover:text-white uppercase mb-1 transition-colors duration-500">
-                    {route.text}
-                  </h2>
-                  
-                  {/* Description */}
-                  <p className="relative z-10 text-[10px] sm:text-xs leading-snug text-white/50 group-hover:text-white/70 tracking-wide transition-colors duration-500">
-                    {route.description}
-                  </p>
+                  <div className="flex-1 min-w-0">
+                    {/* Title */}
+                    <h2 className="relative z-10 font-newake text-base sm:text-lg tracking-wide text-white/90 group-hover:text-white uppercase mb-1 transition-colors duration-500">
+                      {route.text}
+                    </h2>
+                    
+                    {/* Description */}
+                    <p className="relative z-10 text-[10px] sm:text-xs leading-snug text-white/50 group-hover:text-white/70 tracking-wide transition-colors duration-500 truncate sm:whitespace-normal">
+                      {route.description}
+                    </p>
+                  </div>
 
                   {/* Arrow indicator - smoother reveal */}
                   <div className={cn(
@@ -240,7 +246,7 @@ const HomeHero: React.FC = () => {
 
         {/* Bottom text */}
         <p className={cn(
-          "mt-12 sm:mt-16 text-[10px] sm:text-xs tracking-[0.25em] uppercase text-white",
+          "mt-8 sm:mt-16 text-[10px] sm:text-xs tracking-[0.25em] uppercase text-white",
           "transition-all duration-700 delay-400",
           mounted ? "opacity-100" : "opacity-100"
         )}>

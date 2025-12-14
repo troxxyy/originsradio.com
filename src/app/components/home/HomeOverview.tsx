@@ -51,7 +51,7 @@ const HomeOverview = () => {
 
   return (
     <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8">
-      <div className="mb-4 sm:mb-6 flex items-center justify-between">
+      <div className="mb-4 sm:mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-xl sm:text-2xl font-semibold text-white">Overview</h2>
         <div className="flex items-center gap-4 text-sm">
           <Link href="/events" className="text-white/80 hover:text-white inline-flex items-center gap-1">
