@@ -194,10 +194,11 @@ const HomeHero: React.FC = () => {
         )}>
           {/* Big Navigation Panel */}
           <nav className={cn(
-            "flex flex-wrap items-center justify-center p-2 rounded-[2rem] sm:rounded-full",
+            "flex flex-nowrap overflow-x-auto items-center justify-between sm:justify-center p-1.5 sm:p-2 rounded-[2rem] sm:rounded-full gap-1 sm:gap-2",
             "bg-white/[0.03] backdrop-blur-xl border border-white/[0.08]",
             "shadow-2xl shadow-black/20",
-            "max-w-full"
+            "max-w-full w-full sm:w-auto",
+            "scrollbar-hide snap-x snap-mandatory"
           )}>
             {routes.map((route, index) => {
               const IconComponent = route.icon;
@@ -207,25 +208,25 @@ const HomeHero: React.FC = () => {
                 <Link
                   key={route.key}
                   href={route.href}
-                  className="group relative outline-none"
+                  className="group relative outline-none flex-shrink-0 snap-center"
                   onMouseEnter={() => setHoveredRoute(route.key)}
                   onMouseLeave={() => setHoveredRoute(null)}
                 >
                   <div className={cn(
-                    "relative flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 rounded-full",
+                    "relative flex items-center gap-1.5 sm:gap-3 px-2 sm:px-6 py-2 sm:py-4 rounded-full",
                     "transition-all duration-300 ease-out",
                     "hover:bg-white/[0.08]",
                     "active:scale-95"
                   )}>
                     <IconComponent 
                       className={cn(
-                        "w-5 h-5 transition-colors duration-300",
+                        "w-4 h-4 sm:w-5 sm:h-5 transition-colors duration-300",
                         "text-white/50 group-hover:text-white"
                       )} 
                       strokeWidth={1.5}
                     />
                     <span className={cn(
-                      "font-newake text-base sm:text-lg tracking-wide uppercase",
+                      "font-newake text-xs sm:text-lg tracking-wide uppercase",
                       "text-white/60 group-hover:text-white",
                       "transition-colors duration-300"
                     )}>
