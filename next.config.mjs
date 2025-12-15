@@ -5,7 +5,8 @@ const nextConfig = {
     ignoreBuildErrors: false,
   },
   // Base path for serving the application from a subdirectory
-  basePath: process.env.NEXT_PUBLIC_BASE_PATH || '/originsradio',
+  // Only use basePath if explicitly set via env var, otherwise empty for dev
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH || '',
   // Optimize for virtual environments and production builds
   output: 'standalone',
   experimental: {
@@ -18,6 +19,8 @@ const nextConfig = {
   images: {
     formats: ['image/webp', 'image/avif'],
     minimumCacheTTL: 60,
+    unoptimized: process.env.NODE_ENV === 'development',
+    remotePatterns: [],
   },
   // Enable compression
   compress: true,

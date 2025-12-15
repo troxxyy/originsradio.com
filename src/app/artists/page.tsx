@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
-import { Search, Music, MapPin, Star, LogIn, Sparkles, Tag, ArrowRight, CheckCircle2, Users } from 'lucide-react';
+import { Search, Music, MapPin, Star, LogIn, Tag, ArrowRight, CheckCircle2, Users, Languages } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import PageLayout from '@/components/layout/PageLayout';
@@ -14,34 +14,180 @@ import { generateSlug } from '@/lib/supabase-utils';
 import { cn } from '@/lib/utils';
 
 const copy = {
-  hero: {
-    eyebrow: "the sound of origins",
-    titleTop: "residents, guests,",
-    titleBottom: "and the future.",
-    paragraphs: [
-      "we do not just book names. we book taste, intention, and respect for the room.",
-      "browse the roster, filter by genre, and if you’re a new talent with a point of view—apply for management.",
-    ],
+  en: {
+    hero: {
+      titleTop: "residents, guests,",
+      titleBottom: "and the future.",
+      paragraphs: [
+        "we do not just book names. we book taste, intention, and respect for the room.",
+        "browse the roster, filter by genre, and if you’re a new talent with a point of view—apply for management.",
+      ],
+      actions: {
+        browseRoster: "browse roster",
+        bookByGenre: "book by genre",
+        applyManagement: "apply for management",
+      },
+      stats: {
+        artists: "artists",
+        residents: "residents",
+        genres: "genres",
+        cities: "cities",
+      },
+    },
+    management: {
+      eyebrow: "new talent management",
+      title: "we build careers, not just bookings.",
+      subtitle: "origins management is for artists we truly believe in.",
+      paragraphs: [
+        "for a select group of new talents, we go beyond radio slots. we offer management services: long-term strategy, identity development, release planning, and placing you in the right rooms.",
+        "it is not about filling a calendar. it is about telling a story with your career. if you have a unique sound and the drive to back it up, we want to hear from you.",
+      ],
+      ctaPrimary: "apply for management",
+      ctaPrimaryLink:
+        "mailto:info@originsradio.com?subject=new%20talent%20-%20artist%20management&body=links%20(soundcloud%2Fspotify)%3A%0Ainstagram%3A%0Alocation%3A%0Agenres%3A%0Ashort%20note%3A%0A",
+      ctaSecondary: "submit a mix for radio",
+      ctaSecondaryLink:
+        "mailto:info@originsradio.com?subject=origins%20radio%20-%20mix%20submission&body=artist%20name%3A%0Alocation%3A%0Agenres%3A%0Amix%20link%3A%0Ashort%20note%3A%0A",
+      card: {
+        title: "Join the Roster",
+        body:
+          "we are looking for sound that stands out. if you believe you have what it takes to be a resident or a managed artist, show us what you've got.",
+        bullets: ["Identity development", "Strategic bookings", "Production support"],
+      },
+    },
+    booking: {
+      eyebrow: "curate your night",
+      title: "find the right sound",
+      subtitle:
+        "browse our roster by genre to find the perfect match for your event. from warmups to peak time.",
+      cta: "book a DJ",
+      mailto: {
+        subjectBase: "DJ booking request",
+        bodyLines: [
+          "event date:",
+          "venue / city:",
+          "genre / vibe:",
+          "budget:",
+          "preferred DJs (optional):",
+          "notes:",
+        ],
+        openGenre: "open",
+      },
+    },
+    ui: {
+      artistLogin: "Artist Login",
+      searchPlaceholder: "Search artist name or bio...",
+      filterByVibe: "Filter by Vibe",
+      allGenres: "All Genres",
+      showResidentsOnly: "Show Residents Only",
+      showingResidentsOnly: "Showing Residents Only",
+      foundPrefix: "Found",
+      noMatches: "No artists match your criteria",
+      loading: "Loading artists...",
+      errorTitle: "Error loading artists",
+      emptyTitle: "No artists match this yet",
+      emptyBody: "Try clearing filters or searching with a different word.",
+      viewProfile: "view profile",
+      residentBadge: "Resident",
+      keyboardHintOr: "+",
+    },
+    seo: {
+      title: "Artists & Management - Origins Radio",
+      description:
+        "Discover the DJs and artists shaping nights at Origins Radio. Browse residents, explore by genre, and learn about our artist management services.",
+      keywords:
+        "DJs, artist management, underground music, techno, house, Origins Radio, booking, new talent",
+      listName: "Artists & DJs",
+      listDescription: "Resident DJs and music producers from the underground music scene",
+    },
   },
-  management: {
-    eyebrow: "new talent management",
-    title: "we build careers, not just bookings.",
-    subtitle: "origins management is for artists we truly believe in.",
-    paragraphs: [
-      "for a select group of new talents, we go beyond radio slots. we offer management services: long-term strategy, identity development, release planning, and placing you in the right rooms.",
-      "it is not about filling a calendar. it is about telling a story with your career. if you have a unique sound and the drive to back it up, we want to hear from you.",
-    ],
-    ctaPrimary: "apply for management",
-    ctaPrimaryLink: "mailto:info@originsradio.com?subject=new%20talent%20-%20artist%20management&body=links%20(soundcloud%2Fspotify)%3A%0Ainstagram%3A%0Alocation%3A%0Agenres%3A%0Ashort%20note%3A%0A",
-    ctaSecondary: "submit a mix for radio",
-    ctaSecondaryLink: "mailto:info@originsradio.com?subject=origins%20radio%20-%20mix%20submission&body=artist%20name%3A%0Alocation%3A%0Agenres%3A%0Amix%20link%3A%0Ashort%20note%3A%0A",
+  tr: {
+    hero: {
+      titleTop: "resident’lar, konuklar,",
+      titleBottom: "ve gelecek.",
+      paragraphs: [
+        "biz sadece isimleri book’lamıyoruz. zevki, niyeti ve mekâna saygıyı book’luyoruz.",
+        "kadroyu incele, türlere göre filtrele; yeni bir yeteneksen ve bir bakış açın varsa—menajerlik için başvur.",
+      ],
+      actions: {
+        browseRoster: "kadroyu incele",
+        bookByGenre: "türe göre rezervasyon",
+        applyManagement: "menajerlik için başvur",
+      },
+      stats: {
+        artists: "sanatçı",
+        residents: "resident",
+        genres: "tür",
+        cities: "şehir",
+      },
+    },
+    management: {
+      eyebrow: "yeni yetenek menajerliği",
+      title: "biz kariyer inşa ederiz, sadece booking değil.",
+      subtitle: "origins management, gerçekten inandığımız sanatçılar içindir.",
+      paragraphs: [
+        "seçilmiş yeni yetenekler için radyo slotlarının ötesine geçiyoruz. menajerlik hizmetleri sunuyoruz: uzun vadeli strateji, kimlik geliştirme, yayın planı ve seni doğru odalara yerleştirmek.",
+        "mesele takvimi doldurmak değil. mesele kariyerinle bir hikâye anlatmak. kendine özgü bir sesin ve onu taşıyacak disiplinin varsa, senden haber almak isteriz.",
+      ],
+      ctaPrimary: "menajerlik için başvur",
+      ctaPrimaryLink:
+        "mailto:info@originsradio.com?subject=yeni%20yetenek%20-%20sanatci%20menajerligi&body=linkler%20(soundcloud%2Fspotify)%3A%0Ainstagram%3A%0Akonum%3A%0Aturler%3A%0Akisa%20not%3A%0A",
+      ctaSecondary: "radyoya mix gönder",
+      ctaSecondaryLink:
+        "mailto:info@originsradio.com?subject=origins%20radio%20-%20mix%20gonderimi&body=artist%20adi%3A%0Akonum%3A%0Aturler%3A%0Amix%20linki%3A%0Akisa%20not%3A%0A",
+      card: {
+        title: "Kadromuza Katıl",
+        body:
+          "öne çıkan bir sound arıyoruz. resident ya da menajerli sanatçı olabileceğine inanıyorsan, bize ne yaptığını göster.",
+        bullets: ["Kimlik geliştirme", "Stratejik booking", "Prodüksiyon desteği"],
+      },
+    },
+    booking: {
+      eyebrow: "geceni kurgula",
+      title: "doğru sound’u bul",
+      subtitle:
+        "etkinliğin için en doğru eşleşmeyi türlere göre bul. warmup’tan peak time’a.",
+      cta: "DJ rezervasyonu",
+      mailto: {
+        subjectBase: "DJ rezervasyon talebi",
+        bodyLines: [
+          "etkinlik tarihi:",
+          "mekan / şehir:",
+          "tür / vibe:",
+          "bütçe:",
+          "tercih edilen DJ’ler (opsiyonel):",
+          "notlar:",
+        ],
+        openGenre: "fark etmez",
+      },
+    },
+    ui: {
+      artistLogin: "Artist Login",
+      searchPlaceholder: "Sanatçı adı veya biyografide ara...",
+      filterByVibe: "Vibe’a Göre Filtrele",
+      allGenres: "Tüm Türler",
+      showResidentsOnly: "Sadece Resident’lar",
+      showingResidentsOnly: "Sadece Resident’lar Gösteriliyor",
+      foundPrefix: "Bulunan",
+      noMatches: "Kriterlerine uyan sanatçı yok",
+      loading: "Sanatçılar yükleniyor...",
+      errorTitle: "Sanatçılar yüklenemedi",
+      emptyTitle: "Şu an eşleşme yok",
+      emptyBody: "Filtreleri temizlemeyi ya da farklı bir kelimeyle aramayı dene.",
+      viewProfile: "profili gör",
+      residentBadge: "Resident",
+      keyboardHintOr: "+",
+    },
+    seo: {
+      title: "Sanatçılar & Menajerlik - Origins Radio",
+      description:
+        "Origins Radio gecelerini şekillendiren DJ ve sanatçıları keşfet. Resident’lara göz at, türe göre filtrele ve menajerlik hizmetlerimizi incele.",
+      keywords:
+        "DJ, sanatçı menajerliği, underground müzik, techno, house, Origins Radio, rezervasyon, yeni yetenek",
+      listName: "Sanatçılar & DJ’ler",
+      listDescription: "Underground sahneden resident DJ’ler ve müzik prodüktörleri",
+    },
   },
-  booking: {
-    eyebrow: "curate your night",
-    title: "find the right sound",
-    subtitle: "browse our roster by genre to find the perfect match for your event. from warmups to peak time.",
-    cta: "book a DJ",
-  }
 };
 
 function SectionTitle({
@@ -98,6 +244,7 @@ export default function ArtistsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
+  const [language, setLanguage] = useState<'en' | 'tr'>('en');
   const searchInputRef = useRef<HTMLInputElement>(null);
   const rosterRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -161,12 +308,12 @@ export default function ArtistsPage() {
       if (l) locations.add(l);
     });
     return [
-      { icon: Users, label: 'artists', value: String(totalArtists) },
-      { icon: Star, label: 'residents', value: String(residents) },
-      { icon: Tag, label: 'genres', value: String(allGenres.length) },
-      { icon: MapPin, label: 'cities', value: String(locations.size) },
+      { icon: Users, label: copy[language].hero.stats.artists, value: String(totalArtists) },
+      { icon: Star, label: copy[language].hero.stats.residents, value: String(residents) },
+      { icon: Tag, label: copy[language].hero.stats.genres, value: String(allGenres.length) },
+      { icon: MapPin, label: copy[language].hero.stats.cities, value: String(locations.size) },
     ];
-  }, [artists, allGenres.length]);
+  }, [artists, allGenres.length, language]);
 
   // Initialize genre from URL (?genre=...) so people can share "book by genre" links
   useEffect(() => {
@@ -218,56 +365,50 @@ export default function ArtistsPage() {
   };
 
   const bookingMailto = useMemo(() => {
-    const subject = encodeURIComponent(
-      `DJ booking request${selectedGenre ? ` - ${selectedGenre}` : ''}`
-    );
-    const body = encodeURIComponent(
-      [
-        'event date:',
-        'venue / city:',
-        `genre / vibe: ${selectedGenre ?? 'open'}`,
-        'budget:',
-        'preferred DJs (optional):',
-        'notes:',
-      ].join('\n')
-    );
+    const base = copy[language].booking.mailto.subjectBase;
+    const subject = encodeURIComponent(`${base}${selectedGenre ? ` - ${selectedGenre}` : ''}`);
+    const lines = copy[language].booking.mailto.bodyLines.slice();
+    const genreLineIndex = lines.findIndex((l) => l.toLowerCase().includes('genre') || l.toLowerCase().includes('tür'));
+    const genreValue = selectedGenre ?? copy[language].booking.mailto.openGenre;
+    if (genreLineIndex >= 0) lines[genreLineIndex] = `${lines[genreLineIndex]} ${genreValue}`;
+    const body = encodeURIComponent(lines.join('\n'));
     return `mailto:info@originsradio.com?subject=${subject}&body=${body}`;
-  }, [selectedGenre]);
+  }, [selectedGenre, language]);
 
   // SEO Data
-  const seoData = {
-    title: 'Artists & Management - Origins Radio',
-    description:
-      'Discover the DJs and artists shaping nights at Origins Radio. Browse residents, explore by genre, and learn about our artist management services.',
-    keywords:
-      'DJs, artist management, underground music, techno, house, Origins Radio, booking, new talent',
-    structuredData: {
-      '@context': 'https://schema.org',
-      '@type': 'ItemList',
-      name: 'Artists & DJs',
-      description:
-        'Resident DJs and music producers from the underground music scene',
-      url: 'https://originsradio.com/artists',
-      numberOfItems: artists?.length || 0,
-      itemListElement:
-        artists?.map((artist, index) => ({
-          '@type': 'ListItem',
-          position: index + 1,
-          item: {
-            '@type': 'Person',
-            name: artist.name,
-            description: artist.bio || `Professional DJ ${artist.name}`,
-            url: `https://originsradio.com/artists/${generateSlug(artist.name)}`,
-            image: artist.photo_url || '/placeholder.svg',
-            jobTitle: 'DJ & Music Producer',
-            worksFor: {
-              '@type': 'Organization',
-              name: 'Origins Radio',
+  const seoData = useMemo(() => {
+    const current = copy[language].seo;
+    return {
+      title: current.title,
+      description: current.description,
+      keywords: current.keywords,
+      structuredData: {
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        name: current.listName,
+        description: current.listDescription,
+        url: 'https://originsradio.com/artists',
+        numberOfItems: artists?.length || 0,
+        itemListElement:
+          artists?.map((artist, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            item: {
+              '@type': 'Person',
+              name: artist.name,
+              description: artist.bio || `Professional DJ ${artist.name}`,
+              url: `https://originsradio.com/artists/${generateSlug(artist.name)}`,
+              image: artist.photo_url || '/placeholder.svg',
+              jobTitle: 'DJ & Music Producer',
+              worksFor: {
+                '@type': 'Organization',
+                name: 'Origins Radio',
+              },
             },
-          },
-        })) || [],
-    },
-  };
+          })) || [],
+      },
+    };
+  }, [artists, language]);
 
   const motionIn = reduceMotion
     ? {
@@ -295,22 +436,34 @@ export default function ArtistsPage() {
       <SocialBubbles />
       <Navigation />
 
-      {/* Artist Login button (fixed, top-right) */}
+      {/* Top-right controls (language + artist login) */}
       <div
         className={cn(
-          'fixed z-40',
+          'fixed z-40 flex items-center gap-2',
           'top-[calc(0.75rem+env(safe-area-inset-top))] right-[calc(0.75rem+env(safe-area-inset-right))]',
           'sm:top-[calc(1.5rem+env(safe-area-inset-top))] sm:right-[calc(1.5rem+env(safe-area-inset-right))]'
         )}
       >
+        <motion.button
+          onClick={() => setLanguage(language === 'en' ? 'tr' : 'en')}
+          className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white hover:bg-white/20 transition-colors backdrop-blur-sm"
+          whileHover={reduceMotion ? undefined : { scale: 1.05 }}
+          whileTap={reduceMotion ? undefined : { scale: 0.95 }}
+          type="button"
+          aria-label="Toggle language"
+          title="Toggle language"
+        >
+          <Languages className="w-4 h-4" />
+          <span className="text-sm font-semibold">{language === 'en' ? 'TR' : 'EN'}</span>
+        </motion.button>
         <Link
           href="/artist/login"
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-stone-900/70 border border-white/20 hover:bg-stone-800/90 text-white transition-colors group"
-          aria-label="Artist Login"
-          title="Artist Login"
+          aria-label={copy[language].ui.artistLogin}
+          title={copy[language].ui.artistLogin}
         >
           <LogIn className="w-4 h-4 group-hover:scale-110 transition-transform" />
-          <span className="text-sm font-medium">Artist Login</span>
+          <span className="text-sm font-medium">{copy[language].ui.artistLogin}</span>
         </Link>
       </div>
 
@@ -334,27 +487,18 @@ export default function ArtistsPage() {
       </Helmet>
 
       {/* Hero Section */}
-      <section className="min-h-screen flex items-center justify-center relative z-10 px-6 pt-32 pb-16">
+      <section className="min-h-screen flex items-center justify-center relative z-10 px-6 pt-12 pb-16">
         <motion.div className="max-w-5xl mx-auto" {...motionIn}>
-          <div className="mb-8 md:mb-12 inline-block">
-            <div className="inline-flex items-center gap-2 bg-amber-100/10 border border-amber-400/20 px-5 py-3 rounded-xl backdrop-blur-sm">
-              <Sparkles className="w-4 h-4 text-amber-300/80" />
-              <p className="text-amber-200/80 text-sm md:text-base italic">
-                {copy.hero.eyebrow}
-              </p>
-            </div>
-          </div>
-
           <div className="mb-10 md:mb-12">
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 text-white leading-[1.05] text-left md:text-center">
-              {copy.hero.titleTop}
+              {copy[language].hero.titleTop}
               <br />
-              <span className="text-amber-300/85">{copy.hero.titleBottom}</span>
+              <span className="text-amber-300/85">{copy[language].hero.titleBottom}</span>
             </h1>
           </div>
 
           <div className="max-w-3xl mx-auto space-y-4 text-left">
-            {copy.hero.paragraphs.map((p) => (
+            {copy[language].hero.paragraphs.map((p) => (
               <p key={p} className="text-lg md:text-xl text-stone-300 leading-relaxed">
                 {p}
               </p>
@@ -386,7 +530,7 @@ export default function ArtistsPage() {
                 rosterRef.current?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
               }}
             >
-              browse roster <ArrowRight className="inline w-4 h-4 ml-2" />
+              {copy[language].hero.actions.browseRoster} <ArrowRight className="inline w-4 h-4 ml-2" />
             </motion.button>
             <motion.button
               className="w-full sm:w-auto px-7 py-3 rounded-full bg-stone-900/40 border border-white/15 text-white font-semibold hover:bg-stone-900/60 transition-colors"
@@ -398,15 +542,15 @@ export default function ArtistsPage() {
                 el?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
               }}
             >
-              book by genre <ArrowRight className="inline w-4 h-4 ml-2" />
+              {copy[language].hero.actions.bookByGenre} <ArrowRight className="inline w-4 h-4 ml-2" />
             </motion.button>
-            <a href={copy.management.ctaPrimaryLink} className="w-full sm:w-auto">
+            <a href={copy[language].management.ctaPrimaryLink} className="w-full sm:w-auto">
               <motion.div
                 className="w-full px-7 py-3 rounded-full bg-amber-300 text-stone-950 font-semibold hover:bg-amber-200 transition-colors text-center"
                 whileHover={reduceMotion ? undefined : { scale: 1.02 }}
                 whileTap={reduceMotion ? undefined : { scale: 0.98 }}
               >
-                {copy.management.ctaPrimary}
+                {copy[language].hero.actions.applyManagement}
               </motion.div>
             </a>
           </div>
@@ -419,28 +563,28 @@ export default function ArtistsPage() {
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
             <div className="space-y-8 order-2 lg:order-1">
               <SectionTitle
-                eyebrow={copy.management.eyebrow}
-                title={copy.management.title}
-                subtitle={copy.management.subtitle}
+                eyebrow={copy[language].management.eyebrow}
+                title={copy[language].management.title}
+                subtitle={copy[language].management.subtitle}
               />
               <div className="space-y-4 text-lg text-stone-300 leading-relaxed">
-                {copy.management.paragraphs.map((p, i) => (
+                {copy[language].management.paragraphs.map((p, i) => (
                   <p key={i}>{p}</p>
                 ))}
               </div>
               <div>
                 <div className="flex flex-col sm:flex-row gap-3">
                   <a
-                    href={copy.management.ctaPrimaryLink}
+                    href={copy[language].management.ctaPrimaryLink}
                     className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-white text-stone-950 font-semibold hover:bg-stone-100 transition-colors text-base"
                   >
-                    {copy.management.ctaPrimary} <ArrowRight className="ml-2 w-4 h-4" />
+                    {copy[language].management.ctaPrimary} <ArrowRight className="ml-2 w-4 h-4" />
                   </a>
                   <a
-                    href={copy.management.ctaSecondaryLink}
+                    href={copy[language].management.ctaSecondaryLink}
                     className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-stone-900/40 border border-white/15 text-white font-semibold hover:bg-stone-900/60 transition-colors text-base"
                   >
-                    {copy.management.ctaSecondary} <ArrowRight className="ml-2 w-4 h-4" />
+                    {copy[language].management.ctaSecondary} <ArrowRight className="ml-2 w-4 h-4" />
                   </a>
                 </div>
               </div>
@@ -452,22 +596,22 @@ export default function ArtistsPage() {
                       <div className="w-24 h-24 rounded-full bg-amber-400/10 flex items-center justify-center mb-4">
                         <Star className="w-10 h-10 text-amber-400" />
                       </div>
-                      <h3 className="text-2xl font-bold text-white">Join the Roster</h3>
+                      <h3 className="text-2xl font-bold text-white">{copy[language].management.card.title}</h3>
                       <p className="text-stone-400 leading-relaxed">
-                        we are looking for sound that stands out. if you believe you have what it takes to be a resident or a managed artist, show us what you've got.
+                        {copy[language].management.card.body}
                       </p>
                       <ul className="text-left text-stone-300 space-y-3 w-full max-w-xs mx-auto">
                         <li className="flex items-center gap-3">
                           <CheckCircle2 className="w-5 h-5 text-amber-400" />
-                          <span>Identity development</span>
+                          <span>{copy[language].management.card.bullets[0]}</span>
                         </li>
                         <li className="flex items-center gap-3">
                           <CheckCircle2 className="w-5 h-5 text-amber-400" />
-                          <span>Strategic bookings</span>
+                          <span>{copy[language].management.card.bullets[1]}</span>
                         </li>
                         <li className="flex items-center gap-3">
                           <CheckCircle2 className="w-5 h-5 text-amber-400" />
-                          <span>Production support</span>
+                          <span>{copy[language].management.card.bullets[2]}</span>
                         </li>
                       </ul>
                   </div>
@@ -483,9 +627,9 @@ export default function ArtistsPage() {
       <section className="max-w-6xl mx-auto px-6" id="booking">
         <div className="text-center mb-12">
            <SectionTitle 
-              eyebrow={copy.booking.eyebrow}
-              title={copy.booking.title}
-              subtitle={copy.booking.subtitle}
+              eyebrow={copy[language].booking.eyebrow}
+              title={copy[language].booking.title}
+              subtitle={copy[language].booking.subtitle}
               center
            />
         </div>
@@ -499,7 +643,7 @@ export default function ArtistsPage() {
                 <input
                   ref={searchInputRef}
                   type="text"
-                  placeholder="Search artist name or bio..."
+                  placeholder={copy[language].ui.searchPlaceholder}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-12 pr-24 py-4 bg-stone-900/70 border border-white/15 rounded-xl text-white placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-400/30 focus:border-amber-300/40 transition-all text-lg"
@@ -511,7 +655,7 @@ export default function ArtistsPage() {
                       ? '⌘'
                       : 'Ctrl'}
                   </kbd>
-                  <span>+</span>
+                  <span>{copy[language].ui.keyboardHintOr}</span>
                   <kbd className="px-2 py-1 bg-stone-900/80 rounded border border-white/10 text-[11px] font-mono">
                     K
                   </kbd>
@@ -522,7 +666,7 @@ export default function ArtistsPage() {
               <div className="flex flex-col items-center gap-4">
                  <div className="flex items-center gap-2 text-stone-500 text-sm uppercase tracking-widest">
                     <Tag className="w-4 h-4" />
-                    <span>Filter by Vibe</span>
+                    <span>{copy[language].ui.filterByVibe}</span>
                  </div>
                  <div className="flex flex-wrap justify-center gap-2">
                     <button
@@ -534,7 +678,7 @@ export default function ArtistsPage() {
                             : 'bg-stone-900/60 text-stone-300 border-white/10 hover:bg-stone-800/90 hover:border-white/30'
                         )}
                       >
-                        All Genres
+                        {copy[language].ui.allGenres}
                       </button>
                       {allGenres.map((genre) => (
                         <button
@@ -568,7 +712,7 @@ export default function ArtistsPage() {
                       )}
                     >
                       <Star className="w-4 h-4 fill-current" />
-                      {showFeaturedOnly ? 'Showing Residents Only' : 'Show Residents Only'}
+                      {showFeaturedOnly ? copy[language].ui.showingResidentsOnly : copy[language].ui.showResidentsOnly}
                     </button>
                  </div>
               </div>
@@ -577,10 +721,10 @@ export default function ArtistsPage() {
                 <div className="pt-4 border-t border-white/10 text-center">
                   <p className="text-stone-400">
                     {filteredArtists.length === 0
-                      ? 'No artists match your criteria'
-                      : `Found ${filteredArtists.length} artist${
-                          filteredArtists.length !== 1 ? 's' : ''
-                        }`}
+                      ? copy[language].ui.noMatches
+                      : language === 'en'
+                        ? `Found ${filteredArtists.length} artist${filteredArtists.length !== 1 ? 's' : ''}`
+                        : `${copy[language].ui.foundPrefix} ${filteredArtists.length} ${filteredArtists.length === 1 ? 'sanatçı' : 'sanatçı'}`}
                   </p>
                 </div>
               )}
@@ -590,7 +734,7 @@ export default function ArtistsPage() {
                   href={bookingMailto}
                   className="inline-flex items-center justify-center px-7 py-3 rounded-full bg-amber-300 text-stone-950 font-semibold hover:bg-amber-200 transition-colors"
                 >
-                  {copy.booking.cta} <ArrowRight className="ml-2 w-4 h-4" />
+                  {copy[language].booking.cta} <ArrowRight className="ml-2 w-4 h-4" />
                 </a>
               </div>
             </div>
@@ -607,7 +751,7 @@ export default function ArtistsPage() {
             >
               <Music className="w-16 h-16 text-stone-500 mx-auto mb-4 animate-pulse" />
               <h3 className="text-2xl font-semibold text-white mb-2">
-                Loading artists...
+                {copy[language].ui.loading}
               </h3>
             </motion.div>
           ) : error ? (
@@ -618,7 +762,7 @@ export default function ArtistsPage() {
             >
               <Music className="w-16 h-16 text-red-500 mx-auto mb-4" />
               <h3 className="text-2xl font-semibold text-white mb-2">
-                Error loading artists
+                {copy[language].ui.errorTitle}
               </h3>
               <p className="text-stone-400">{error.message}</p>
             </motion.div>
@@ -630,10 +774,10 @@ export default function ArtistsPage() {
             >
               <Music className="w-16 h-16 text-stone-600 mx-auto mb-4" />
               <h3 className="text-2xl font-semibold text-white mb-2">
-                No artists match this yet
+                {copy[language].ui.emptyTitle}
               </h3>
               <p className="text-stone-400">
-                Try clearing filters or searching with a different word.
+                {copy[language].ui.emptyBody}
               </p>
             </motion.div>
           ) : (
@@ -666,7 +810,7 @@ export default function ArtistsPage() {
                         <div className="absolute top-3 left-3 z-10">
                           <div className="bg-amber-300 text-stone-950 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 shadow-lg border border-amber-500/40">
                             <Star className="w-3 h-3 fill-current" />
-                            <span>Resident</span>
+                            <span>{copy[language].ui.residentBadge}</span>
                           </div>
                         </div>
                       )}
@@ -705,7 +849,7 @@ export default function ArtistsPage() {
                       </div>
 
                       <div className="mt-4 pt-4 border-t border-white/5 flex items-center justify-between text-xs text-stone-500 group-hover:text-stone-400 transition-colors">
-                        <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-x-2 group-hover:translate-x-0">view profile</span>
+                        <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-x-2 group-hover:translate-x-0">{copy[language].ui.viewProfile}</span>
                         <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-amber-300 group-hover:text-black transition-all duration-300">
                            <ArrowRight className="w-4 h-4" />
                         </div>

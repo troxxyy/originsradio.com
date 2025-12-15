@@ -21,6 +21,7 @@ import {
   Volume2,
   CheckCircle2,
   XCircle,
+  Languages,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -38,13 +39,14 @@ const aboutImages = [
   "/origins-aboutimage/569066725_18408359128190686_2614623633597991346_n.jpg",
 ];
 
-const teamMembers = [
+const teamMembers = {
+  en: [
   {
     name: "Kaan",
     fullName: "Kaan Şimşir",
     role: "founder, programming",
     image: "/team/castor.jpeg",
-    quote: "if it’s honest, it belongs here.",
+      quote: "if it's honest, it belongs here.",
     story:
       "origins started as a late night idea, then we kept showing up until it became real. no perfect timing, just momentum and stubbornness.",
     funFact: "keeps way too many drafts and voice notes",
@@ -61,20 +63,35 @@ const teamMembers = [
     funFact: "has opinions about latency that nobody asked for",
     favoriteMoment: "shipping a small fix that instantly feels better",
   },
-  {
-    name: "Rahmi",
-    fullName: "Rahmi Mert Üner",
-    role: "visuals, creative",
-    image: "/team/rahmi.jpeg",
-    quote: "a night has a mood, visuals should match it.",
+  ],
+  tr: [
+    {
+      name: "Kaan",
+      fullName: "Kaan Şimşir",
+      role: "kurucu, programlama",
+      image: "/team/castor.jpeg",
+      quote: "dürüstse, buraya ait.",
     story:
-      "handles the visual identity, flyers, and tiny details you feel before you can explain them. makes origins look like origins.",
-    funFact: "will notice one pixel being off",
-    favoriteMoment: "seeing a poster in a venue and hearing people talk lineup",
-  },
-];
+        "origins gece yarısı bir fikir olarak başladı, sonra gerçek olana kadar devam ettik. mükemmel zamanlama yok, sadece momentum ve inatçılık.",
+      funFact: "çok fazla taslak ve ses notu tutuyor",
+      favoriteMoment: "bir DJ'in setin dinleyici getirdiğini söylediği ilk an",
+    },
+    {
+      name: "Sina",
+      fullName: "Sina Çetinkaya",
+      role: "teknoloji, ürün",
+      image: "/team/sina.jpeg",
+      quote: "hızlı yap. basit yap. gece 3'te çalışsın.",
+      story:
+        "siteyi, yayın altyapısını ve bir şeyler bozulduğunda geceyi kurtaran sıkıcı altyapıyı yapıyor. akıcı oynatma takıntısı var.",
+      funFact: "kimsenin sormadığı gecikme hakkında fikirleri var",
+      favoriteMoment: "anında daha iyi hissettiren küçük bir düzeltmeyi yayınlamak",
+    },
+  ],
+};
 
 const copy = {
+  en: {
   hero: {
     eyebrow: "a note from the people behind origins",
     titleTop: "origins radio keeps the night human.",
@@ -164,6 +181,9 @@ const copy = {
   wont: {
     eyebrow: "what we will not do",
     title: "simple rules, no performance",
+    subtitle: "no pretending. no corporate voice. just how we operate.",
+    leftTitle: "we will not",
+    rightTitle: "we do",
     left: [
       "chase names we do not believe in",
       "force artists into a template",
@@ -178,6 +198,11 @@ const copy = {
       "build long term relationships",
       "keep learning in public",
     ],
+    ctas: {
+      email: "email us",
+      instagram: "instagram",
+      mailSubject: "origins radio booking or collab",
+    },
   },
   archive: {
     eyebrow: "archive",
@@ -213,12 +238,184 @@ const copy = {
     p3: "thanks for being here.",
     email: "info@originsradio.com",
     instagram: "https://www.instagram.com/origins.radio/",
+    cards: {
+      emailTitle: "email",
+      emailSubtitle: "best for collabs and bookings",
+      instagramTitle: "instagram dm",
+      instagramSubtitle: "quick questions live here",
+    },
+    orVibe: "or just vibe",
     buttons: [
       { label: "events", href: "/events" },
       { label: "schedule", href: "/radio/schedule" },
       { label: "artists", href: "/artists" },
     ],
-    footer: "kaan, sina, rahmi",
+    footer: "kaan, sina",
+    thanks: "thanks for reading",
+  },
+  },
+  tr: {
+    hero: {
+      eyebrow: "origins'in arkasındaki insanlardan bir not",
+      titleTop: "origins radio geceyi insan tutar.",
+      titleMid: "marka değil.",
+      titleBottom: "sevdiğimiz müzik için bir ev inşa eden küçük bir ekip.",
+      paragraphs: [
+        "2023'te ankara'da başladık çünkü gerçek hissettiren mekanları özledik. cilalı değil. optimize edilmiş değil. sadece zevk, ses ve nabzı olan bir oda.",
+        "origins radyo, etkinlikler ve bir şey ifade eden gecelerin arşividir. bunu bir geceyi inşa ettiğimiz gibi inşa ediyoruz: detaylara dikkatli, sıkıcı kısımlarda acımasız, odanın kilitlendiği anı her zaman kovalıyoruz.",
+        "hissediyorsan, zaten bunun bir parçasısın.",
+      ],
+      stats: [
+        { icon: Coffee, label: "başladı", value: "2023" },
+        { icon: Music, label: "odak", value: "önce zevk" },
+        { icon: Heart, label: "için yapıldı", value: "topluluk" },
+        { icon: Zap, label: "saatler", value: "gece" },
+      ],
+      actions: [
+        { label: "şimdi dinle", href: "/radio", primary: true },
+        { label: "etkinlikleri gör", href: "/events", primary: false },
+      ],
+    },
+    origin: {
+      eyebrow: "gerçek başlangıç",
+      title: "her şey çok aynı olmaya başladığı için başladık",
+      subtitle:
+        "online müzik sonsuzdu, ama etrafındaki mekanlar boş hissettirmeye başladı. sahneler içeriğe dönüştü. ve gece hayatının en iyi kısımları aktarılmadı.",
+      paragraphs: [
+        "bütçe, plan veya izinle başlamadık. bir sorunla başladık: her şey bir şablona benzemeye başlıyordu.",
+        "ilk versiyon dağınıktı. ödünç ekipman. son dakika düzeltmeleri. aptal saatlerde yayın stres testleri. çok geç yapılan afişler. her zaman kaybolan kablolar.",
+        "sonra ilk gece oldu. insanlar geldi. izleyici değil. insanlar. setin sonunda arkadaş gibi hissettiren yabancılar.",
+        "işte o zaman origins bir proje olmaktan çıkıp bir sorumluluk haline geldi.",
+      ],
+      calloutTitle: "bizi şaşırtan şey",
+      calloutBody:
+        "en iyi kısım asla 'büyüme' değildi. mesajlardı. anlardı. bir parça yüzünden tanışan insanlar. bir noktada beklediğimiz şekilde bizim olmaktan çıktı.",
+      calloutLine: "artık paylaşılıyor.",
+    },
+    whatThisIs: {
+      eyebrow: "bu nedir",
+      title: "radyo, etkinlikler, görseller",
+      subtitle: "üç parça, bir hedef: belirli bir gece türünü korumak.",
+      cards: [
+        {
+          icon: Radio,
+          title: "radyo",
+          text: "şovlar, resident'lar, konuk mix'ler. dolgu yok. sadece niyet ve tempo ile seçimler.",
+          cta: { label: "program", href: "/radio/schedule" },
+        },
+        {
+          icon: CalendarDays,
+          title: "etkinlikler",
+          text: "küçük odalar, gerçek ses, dürüst enerji. vibe doğruysa, büyük bir sahneye ihtiyacın yok.",
+          cta: { label: "etkinlikler", href: "/events" },
+        },
+        {
+          icon: Sparkles,
+          title: "görseller",
+          text: "kimlik, posterler, hareket, detaylar. bass bile vurmadan önce hissettiğin şeyler.",
+          cta: { label: "sanatçılar", href: "/artists" },
+        },
+      ],
+    },
+    protect: {
+      eyebrow: "koruduğumuz şey",
+      title: "hala gerçek hisseden bir gece",
+      subtitle: "her yerde olmaya çalışmıyoruz. bunu canlı tutmaya çalışıyoruz.",
+      bullets: [
+        { icon: Shield, title: "telefonsuz enerji", text: "ekranının var olduğunu unuttuğun an türü." },
+        { icon: Users, title: "metriklerden önce insanlar", text: "bir parçadan yapılan arkadaşlar. sayılardan önce topluluk." },
+        { icon: Volume2, title: "ses asıl nokta", text: "müzik burada arka plan değil. sebep bu." },
+        { icon: Target, title: "şablonlardan önce zevk", text: "genel olmaktansa spesifik olmayı tercih ederiz." },
+      ],
+    },
+    booking: {
+      eyebrow: "sanatçıları nasıl seçiyoruz",
+      title: "tür rezervasyonu yapmıyoruz",
+      subtitle: "zevk, niyet ve odaya saygı rezervasyonu yapıyoruz.",
+      list: [
+        "bir bakış açısı",
+        "tempo ve kontrol",
+        "egosuz cesaret",
+        "kalabalığa saygı",
+      ],
+      note:
+        "bazı geceler zirve zamanı. bazı geceler garip. ikisi de önemli.",
+    },
+    wont: {
+      eyebrow: "yapmayacağımız şeyler",
+      title: "basit kurallar, performans yok",
+      subtitle: "rol yapmıyoruz. kurumsal dil yok. sadece nasıl çalıştığımız.",
+      leftTitle: "yapmayız",
+      rightTitle: "yaparız",
+      left: [
+        "inancımız olmayan isimleri kovalamak",
+        "sanatçıları bir şablona zorlamak",
+        "insanlara içerik gibi davranmak",
+        "optik için sesten ödün vermek",
+        "çabasız görünmek",
+      ],
+      right: [
+        "sorunları hızlı çözmek ve devam etmek",
+        "rezervasyon yaptığımızda adil ödemek",
+        "düzgün tanıtmak",
+        "uzun vadeli ilişkiler kurmak",
+        "halka açık öğrenmeye devam etmek",
+      ],
+      ctas: {
+        email: "bize mail at",
+        instagram: "instagram",
+        mailSubject: "origins radio - booking ya da işbirliği",
+      },
+    },
+    archive: {
+      eyebrow: "arşiv",
+      title: "sakladığımız bazı geceler",
+      subtitle: "gecenin bitmesini istemediğin zaman çektiğin fotoğraflar.",
+      captions: [
+        "ışıklar söndü",
+        "eller havada",
+        "bir parça daha",
+        "kalabalık kilitlendi",
+        "afterhours",
+        "yeni arkadaşlar",
+        "büyük bas, küçük oda",
+        "telefon yok, sadece dans",
+        "sonuna kadar kaldık",
+        "bunu hatırlayacağız",
+        "bir sonraki sefer aynı yer",
+        "o drop",
+      ],
+      callout:
+        "buradaki her fotoğraf, en iyi gecelerin içerik değil, paylaşıldığının kanıtıdır. koruduğumuz şey bu.",
+    },
+    team: {
+      eyebrow: "ekip",
+      title: "işi yapan insanlar",
+      subtitle: "iki rol, bir takıntı: doğru hissettirmek.",
+      hintClosed: "detaylar için dokun",
+    },
+    contact: {
+      title: "bize ulaşmak ister misin",
+      p1: "bir şov öner, bir sanatçı öner veya etkinlikler hakkında konuş. bir mesaj gönder.",
+      p2: "her şeyi okuyoruz. inşa ederken cevaplar yavaş olabilir, ama insanları görmezden gelmiyoruz.",
+      p3: "burada olduğun için teşekkürler.",
+      email: "info@originsradio.com",
+      instagram: "https://www.instagram.com/origins.radio/",
+      cards: {
+        emailTitle: "e-posta",
+        emailSubtitle: "booking ve işbirlikleri için en iyi seçenek",
+        instagramTitle: "instagram dm",
+        instagramSubtitle: "hızlı sorular genelde burada",
+      },
+      orVibe: "ya da sadece vibe",
+      buttons: [
+        { label: "etkinlikler", href: "/events" },
+        { label: "program", href: "/radio/schedule" },
+        { label: "sanatçılar", href: "/artists" },
+      ],
+      footer: "kaan, sina",
+      thanks: "okuduğun için teşekkürler",
+    },
   },
 };
 
@@ -303,10 +500,14 @@ function Divider() {
 export default function AboutPage() {
   const reduceMotion = useReducedMotion();
   const [activeMember, setActiveMember] = useState<number | null>(null);
+  const [language, setLanguage] = useState<"en" | "tr">("en");
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const currentCopy = copy[language];
+  const currentTeamMembers = teamMembers[language];
 
   const shuffledImages = useMemo(() => {
     const seed = hashSeed("origins-about-2025");
@@ -339,7 +540,7 @@ export default function AboutPage() {
       };
 
   return (
-    <PageLayout backgroundImage="/about-background.jpg">
+    <PageLayout backgroundImage="/backgr.jpg">
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-b from-stone-950 via-neutral-950 to-stone-950" />
         <div className="absolute inset-0 bg-gradient-to-br from-amber-950/15 via-transparent to-stone-900/20" />
@@ -351,53 +552,66 @@ export default function AboutPage() {
       <SocialBubbles />
       <Navigation />
 
+      {/* Language Switcher */}
+      <div className="fixed top-24 right-6 z-50">
+        <motion.button
+          onClick={() => setLanguage(language === "en" ? "tr" : "en")}
+          className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white hover:bg-white/20 transition-colors backdrop-blur-sm"
+          whileHover={reduceMotion ? undefined : { scale: 1.05 }}
+          whileTap={reduceMotion ? undefined : { scale: 0.95 }}
+        >
+          <Languages className="w-4 h-4" />
+          <span className="text-sm font-semibold">{language === "en" ? "TR" : "EN"}</span>
+        </motion.button>
+      </div>
+
       {/* hero */}
       <section className="min-h-screen flex items-center justify-center relative z-10 px-6 pt-32 pb-16">
         <motion.div className="max-w-5xl mx-auto" {...motionIn}>
-          <div className="mb-8 md:mb-12">
-            <div className="inline-flex items-center gap-2 bg-amber-100/10 border border-amber-400/20 px-5 py-3 rounded-xl backdrop-blur-sm">
-              <Sparkles className="w-4 h-4 text-amber-300/80" />
-              <p className="text-amber-200/80 text-sm md:text-base italic">
-                {copy.hero.eyebrow}
-              </p>
+          {/* Top images gallery */}
+          <div className="mb-12 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+            {shuffledImages.slice(0, 4).map((src, index) => (
+              <motion.div
+                key={`hero-${index}`}
+                className="relative aspect-[4/3] overflow-hidden rounded-xl bg-white p-1 shadow-lg"
+                style={{ rotate: index % 2 === 0 ? -1.5 : 1.5 }}
+                whileHover={reduceMotion ? undefined : { scale: 1.05, rotate: 0, zIndex: 10 }}
+                transition={{ duration: 0.25 }}
+              >
+                <div className="relative w-full h-full overflow-hidden rounded-lg">
+                  <Image
+                    src={src}
+                    alt={`origins moment ${index + 1}`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 50vw, 25vw"
+                    loading="eager"
+                  />
             </div>
+              </motion.div>
+            ))}
           </div>
 
           <div className="text-left md:text-center mb-10 md:mb-12">
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 text-white leading-[1.05]">
-              {copy.hero.titleTop}
+              {currentCopy.hero.titleTop}
               <br />
-              <span className="text-stone-400">{copy.hero.titleMid}</span>
+              <span className="text-stone-400">{currentCopy.hero.titleMid}</span>
               <br />
-              <span className="text-amber-300/85">{copy.hero.titleBottom}</span>
+              <span className="text-amber-300/85">{currentCopy.hero.titleBottom}</span>
             </h1>
           </div>
 
           <div className="max-w-3xl mx-auto space-y-4 text-left">
-            {copy.hero.paragraphs.map((p) => (
+            {currentCopy.hero.paragraphs.map((p) => (
               <p key={p} className="text-lg md:text-xl text-stone-300 leading-relaxed">
                 {p}
               </p>
             ))}
           </div>
 
-          <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
-            {copy.hero.stats.map((stat, i) => (
-              <div
-                key={i}
-                className="text-center p-4 bg-white/5 rounded-xl backdrop-blur-sm border border-white/10"
-              >
-                <stat.icon className="w-6 h-6 text-amber-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-white mb-1">{stat.value}</div>
-                <div className="text-xs text-stone-400 uppercase tracking-[0.18em]">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </div>
-
           <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center items-stretch sm:items-center">
-            {copy.hero.actions.map((a) => (
+            {currentCopy.hero.actions.map((a) => (
               <Link key={a.href} href={a.href} className="w-full sm:w-auto">
                 <motion.button
                   className={
@@ -423,12 +637,12 @@ export default function AboutPage() {
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-start">
             <div className="space-y-6">
               <SectionTitle
-                eyebrow={copy.origin.eyebrow}
-                title={copy.origin.title}
-                subtitle={copy.origin.subtitle}
+                eyebrow={currentCopy.origin.eyebrow}
+                title={currentCopy.origin.title}
+                subtitle={currentCopy.origin.subtitle}
               />
               <div className="space-y-4 text-lg text-stone-300 leading-relaxed">
-                {copy.origin.paragraphs.map((p) => (
+                {currentCopy.origin.paragraphs.map((p) => (
                   <p key={p}>{p}</p>
                 ))}
               </div>
@@ -437,15 +651,15 @@ export default function AboutPage() {
             <SoftCard>
               <div className="p-7 md:p-10">
                 <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
-                  {copy.origin.calloutTitle}
+                  {currentCopy.origin.calloutTitle}
                 </h3>
-                <p className="text-stone-300 leading-relaxed">{copy.origin.calloutBody}</p>
+                <p className="text-stone-300 leading-relaxed">{currentCopy.origin.calloutBody}</p>
                 <p className="mt-6 text-xl md:text-2xl text-amber-300 font-semibold italic">
-                  {copy.origin.calloutLine}
+                  {currentCopy.origin.calloutLine}
                 </p>
                 <div className="mt-8 grid grid-cols-2 gap-3">
                   <a
-                    href={`mailto:${copy.contact.email}?subject=origins%20radio%20mix%20or%20show`}
+                    href={`mailto:${currentCopy.contact.email}?subject=origins%20radio%20mix%20or%20show`}
                     className="inline-flex items-center justify-center px-4 py-3 rounded-xl bg-amber-300 text-stone-950 font-semibold hover:bg-amber-200 transition-colors"
                   >
                     pitch a show
@@ -466,15 +680,15 @@ export default function AboutPage() {
           {/* what this is */}
           <div className="mb-10 md:mb-14">
             <SectionTitle
-              eyebrow={copy.whatThisIs.eyebrow}
-              title={copy.whatThisIs.title}
-              subtitle={copy.whatThisIs.subtitle}
+              eyebrow={currentCopy.whatThisIs.eyebrow}
+              title={currentCopy.whatThisIs.title}
+              subtitle={currentCopy.whatThisIs.subtitle}
               center
             />
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            {copy.whatThisIs.cards.map((item) => (
+            {currentCopy.whatThisIs.cards.map((item) => (
               <SoftCard key={item.title}>
                 <div className="p-7 md:p-8">
                   <item.icon className="w-6 h-6 text-amber-400 mb-4" />
@@ -500,12 +714,12 @@ export default function AboutPage() {
             <div className="space-y-10">
               <div>
                 <SectionTitle
-                  eyebrow={copy.protect.eyebrow}
-                  title={copy.protect.title}
-                  subtitle={copy.protect.subtitle}
+                  eyebrow={currentCopy.protect.eyebrow}
+                  title={currentCopy.protect.title}
+                  subtitle={currentCopy.protect.subtitle}
                 />
                 <div className="mt-8 grid sm:grid-cols-2 gap-4">
-                  {copy.protect.bullets.map((b) => (
+                  {currentCopy.protect.bullets.map((b) => (
                     <div
                       key={b.title}
                       className="p-5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm"
@@ -521,19 +735,19 @@ export default function AboutPage() {
               <SoftCard>
                 <div className="p-7 md:p-8">
                   <SectionTitle
-                    eyebrow={copy.booking.eyebrow}
-                    title={copy.booking.title}
-                    subtitle={copy.booking.subtitle}
+                    eyebrow={currentCopy.booking.eyebrow}
+                    title={currentCopy.booking.title}
+                    subtitle={currentCopy.booking.subtitle}
                   />
                   <ul className="mt-6 space-y-3">
-                    {copy.booking.list.map((t) => (
+                    {currentCopy.booking.list.map((t) => (
                       <li key={t} className="flex items-start gap-3 text-stone-300">
                         <CheckCircle2 className="w-5 h-5 text-amber-400 mt-0.5" />
                         <span className="leading-relaxed">{t}</span>
                       </li>
                     ))}
                   </ul>
-                  <p className="mt-6 text-stone-400 italic">{copy.booking.note}</p>
+                  <p className="mt-6 text-stone-400 italic">{currentCopy.booking.note}</p>
                 </div>
               </SoftCard>
             </div>
@@ -541,15 +755,15 @@ export default function AboutPage() {
             <SoftCard>
               <div className="p-7 md:p-10">
                 <SectionTitle
-                  eyebrow={copy.wont.eyebrow}
-                  title={copy.wont.title}
-                  subtitle="no pretending. no corporate voice. just how we operate."
+                  eyebrow={currentCopy.wont.eyebrow}
+                  title={currentCopy.wont.title}
+                  subtitle={currentCopy.wont.subtitle}
                 />
                 <div className="mt-8 grid md:grid-cols-2 gap-6">
                   <div className="rounded-2xl bg-stone-950/30 border border-white/10 p-5">
-                    <p className="text-white font-semibold mb-4">we will not</p>
+                    <p className="text-white font-semibold mb-4">{currentCopy.wont.leftTitle}</p>
                     <ul className="space-y-3">
-                      {copy.wont.left.map((t) => (
+                      {currentCopy.wont.left.map((t) => (
                         <li key={t} className="flex items-start gap-3 text-stone-300">
                           <XCircle className="w-5 h-5 text-stone-500 mt-0.5" />
                           <span className="leading-relaxed">{t}</span>
@@ -558,9 +772,9 @@ export default function AboutPage() {
                     </ul>
                   </div>
                   <div className="rounded-2xl bg-amber-950/20 border border-amber-900/30 p-5">
-                    <p className="text-white font-semibold mb-4">we do</p>
+                    <p className="text-white font-semibold mb-4">{currentCopy.wont.rightTitle}</p>
                     <ul className="space-y-3">
-                      {copy.wont.right.map((t) => (
+                      {currentCopy.wont.right.map((t) => (
                         <li key={t} className="flex items-start gap-3 text-stone-200">
                           <CheckCircle2 className="w-5 h-5 text-amber-400 mt-0.5" />
                           <span className="leading-relaxed">{t}</span>
@@ -572,18 +786,20 @@ export default function AboutPage() {
 
                 <div className="mt-8 flex flex-col sm:flex-row gap-3">
                   <a
-                    href={`mailto:${copy.contact.email}?subject=origins%20radio%20booking%20or%20collab`}
+                    href={`mailto:${currentCopy.contact.email}?subject=${encodeURIComponent(
+                      currentCopy.wont.ctas.mailSubject
+                    )}`}
                     className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-white text-stone-950 font-semibold hover:bg-stone-100 transition-colors"
                   >
-                    email us
+                    {currentCopy.wont.ctas.email}
                   </a>
                   <a
-                    href={copy.contact.instagram}
+                    href={currentCopy.contact.instagram}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-stone-900/40 border border-white/15 text-white font-semibold hover:bg-stone-900/60 transition-colors"
                   >
-                    instagram
+                    {currentCopy.wont.ctas.instagram}
                   </a>
                 </div>
               </div>
@@ -596,9 +812,9 @@ export default function AboutPage() {
       <section className="relative z-10 py-16 md:py-24 overflow-hidden">
         <div className="max-w-6xl mx-auto px-6">
           <SectionTitle
-            eyebrow={copy.archive.eyebrow}
-            title={copy.archive.title}
-            subtitle={copy.archive.subtitle}
+            eyebrow={currentCopy.archive.eyebrow}
+            title={currentCopy.archive.title}
+            subtitle={currentCopy.archive.subtitle}
             center
           />
 
@@ -627,7 +843,7 @@ export default function AboutPage() {
                       />
                     </div>
                     <p className="absolute bottom-2 left-2 right-2 text-center text-stone-600 text-[10px] md:text-xs italic font-serif">
-                      {copy.archive.captions[index % copy.archive.captions.length]}
+                      {currentCopy.archive.captions[index % currentCopy.archive.captions.length]}
                     </p>
                   </motion.div>
                 ))}
@@ -638,7 +854,7 @@ export default function AboutPage() {
           <div className="mt-10 max-w-xl mx-auto">
             <div className="bg-amber-100/10 p-6 rounded-2xl backdrop-blur-sm border border-amber-600/20">
               <p className="text-stone-300 text-sm md:text-base leading-relaxed">
-                {copy.archive.callout}
+                {currentCopy.archive.callout}
               </p>
             </div>
           </div>
@@ -650,15 +866,15 @@ export default function AboutPage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12 md:mb-20">
             <SectionTitle
-              eyebrow={copy.team.eyebrow}
-              title={copy.team.title}
-              subtitle={copy.team.subtitle}
+              eyebrow={currentCopy.team.eyebrow}
+              title={currentCopy.team.title}
+              subtitle={currentCopy.team.subtitle}
               center
             />
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
-            {teamMembers.map((member, index) => {
+            {currentTeamMembers.map((member, index) => {
               const isOpen = activeMember === index;
               return (
                 <motion.div
@@ -758,7 +974,7 @@ export default function AboutPage() {
 
                       {!isOpen ? (
                         <p className="text-xs text-stone-600 text-center italic">
-                          {copy.team.hintClosed}
+                          {currentCopy.team.hintClosed}
                         </p>
                       ) : null}
                     </div>
@@ -781,34 +997,34 @@ export default function AboutPage() {
         >
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">
-              {copy.contact.title}
+              {currentCopy.contact.title}
             </h2>
             <div className="max-w-2xl mx-auto space-y-3 text-left md:text-center">
-              <p className="text-lg md:text-xl text-stone-300 leading-relaxed">{copy.contact.p1}</p>
-              <p className="text-base md:text-lg text-stone-400 leading-relaxed">{copy.contact.p2}</p>
-              <p className="text-lg text-amber-300 font-semibold">{copy.contact.p3}</p>
+              <p className="text-lg md:text-xl text-stone-300 leading-relaxed">{currentCopy.contact.p1}</p>
+              <p className="text-base md:text-lg text-stone-400 leading-relaxed">{currentCopy.contact.p2}</p>
+              <p className="text-lg text-amber-300 font-semibold">{currentCopy.contact.p3}</p>
             </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6 mb-12">
             <motion.a
-              href={`mailto:${copy.contact.email}`}
+              href={`mailto:${currentCopy.contact.email}`}
               className="group"
               whileHover={reduceMotion ? undefined : { y: -4 }}
             >
               <div className="bg-white/5 border border-white/15 rounded-2xl p-8 hover:bg-white hover:border-white transition-all duration-300 text-center h-full flex flex-col justify-center">
                 <div className="text-4xl mb-4">✉️</div>
                 <h3 className="text-xl font-bold text-white group-hover:text-stone-900 transition-colors mb-2">
-                  email
+                  {currentCopy.contact.cards.emailTitle}
                 </h3>
                 <p className="text-stone-400 group-hover:text-stone-600 transition-colors text-sm">
-                  best for collabs and bookings
+                  {currentCopy.contact.cards.emailSubtitle}
                 </p>
               </div>
             </motion.a>
 
             <motion.a
-              href={copy.contact.instagram}
+              href={currentCopy.contact.instagram}
               target="_blank"
               rel="noopener noreferrer"
               className="group"
@@ -817,19 +1033,19 @@ export default function AboutPage() {
               <div className="bg-white/5 border border-white/15 rounded-2xl p-8 hover:bg-white hover:border-white transition-all duration-300 text-center h-full flex flex-col justify-center">
                 <div className="text-4xl mb-4">📱</div>
                 <h3 className="text-xl font-bold text-white group-hover:text-stone-900 transition-colors mb-2">
-                  instagram dm
+                  {currentCopy.contact.cards.instagramTitle}
                 </h3>
                 <p className="text-stone-400 group-hover:text-stone-600 transition-colors text-sm">
-                  quick questions live here
+                  {currentCopy.contact.cards.instagramSubtitle}
                 </p>
               </div>
             </motion.a>
           </div>
 
           <div className="text-center space-y-6">
-            <p className="text-stone-500 text-sm">or just vibe</p>
+            <p className="text-stone-500 text-sm">{currentCopy.contact.orVibe}</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              {copy.contact.buttons.map((b) => (
+              {currentCopy.contact.buttons.map((b) => (
                 <Link key={b.href} href={b.href}>
                   <motion.button
                     className="px-8 py-3 bg-stone-900/40 border border-white/15 text-white font-semibold rounded-full hover:bg-stone-900/60 transition-colors"
@@ -847,9 +1063,9 @@ export default function AboutPage() {
           <div className="mt-16 text-center">
             <div className="inline-block bg-amber-100/10 border border-amber-600/20 rounded-2xl px-6 py-4 backdrop-blur-sm">
               <p className="text-stone-400 text-sm italic">
-                thanks for reading
+                {currentCopy.contact.thanks}
                 <br />
-                <span className="text-stone-500 text-xs">{copy.contact.footer}</span>
+                <span className="text-stone-500 text-xs">{currentCopy.contact.footer}</span>
               </p>
             </div>
           </div>

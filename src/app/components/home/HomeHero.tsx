@@ -37,7 +37,7 @@ const socialLinks = [
 const HomeHero: React.FC = () => {
   const [mounted, setMounted] = useState(false);
   const [hoveredRoute, setHoveredRoute] = useState<RouteKey | null>(null);
-  const [videoOpacity, setVideoOpacity] = useState(0.7);
+  const [videoOpacity, setVideoOpacity] = useState(1.0);
   const { currentSlot } = useCurrentRadioSlot(5000);
   const isMobile = useIsMobile();
   const isLive = !!currentSlot?.isLiveStream;
@@ -153,13 +153,18 @@ const HomeHero: React.FC = () => {
             "text-[10px] sm:text-xs tracking-[0.4em] uppercase text-white/40 mb-4 transition-all duration-700 delay-100",
             mounted ? "opacity-100" : "opacity-0"
           )}>
-            Underground Sound
+            live everyday at 9pm istanbul time
           </p>
           
           {/* Main Title */}
-          <h1 className="font-newake text-6xl sm:text-7xl md:text-8xl lg:text-9xl tracking-tight text-white uppercase leading-none">
-            Origins
-          </h1>
+          <div className="relative">
+            <h1 className="font-newake text-6xl sm:text-7xl md:text-8xl lg:text-9xl tracking-tight text-white/80 uppercase leading-none relative z-10">
+              originsradio
+            </h1>
+            {/* Overlay glow effect */}
+            <div className="absolute inset-0 blur-2xl bg-white/10 -z-10" />
+            <div className="absolute inset-0 blur-[60px] bg-gradient-to-r from-cyan-500/20 via-transparent to-teal-500/20 -z-10" />
+          </div>
           
           {/* Subtitle with glow */}
           <div className="relative mt-4">

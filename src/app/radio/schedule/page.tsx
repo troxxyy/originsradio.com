@@ -9,12 +9,6 @@ import { generateSlug } from '@/lib/supabase-utils'
 
 const HOURS = [19,20,21,22,23]
 const DAY_LABELS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
-const isMobile = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(max-width: 430px)').matches
-const TIME_COL_PX = isMobile ? 50 : 70
-const DAY_COL_PX = isMobile ? 176 : 240
-const HEADER_PX = isMobile ? 48 : 68
-const ROW_PX = isMobile ? 176 : 240  // Match DAY_COL_PX for 1:1 aspect ratio
-const SLOT_GAP_PX = isMobile ? 8 : 12
 
 function getHourLabel(h: number) {
   return `${String(h).padStart(2, '0')}:00`
@@ -31,11 +25,14 @@ export default function RadioSchedule() {
   const [currentTime, setCurrentTime] = useState(getIstanbulTime())
   const { currentSlot } = useCurrentRadioSlot(5000)
 
+  // Viewport detection (drives mobile layout + sizing)
+  const [isMobile, setIsMobile] = useState(false)
+
   // Mobile-specific state
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
   const daySelectorRef = useRef<HTMLDivElement>(null)
   
-  // Touch handling for mobile swipe
+  // Drag/scroll handling for desktop grid (mouse only)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [isScrolling, setIsScrolling] = useState(false)
   const touchStartX = useRef<number>(0)
@@ -46,12 +43,36 @@ export default function RadioSchedule() {
   const velocityX = useRef<number>(0)
   const lastTouchX = useRef<number>(0)
 
+  // Mobile swipe-to-change-day (list layout)
+  const mobileSwipeStartX = useRef<number>(0)
+  const mobileSwipeStartY = useRef<number>(0)
+  const mobileDidSwipe = useRef<boolean>(false)
+  const mobileDidSwipeResetTimer = useRef<number | null>(null)
+
   // Update current time every minute (Istanbul time)
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(getIstanbulTime())
     }, 60000) // Update every minute
     return () => clearInterval(interval)
+  }, [])
+
+  // Track viewport changes (avoid module-level matchMedia which can cause mismatches)
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return
+    // Widened to include common phone widths; the "desktop grid" is still available on larger screens.
+    const mql = window.matchMedia('(max-width: 768px)')
+    const update = () => setIsMobile(mql.matches)
+    update()
+    mql.addEventListener?.('change', update)
+    // Safari < 14 fallback
+    // eslint-disable-next-line deprecation/deprecation
+    mql.addListener?.(update)
+    return () => {
+      mql.removeEventListener?.('change', update)
+      // eslint-disable-next-line deprecation/deprecation
+      mql.removeListener?.(update)
+    }
   }, [])
 
   // Auto-scroll day selector to current day on mobile
@@ -91,101 +112,55 @@ export default function RadioSchedule() {
     }
   }, [])
 
-  // Touch event handlers for smooth mobile scrolling
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (!scrollContainerRef.current) return
-    
-    const touch = e.touches[0]
-    touchStartX.current = touch.clientX
-    touchStartY.current = touch.clientY
-    scrollStartX.current = scrollContainerRef.current.scrollLeft
-    lastTouchTime.current = Date.now()
-    lastTouchX.current = touch.clientX
-    velocityX.current = 0
-    // Don't set isDragging yet - wait to determine swipe direction
+  const clearMobileDidSwipeSoon = () => {
+    if (mobileDidSwipeResetTimer.current) {
+      window.clearTimeout(mobileDidSwipeResetTimer.current)
+      mobileDidSwipeResetTimer.current = null
+    }
+    mobileDidSwipeResetTimer.current = window.setTimeout(() => {
+      mobileDidSwipe.current = false
+    }, 250)
   }
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!scrollContainerRef.current) return
-    
-    const touch = e.touches[0]
-    const deltaX = touch.clientX - touchStartX.current
-    const deltaY = touch.clientY - touchStartY.current
-    
-    // Movement threshold - require at least 10px movement before engaging
-    const movementThreshold = 10
-    const totalMovement = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
-    
-    if (totalMovement < movementThreshold) {
-      return // Not enough movement yet
-    }
-    
-    // Determine swipe direction
-    const isHorizontalSwipe = Math.abs(deltaX) > Math.abs(deltaY)
-    
-    if (!isHorizontalSwipe) {
-      // This is a vertical swipe - let the browser handle it naturally
-      return
-    }
-    
-    // This is a horizontal swipe - engage custom scrolling
-    if (!isDragging.current) {
-      isDragging.current = true
-      setIsScrolling(true)
-    }
-    
-    e.preventDefault()
-    
-    // Calculate velocity for momentum scrolling
-    const now = Date.now()
-    const timeDelta = now - lastTouchTime.current
-    if (timeDelta > 0) {
-      const distanceDelta = touch.clientX - lastTouchX.current
-      velocityX.current = distanceDelta / timeDelta
-      lastTouchTime.current = now
-      lastTouchX.current = touch.clientX
-    }
-    
-    // Apply the scroll with some resistance at the edges
-    const container = scrollContainerRef.current
-    const maxScroll = container.scrollWidth - container.clientWidth
-    const currentScroll = scrollStartX.current - deltaX
-    
-    // Add resistance at edges
-    let newScroll = currentScroll
-    if (currentScroll < 0) {
-      newScroll = currentScroll * 0.3 // Resistance when scrolling past start
-    } else if (currentScroll > maxScroll) {
-      newScroll = maxScroll + (currentScroll - maxScroll) * 0.3 // Resistance when scrolling past end
-    }
-    
-    container.scrollLeft = newScroll
+  const getEffectiveDay = (currentDayIdx: number) => {
+    return selectedDay !== null ? selectedDay : currentDayIdx
   }
 
-  const handleTouchEnd = () => {
-    if (!isDragging.current || !scrollContainerRef.current) return
-    
-    isDragging.current = false
-    setIsScrolling(false)
-    
-    // Apply momentum scrolling
-    if (Math.abs(velocityX.current) > 0.5) {
-      const container = scrollContainerRef.current
-      const maxScroll = container.scrollWidth - container.clientWidth
-      let targetScroll = container.scrollLeft + velocityX.current * 200 // Momentum multiplier
-      
-      // Clamp to bounds
-      targetScroll = Math.max(0, Math.min(targetScroll, maxScroll))
-      
-      // Smooth scroll to target
-      container.scrollTo({
-        left: targetScroll,
-        behavior: 'smooth'
-      })
-    }
-    
-    // Reset velocity
-    velocityX.current = 0
+  const scrollDaySelectorIntoView = (dayIdx: number) => {
+    const el = daySelectorRef.current?.children?.[dayIdx] as HTMLElement | undefined
+    el?.scrollIntoView?.({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+  }
+
+  // Touch swipe on the mobile list to switch days (doesn't block vertical scroll)
+  const handleMobileTouchStart = (e: React.TouchEvent) => {
+    const t = e.touches[0]
+    if (!t) return
+    mobileSwipeStartX.current = t.clientX
+    mobileSwipeStartY.current = t.clientY
+  }
+
+  const handleMobileTouchEnd = (currentDayIdx: number) => (e: React.TouchEvent) => {
+    const t = e.changedTouches[0]
+    if (!t) return
+
+    const deltaX = t.clientX - mobileSwipeStartX.current
+    const deltaY = t.clientY - mobileSwipeStartY.current
+
+    // Require a clear horizontal intent
+    const minX = 60
+    if (Math.abs(deltaX) < minX) return
+    if (Math.abs(deltaX) <= Math.abs(deltaY) * 1.2) return
+
+    const activeDay = getEffectiveDay(currentDayIdx)
+    const nextDay =
+      deltaX < 0
+        ? (activeDay + 1) % 7
+        : (activeDay + 6) % 7
+
+    mobileDidSwipe.current = true
+    clearMobileDidSwipeSoon()
+    setSelectedDay(nextDay)
+    scrollDaySelectorIntoView(nextDay)
   }
 
   // Mouse event handlers for desktop only
@@ -297,6 +272,12 @@ export default function RadioSchedule() {
     return map
   }, [data])
 
+  const TIME_COL_PX = isMobile ? 50 : 70
+  const DAY_COL_PX = isMobile ? 176 : 240
+  const HEADER_PX = isMobile ? 48 : 68
+  const ROW_PX = isMobile ? 176 : 240  // Match DAY_COL_PX for 1:1 aspect ratio
+  const SLOT_GAP_PX = isMobile ? 8 : 12
+
   return (
     <PageLayout showFooter={false}>
       {/* Natural warm background */}
@@ -362,7 +343,13 @@ export default function RadioSchedule() {
                       const shouldShow = dayIdx === dayToShow
 
                       return (
-                        <div key={label} className={`transition-opacity duration-300 ${shouldShow ? 'block opacity-100' : 'hidden opacity-0'}`}>
+                        <div
+                          key={label}
+                          className={`transition-opacity duration-300 ${shouldShow ? 'block opacity-100' : 'hidden opacity-0'}`}
+                          onTouchStart={handleMobileTouchStart}
+                          onTouchEnd={handleMobileTouchEnd(currentDayIdx)}
+                          style={{ touchAction: 'pan-y' }}
+                        >
                         {/* Day header with today indicator */}
                         <div className="flex items-center justify-between mb-3 px-2">
                           <div className="flex items-center gap-2">
@@ -444,6 +431,7 @@ export default function RadioSchedule() {
                                           </div>
                                           
                                           <div onClick={() => {
+                                            if (mobileDidSwipe.current) return
                                             if (item.set?.artists?.name) {
                                               router.push(`/artists/${generateSlug(item.set.artists.name)}`)
                                             }
@@ -482,16 +470,12 @@ export default function RadioSchedule() {
             ) : (
               <div 
                 ref={scrollContainerRef}
-                className={`relative overflow-x-auto overscroll-x-contain touch-pan-x snap-x snap-mandatory ${isScrolling ? 'scroll-smooth' : ''}`}
-                onTouchStart={handleTouchStart}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEnd}
+                className={`relative overflow-x-auto overscroll-x-contain snap-x snap-mandatory ${isScrolling ? 'scroll-smooth' : ''}`}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseUp}
                 style={{ 
-                  touchAction: 'pan-x',
                   WebkitOverflowScrolling: 'touch',
                   scrollBehavior: isScrolling ? 'auto' : 'smooth'
                 }}
@@ -545,6 +529,7 @@ export default function RadioSchedule() {
                                   photoUrl={item.set?.artists?.photo_url || ''}
                                   artistId={item.set?.artists?.id}
                                   onClick={() => {
+                                    if (mobileDidSwipe.current) return
                                     if (item.set?.artists?.name) {
                                       router.push(`/artists/${generateSlug(item.set.artists.name)}`)
                                     }
