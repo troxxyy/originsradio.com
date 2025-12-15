@@ -1,23 +1,108 @@
 'use client'
 
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
-import { Search, Filter, Music, MapPin, Star } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { Search, Music, MapPin, Star, LogIn, Sparkles, Tag, ArrowRight, CheckCircle2, Users } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { LogIn } from 'lucide-react';
 import PageLayout from '@/components/layout/PageLayout';
-import NaturalBackground from '@/components/ui/NaturalBackground';
+import SocialBubbles from '@/components/social/SocialBubbles';
+import Navigation from '@/components/Navigation';
 import { useArtists } from '@/hooks/use-supabase';
 import { generateSlug } from '@/lib/supabase-utils';
 import { cn } from '@/lib/utils';
 
+const copy = {
+  hero: {
+    eyebrow: "the sound of origins",
+    titleTop: "residents, guests,",
+    titleBottom: "and the future.",
+    paragraphs: [
+      "we do not just book names. we book taste, intention, and respect for the room.",
+      "browse the roster, filter by genre, and if you’re a new talent with a point of view—apply for management.",
+    ],
+  },
+  management: {
+    eyebrow: "new talent management",
+    title: "we build careers, not just bookings.",
+    subtitle: "origins management is for artists we truly believe in.",
+    paragraphs: [
+      "for a select group of new talents, we go beyond radio slots. we offer management services: long-term strategy, identity development, release planning, and placing you in the right rooms.",
+      "it is not about filling a calendar. it is about telling a story with your career. if you have a unique sound and the drive to back it up, we want to hear from you.",
+    ],
+    ctaPrimary: "apply for management",
+    ctaPrimaryLink: "mailto:info@originsradio.com?subject=new%20talent%20-%20artist%20management&body=links%20(soundcloud%2Fspotify)%3A%0Ainstagram%3A%0Alocation%3A%0Agenres%3A%0Ashort%20note%3A%0A",
+    ctaSecondary: "submit a mix for radio",
+    ctaSecondaryLink: "mailto:info@originsradio.com?subject=origins%20radio%20-%20mix%20submission&body=artist%20name%3A%0Alocation%3A%0Agenres%3A%0Amix%20link%3A%0Ashort%20note%3A%0A",
+  },
+  booking: {
+    eyebrow: "curate your night",
+    title: "find the right sound",
+    subtitle: "browse our roster by genre to find the perfect match for your event. from warmups to peak time.",
+    cta: "book a DJ",
+  }
+};
+
+function SectionTitle({
+  eyebrow,
+  title,
+  subtitle,
+  center = false,
+}: {
+  eyebrow?: string;
+  title: string;
+  subtitle?: string;
+  center?: boolean;
+}) {
+  return (
+    <div className={center ? 'text-center' : ''}>
+      {eyebrow ? (
+        <p className="text-amber-300/70 text-xs md:text-sm uppercase tracking-[0.22em] mb-3">
+          {eyebrow}
+        </p>
+      ) : null}
+      <h2 className="text-3xl md:text-5xl font-bold text-white leading-tight">
+        {title}
+      </h2>
+      {subtitle ? (
+        <p
+          className={`mt-4 text-base md:text-lg text-stone-400 ${
+            center ? 'max-w-2xl mx-auto' : 'max-w-2xl'
+          }`}
+        >
+          {subtitle}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function SoftCard({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm shadow-2xl shadow-black/30">
+      {children}
+    </div>
+  );
+}
+
+function Divider() {
+  return (
+    <div className="relative my-14 md:my-20">
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+    </div>
+  );
+}
+
 export default function ArtistsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
+  const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const rosterRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const reduceMotion = useReducedMotion();
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -40,73 +125,187 @@ export default function ArtistsPage() {
   // Fetch artists from Supabase
   const { data: artists, isLoading, error } = useArtists();
 
-  // Filter artists based on search and featured filter
+  const genreCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    (artists || []).forEach((artist) => {
+      if (Array.isArray(artist.genre)) {
+        artist.genre.forEach((g: string) => {
+          const key = (g || '').trim();
+          if (!key) return;
+          counts.set(key, (counts.get(key) ?? 0) + 1);
+        });
+      }
+    });
+    return counts;
+  }, [artists]);
+
+  const allGenres = useMemo(() => {
+    if (!artists) return [];
+    const set = new Set<string>();
+    artists.forEach((artist) => {
+      if (Array.isArray(artist.genre)) {
+        artist.genre.forEach((g: string) => {
+          if (g && g.trim()) set.add(g);
+        });
+      }
+    });
+    return Array.from(set).sort();
+  }, [artists]);
+
+  const heroStats = useMemo(() => {
+    const totalArtists = artists?.length ?? 0;
+    const residents = (artists || []).filter((a) => a.featured).length;
+    const locations = new Set<string>();
+    (artists || []).forEach((a) => {
+      const l = (a.location || '').trim();
+      if (l) locations.add(l);
+    });
+    return [
+      { icon: Users, label: 'artists', value: String(totalArtists) },
+      { icon: Star, label: 'residents', value: String(residents) },
+      { icon: Tag, label: 'genres', value: String(allGenres.length) },
+      { icon: MapPin, label: 'cities', value: String(locations.size) },
+    ];
+  }, [artists, allGenres.length]);
+
+  // Initialize genre from URL (?genre=...) so people can share "book by genre" links
+  useEffect(() => {
+    const urlGenre = searchParams.get('genre');
+    if (!urlGenre) return;
+    // we keep the exact case from DB genres; allow matching by case-insensitive compare
+    const match = allGenres.find((g) => g.toLowerCase() === urlGenre.toLowerCase());
+    if (match) setSelectedGenre(match);
+  }, [searchParams, allGenres]);
+
+  // Filter artists based on search, featured filter and genre
   const filteredArtists = useMemo(() => {
     if (!artists) return [];
-    
-    let filtered = artists.filter(artist => 
-      artist.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (artist.bio && artist.bio.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
-    
-    // Apply featured filter
+
+    let filtered = artists.filter((artist) => {
+      const haystack =
+        (artist.name || '').toLowerCase() +
+        ' ' +
+        (artist.bio ? artist.bio.toLowerCase() : '');
+      const matchesSearch = haystack.includes(searchTerm.toLowerCase());
+
+      const matchesGenre =
+        !selectedGenre ||
+        (Array.isArray(artist.genre) &&
+          artist.genre.some((g: string) => g === selectedGenre));
+
+      return matchesSearch && matchesGenre;
+    });
+
     if (showFeaturedOnly) {
-      filtered = filtered.filter(artist => artist.featured);
+      filtered = filtered.filter((artist) => artist.featured);
     }
-    
+
     return filtered;
-  }, [artists, searchTerm, showFeaturedOnly]);
+  }, [artists, searchTerm, showFeaturedOnly, selectedGenre]);
 
   const handleArtistClick = (artist: any) => {
     const slug = generateSlug(artist.name);
     router.push(`/artists/${slug}`);
   };
 
+  const setGenreAndSyncUrl = (genre: string | null) => {
+    setSelectedGenre(genre);
+    const params = new URLSearchParams(Array.from(searchParams.entries()));
+    if (genre) params.set('genre', genre);
+    else params.delete('genre');
+    const query = params.toString();
+    router.replace(query ? `/artists?${query}` : '/artists', { scroll: false });
+  };
+
+  const bookingMailto = useMemo(() => {
+    const subject = encodeURIComponent(
+      `DJ booking request${selectedGenre ? ` - ${selectedGenre}` : ''}`
+    );
+    const body = encodeURIComponent(
+      [
+        'event date:',
+        'venue / city:',
+        `genre / vibe: ${selectedGenre ?? 'open'}`,
+        'budget:',
+        'preferred DJs (optional):',
+        'notes:',
+      ].join('\n')
+    );
+    return `mailto:info@originsradio.com?subject=${subject}&body=${body}`;
+  }, [selectedGenre]);
+
   // SEO Data
   const seoData = {
-    title: "Artists & DJs - Origins Radio | Underground Music Scene",
-    description: "Discover talented DJs and music producers from the underground music scene. Listen to the latest tracks, sets, and performances from resident artists on Origins Radio.",
-    keywords: "DJs, music producers, underground music, techno, house, electronic music, Origins Radio, artists, musicians",
+    title: 'Artists & Management - Origins Radio',
+    description:
+      'Discover the DJs and artists shaping nights at Origins Radio. Browse residents, explore by genre, and learn about our artist management services.',
+    keywords:
+      'DJs, artist management, underground music, techno, house, Origins Radio, booking, new talent',
     structuredData: {
-      "@context": "https://schema.org",
-      "@type": "ItemList",
-      "name": "Artists & DJs",
-      "description": "Resident DJs and music producers from the underground music scene",
-      "url": "https://originsradio.com/artists",
-      "numberOfItems": artists?.length || 0,
-      "itemListElement": artists?.map((artist, index) => ({
-        "@type": "ListItem",
-        "position": index + 1,
-        "item": {
-          "@type": "Person",
-          "name": artist.name,
-          "description": artist.bio || `Professional DJ ${artist.name}`,
-          "url": `https://originsradio.com/artists/${generateSlug(artist.name)}`,
-          "image": artist.photo_url || "/placeholder.svg",
-          "jobTitle": "DJ & Music Producer",
-          "worksFor": {
-            "@type": "Organization",
-            "name": "Origins Radio"
-          }
-        }
-      })) || []
-    }
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: 'Artists & DJs',
+      description:
+        'Resident DJs and music producers from the underground music scene',
+      url: 'https://originsradio.com/artists',
+      numberOfItems: artists?.length || 0,
+      itemListElement:
+        artists?.map((artist, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          item: {
+            '@type': 'Person',
+            name: artist.name,
+            description: artist.bio || `Professional DJ ${artist.name}`,
+            url: `https://originsradio.com/artists/${generateSlug(artist.name)}`,
+            image: artist.photo_url || '/placeholder.svg',
+            jobTitle: 'DJ & Music Producer',
+            worksFor: {
+              '@type': 'Organization',
+              name: 'Origins Radio',
+            },
+          },
+        })) || [],
+    },
   };
+
+  const motionIn = reduceMotion
+    ? {
+        initial: { opacity: 1, y: 0 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0 },
+      }
+    : {
+        initial: { opacity: 0, y: 24 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.7, ease: 'easeOut' as const },
+      };
 
   return (
     <PageLayout>
-      {/* Natural warm background */}
-      <NaturalBackground />
-      
+      {/* Background to match About page language */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-b from-stone-950 via-neutral-950 to-stone-950" />
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-950/15 via-transparent to-stone-900/20" />
+        <div className="absolute -left-40 -top-40 w-[620px] h-[620px] rounded-full bg-amber-900/10 blur-[160px]" />
+        <div className="absolute right-0 top-1/3 w-[520px] h-[520px] rounded-full bg-orange-950/10 blur-[140px]" />
+        <div className="absolute -left-16 bottom-0 w-[420px] h-[420px] rounded-full bg-stone-800/15 blur-[120px]" />
+      </div>
+
+      <SocialBubbles />
+      <Navigation />
+
       {/* Artist Login button (fixed, top-right) */}
-      <div className={cn(
-        "fixed z-50",
-        "top-[calc(0.75rem+env(safe-area-inset-top))] right-[calc(0.75rem+env(safe-area-inset-right))]",
-        "sm:top-[calc(1.5rem+env(safe-area-inset-top))] sm:right-[calc(1.5rem+env(safe-area-inset-right))]"
-      )}>
-        <Link 
-          href="/artist/login" 
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 text-white transition-colors group"
+      <div
+        className={cn(
+          'fixed z-40',
+          'top-[calc(0.75rem+env(safe-area-inset-top))] right-[calc(0.75rem+env(safe-area-inset-right))]',
+          'sm:top-[calc(1.5rem+env(safe-area-inset-top))] sm:right-[calc(1.5rem+env(safe-area-inset-right))]'
+        )}
+      >
+        <Link
+          href="/artist/login"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-stone-900/70 border border-white/20 hover:bg-stone-800/90 text-white transition-colors group"
           aria-label="Artist Login"
           title="Artist Login"
         >
@@ -114,6 +313,7 @@ export default function ArtistsPage() {
           <span className="text-sm font-medium">Artist Login</span>
         </Link>
       </div>
+
       <Helmet>
         <title>{seoData.title}</title>
         <meta name="description" content={seoData.description} />
@@ -133,94 +333,282 @@ export default function ArtistsPage() {
         <link rel="canonical" href="https://originsradio.com/artists" />
       </Helmet>
 
-      <div className="min-h-screen">
-        {/* Hero Section */}
-        <div className="relative py-20 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center"
-            >
-              <h1 className="text-4xl sm:text-6xl font-bold text-white mb-6">
-                Artists
-              </h1>
-              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                Discover the talented artists behind the music that defines Origins Radio
+      {/* Hero Section */}
+      <section className="min-h-screen flex items-center justify-center relative z-10 px-6 pt-32 pb-16">
+        <motion.div className="max-w-5xl mx-auto" {...motionIn}>
+          <div className="mb-8 md:mb-12 inline-block">
+            <div className="inline-flex items-center gap-2 bg-amber-100/10 border border-amber-400/20 px-5 py-3 rounded-xl backdrop-blur-sm">
+              <Sparkles className="w-4 h-4 text-amber-300/80" />
+              <p className="text-amber-200/80 text-sm md:text-base italic">
+                {copy.hero.eyebrow}
               </p>
-            </motion.div>
+            </div>
           </div>
-        </div>
 
-        {/* Search Section */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-          <div className="glass backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/10">
-            <div className="flex flex-col sm:flex-row gap-4">
-              {/* Search Input */}
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  placeholder="Search artists..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-20 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/30 transition-all"
-                />
-                {/* Keyboard shortcut hint */}
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 hidden sm:flex items-center gap-1 text-gray-500 text-xs">
-                  <kbd className="px-2 py-1 bg-white/10 rounded border border-white/20 text-xs font-mono">
-                    {navigator.platform.indexOf('Mac') > -1 ? '⌘' : 'Ctrl'}
-                  </kbd>
-                  <span>+</span>
-                  <kbd className="px-2 py-1 bg-white/10 rounded border border-white/20 text-xs font-mono">K</kbd>
+          <div className="mb-10 md:mb-12">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 text-white leading-[1.05] text-left md:text-center">
+              {copy.hero.titleTop}
+              <br />
+              <span className="text-amber-300/85">{copy.hero.titleBottom}</span>
+            </h1>
+          </div>
+
+          <div className="max-w-3xl mx-auto space-y-4 text-left">
+            {copy.hero.paragraphs.map((p) => (
+              <p key={p} className="text-lg md:text-xl text-stone-300 leading-relaxed">
+                {p}
+              </p>
+            ))}
+          </div>
+
+          <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
+            {heroStats.map((stat, i) => (
+              <div
+                key={i}
+                className="text-center p-4 bg-white/5 rounded-xl backdrop-blur-sm border border-white/10"
+              >
+                <stat.icon className="w-6 h-6 text-amber-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-white mb-1">{stat.value}</div>
+                <div className="text-xs text-stone-400 uppercase tracking-[0.18em]">
+                  {stat.label}
                 </div>
               </div>
+            ))}
+          </div>
 
-              {/* Featured Filter */}
-              <div className="flex items-center justify-center sm:justify-start">
-                <button
-                  onClick={() => setShowFeaturedOnly(!showFeaturedOnly)}
-                  className={`px-4 py-3 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap ${
-                    showFeaturedOnly
-                      ? 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30'
-                      : 'bg-white/10 text-white border border-white/20 hover:bg-white/20'
-                  }`}
-                >
-                  <Star className="w-4 h-4" />
-                  <span className="hidden sm:inline">Resident Artists</span>
-                  <span className="sm:hidden">Resident Artists</span>
-                </button>
+          <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center items-stretch sm:items-center">
+            <motion.button
+              className="w-full sm:w-auto px-7 py-3 rounded-full bg-white text-stone-950 font-semibold hover:bg-stone-100 transition-colors"
+              whileHover={reduceMotion ? undefined : { scale: 1.02 }}
+              whileTap={reduceMotion ? undefined : { scale: 0.98 }}
+              type="button"
+              onClick={() => {
+                rosterRef.current?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+              }}
+            >
+              browse roster <ArrowRight className="inline w-4 h-4 ml-2" />
+            </motion.button>
+            <motion.button
+              className="w-full sm:w-auto px-7 py-3 rounded-full bg-stone-900/40 border border-white/15 text-white font-semibold hover:bg-stone-900/60 transition-colors"
+              whileHover={reduceMotion ? undefined : { scale: 1.02 }}
+              whileTap={reduceMotion ? undefined : { scale: 0.98 }}
+              type="button"
+              onClick={() => {
+                const el = document.getElementById('booking');
+                el?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+              }}
+            >
+              book by genre <ArrowRight className="inline w-4 h-4 ml-2" />
+            </motion.button>
+            <a href={copy.management.ctaPrimaryLink} className="w-full sm:w-auto">
+              <motion.div
+                className="w-full px-7 py-3 rounded-full bg-amber-300 text-stone-950 font-semibold hover:bg-amber-200 transition-colors text-center"
+                whileHover={reduceMotion ? undefined : { scale: 1.02 }}
+                whileTap={reduceMotion ? undefined : { scale: 0.98 }}
+              >
+                {copy.management.ctaPrimary}
+              </motion.div>
+            </a>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Management / New Talent Section */}
+      <section className="relative z-10 py-16 md:py-24 bg-black/20">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+            <div className="space-y-8 order-2 lg:order-1">
+              <SectionTitle
+                eyebrow={copy.management.eyebrow}
+                title={copy.management.title}
+                subtitle={copy.management.subtitle}
+              />
+              <div className="space-y-4 text-lg text-stone-300 leading-relaxed">
+                {copy.management.paragraphs.map((p, i) => (
+                  <p key={i}>{p}</p>
+                ))}
+              </div>
+              <div>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <a
+                    href={copy.management.ctaPrimaryLink}
+                    className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-white text-stone-950 font-semibold hover:bg-stone-100 transition-colors text-base"
+                  >
+                    {copy.management.ctaPrimary} <ArrowRight className="ml-2 w-4 h-4" />
+                  </a>
+                  <a
+                    href={copy.management.ctaSecondaryLink}
+                    className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-stone-900/40 border border-white/15 text-white font-semibold hover:bg-stone-900/60 transition-colors text-base"
+                  >
+                    {copy.management.ctaSecondary} <ArrowRight className="ml-2 w-4 h-4" />
+                  </a>
+                </div>
               </div>
             </div>
             
-            {/* Search results count */}
-            {(searchTerm || showFeaturedOnly) && (
-              <div className="mt-3 pt-3 border-t border-white/10">
-                <p className="text-sm text-gray-400">
-                  {filteredArtists.length === 0 
-                    ? 'No artists found' 
-                    : `${filteredArtists.length} artist${filteredArtists.length !== 1 ? 's' : ''} found`
-                  }
-                  {searchTerm && ` for "${searchTerm}"`}
-                  {showFeaturedOnly && ' (resident artists only)'}
-                </p>
-              </div>
-            )}
+            <div className="order-1 lg:order-2">
+               <SoftCard>
+                  <div className="p-8 md:p-10 flex flex-col items-center justify-center text-center space-y-6 h-full min-h-[400px]">
+                      <div className="w-24 h-24 rounded-full bg-amber-400/10 flex items-center justify-center mb-4">
+                        <Star className="w-10 h-10 text-amber-400" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-white">Join the Roster</h3>
+                      <p className="text-stone-400 leading-relaxed">
+                        we are looking for sound that stands out. if you believe you have what it takes to be a resident or a managed artist, show us what you've got.
+                      </p>
+                      <ul className="text-left text-stone-300 space-y-3 w-full max-w-xs mx-auto">
+                        <li className="flex items-center gap-3">
+                          <CheckCircle2 className="w-5 h-5 text-amber-400" />
+                          <span>Identity development</span>
+                        </li>
+                        <li className="flex items-center gap-3">
+                          <CheckCircle2 className="w-5 h-5 text-amber-400" />
+                          <span>Strategic bookings</span>
+                        </li>
+                        <li className="flex items-center gap-3">
+                          <CheckCircle2 className="w-5 h-5 text-amber-400" />
+                          <span>Production support</span>
+                        </li>
+                      </ul>
+                  </div>
+               </SoftCard>
+            </div>
           </div>
         </div>
+      </section>
+
+      <Divider />
+
+      {/* Booking / Filtering Section */}
+      <section className="max-w-6xl mx-auto px-6" id="booking">
+        <div className="text-center mb-12">
+           <SectionTitle 
+              eyebrow={copy.booking.eyebrow}
+              title={copy.booking.title}
+              subtitle={copy.booking.subtitle}
+              center
+           />
+        </div>
+
+        <SoftCard>
+          <div className="p-6 md:p-8">
+            <div className="flex flex-col gap-6">
+              {/* Search Bar */}
+              <div className="relative w-full max-w-2xl mx-auto">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-stone-500 w-5 h-5" />
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder="Search artist name or bio..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-12 pr-24 py-4 bg-stone-900/70 border border-white/15 rounded-xl text-white placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-400/30 focus:border-amber-300/40 transition-all text-lg"
+                />
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-1 text-stone-500 text-xs">
+                  <kbd className="px-2 py-1 bg-stone-900/80 rounded border border-white/10 text-[11px] font-mono">
+                    {typeof navigator !== 'undefined' &&
+                    navigator.platform.indexOf('Mac') > -1
+                      ? '⌘'
+                      : 'Ctrl'}
+                  </kbd>
+                  <span>+</span>
+                  <kbd className="px-2 py-1 bg-stone-900/80 rounded border border-white/10 text-[11px] font-mono">
+                    K
+                  </kbd>
+                </div>
+              </div>
+
+              {/* Genre Clouds */}
+              <div className="flex flex-col items-center gap-4">
+                 <div className="flex items-center gap-2 text-stone-500 text-sm uppercase tracking-widest">
+                    <Tag className="w-4 h-4" />
+                    <span>Filter by Vibe</span>
+                 </div>
+                 <div className="flex flex-wrap justify-center gap-2">
+                    <button
+                        onClick={() => setGenreAndSyncUrl(null)}
+                        className={cn(
+                          'px-4 py-2 rounded-full text-sm border transition-all duration-300',
+                          !selectedGenre
+                            ? 'bg-white text-stone-950 border-white font-semibold scale-105 shadow-lg shadow-white/10'
+                            : 'bg-stone-900/60 text-stone-300 border-white/10 hover:bg-stone-800/90 hover:border-white/30'
+                        )}
+                      >
+                        All Genres
+                      </button>
+                      {allGenres.map((genre) => (
+                        <button
+                          key={genre}
+                          onClick={() =>
+                            setGenreAndSyncUrl(selectedGenre === genre ? null : genre)
+                          }
+                          className={cn(
+                            'px-4 py-2 rounded-full text-sm border transition-all duration-300',
+                            selectedGenre === genre
+                              ? 'bg-amber-300 text-stone-950 border-amber-400 font-semibold scale-105 shadow-lg shadow-amber-400/20'
+                              : 'bg-stone-900/60 text-stone-300 border-white/10 hover:bg-stone-800/90 hover:border-white/30'
+                          )}
+                        >
+                          {genre}
+                          <span className="ml-2 opacity-70 text-xs">
+                            {genreCounts.get(genre) ?? 0}
+                          </span>
+                        </button>
+                      ))}
+                 </div>
+                 
+                 <div className="mt-2">
+                    <button
+                      onClick={() => setShowFeaturedOnly((v) => !v)}
+                      className={cn(
+                        'px-5 py-2 rounded-full text-sm font-medium flex items-center gap-2 border transition-all',
+                        showFeaturedOnly
+                          ? 'bg-amber-300 text-stone-950 border-amber-400'
+                          : 'bg-transparent text-amber-200 border-amber-400/30 hover:bg-amber-400/10'
+                      )}
+                    >
+                      <Star className="w-4 h-4 fill-current" />
+                      {showFeaturedOnly ? 'Showing Residents Only' : 'Show Residents Only'}
+                    </button>
+                 </div>
+              </div>
+
+              {(searchTerm || showFeaturedOnly || selectedGenre) && (
+                <div className="pt-4 border-t border-white/10 text-center">
+                  <p className="text-stone-400">
+                    {filteredArtists.length === 0
+                      ? 'No artists match your criteria'
+                      : `Found ${filteredArtists.length} artist${
+                          filteredArtists.length !== 1 ? 's' : ''
+                        }`}
+                  </p>
+                </div>
+              )}
+
+              <div className="pt-6 flex justify-center">
+                <a
+                  href={bookingMailto}
+                  className="inline-flex items-center justify-center px-7 py-3 rounded-full bg-amber-300 text-stone-950 font-semibold hover:bg-amber-200 transition-colors"
+                >
+                  {copy.booking.cta} <ArrowRight className="ml-2 w-4 h-4" />
+                </a>
+              </div>
+            </div>
+          </div>
+        </SoftCard>
 
         {/* Artists Grid */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+        <div ref={rosterRef} className="mt-16 pb-24" id="roster">
           {isLoading ? (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="text-center py-20"
             >
-              <Music className="w-16 h-16 text-gray-500 mx-auto mb-4" />
-              <h3 className="text-2xl font-semibold text-white mb-2">Loading artists...</h3>
+              <Music className="w-16 h-16 text-stone-500 mx-auto mb-4 animate-pulse" />
+              <h3 className="text-2xl font-semibold text-white mb-2">
+                Loading artists...
+              </h3>
             </motion.div>
           ) : error ? (
             <motion.div
@@ -229,8 +617,10 @@ export default function ArtistsPage() {
               className="text-center py-20"
             >
               <Music className="w-16 h-16 text-red-500 mx-auto mb-4" />
-              <h3 className="text-2xl font-semibold text-white mb-2">Error loading artists</h3>
-              <p className="text-gray-400">{error.message}</p>
+              <h3 className="text-2xl font-semibold text-white mb-2">
+                Error loading artists
+              </h3>
+              <p className="text-stone-400">{error.message}</p>
             </motion.div>
           ) : filteredArtists.length === 0 ? (
             <motion.div
@@ -238,100 +628,96 @@ export default function ArtistsPage() {
               animate={{ opacity: 1 }}
               className="text-center py-20"
             >
-              <Music className="w-16 h-16 text-gray-500 mx-auto mb-4" />
-              <h3 className="text-2xl font-semibold text-white mb-2">No artists found</h3>
-              <p className="text-gray-400">Try adjusting your search</p>
+              <Music className="w-16 h-16 text-stone-600 mx-auto mb-4" />
+              <h3 className="text-2xl font-semibold text-white mb-2">
+                No artists match this yet
+              </h3>
+              <p className="text-stone-400">
+                Try clearing filters or searching with a different word.
+              </p>
             </motion.div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-stretch">
               {filteredArtists.map((artist, index) => (
-                <motion.div
+                <motion.button
                   key={artist.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.03 }}
+                  type="button"
+                  initial={reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-80px' }}
+                  transition={{ duration: 0.5, delay: index * 0.05 }}
                   onClick={() => handleArtistClick(artist)}
-                  className="group cursor-pointer h-full"
+                  className="group cursor-pointer h-full text-left"
                 >
-                  <div className="glass backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.1)] transform-gpu hover:scale-105 h-full flex flex-col">
+                  <div className="bg-stone-950/60 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-white/30 transition-all duration-500 hover:shadow-2xl hover:shadow-amber-900/10 transform-gpu hover:-translate-y-2 h-full flex flex-col">
                     {/* Artist Image */}
-                    <div className="relative h-64 overflow-hidden flex-shrink-0">
+                    <div className="relative aspect-[4/5] overflow-hidden flex-shrink-0">
                       <img
                         src={artist.photo_url || '/placeholder.svg'}
                         alt={artist.name}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src = '/placeholder.svg';
                         }}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                      
-                      {/* Resident Badge on Photo */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
+
                       {artist.featured && (
-                        <motion.div 
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 0.3, duration: 0.8 }}
-                          className="absolute top-3 left-3 z-10"
-                        >
-                          <div className="bg-gradient-to-r from-red-500 via-red-600 to-red-700 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg border border-red-500/30">
+                        <div className="absolute top-3 left-3 z-10">
+                          <div className="bg-amber-300 text-stone-950 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 shadow-lg border border-amber-500/40">
                             <Star className="w-3 h-3 fill-current" />
-                            <span>RESIDENT</span>
+                            <span>Resident</span>
                           </div>
-                        </motion.div>
+                        </div>
                       )}
                     </div>
 
                     {/* Artist Info */}
-                    <div className="p-6 flex-1 flex flex-col">
-                      <h3 className="text-xl font-bold text-white mb-2 group-hover:text-blue-300 transition-colors">
-                        {artist.name}
-                      </h3>
+                    <div className="p-6 flex-1 flex flex-col relative">
+                      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent group-hover:via-amber-400/50 transition-all duration-500" />
                       
-                      {artist.location && (
-                        <div className="flex items-center gap-2 text-gray-400 mb-3">
-                          <MapPin className="w-4 h-4" />
-                          <span className="text-sm">{artist.location}</span>
-                        </div>
-                      )}
+                      <div className="mb-auto">
+                        <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-amber-300 transition-colors leading-none">
+                          {artist.name}
+                        </h3>
 
-                      {artist.genre && artist.genre.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          {artist.genre.slice(0, 3).map((genre, index) => (
-                            <span
-                              key={index}
-                              className="px-2 py-1 bg-white/10 rounded-full text-xs text-gray-300 border border-white/20"
-                            >
-                              {genre}
+                        {artist.location && (
+                          <div className="flex items-center gap-2 text-stone-400 mb-4">
+                            <MapPin className="w-3 h-3" />
+                            <span className="text-xs uppercase tracking-[0.2em] opacity-70">
+                              {artist.location}
                             </span>
-                          ))}
-                        </div>
-                      )}
-
-                      {artist.bio && (
-                        <p className="text-gray-400 text-sm leading-relaxed flex-1">
-                          {artist.bio.length > 100 ? `${artist.bio.slice(0, 100)}...` : artist.bio}
-                        </p>
-                      )}
-
-                      <div className="mt-4 pt-4 border-t border-white/10">
-                        <div className="flex items-center justify-between text-sm text-gray-500">
-                          <span>View Profile</span>
-                          <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-all">
-                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                            </svg>
                           </div>
+                        )}
+
+                        {artist.genre && artist.genre.length > 0 && (
+                          <div className="flex flex-wrap gap-2 mb-4">
+                            {artist.genre.slice(0, 3).map((genre: string) => (
+                              <span
+                                key={genre}
+                                className="px-2 py-0.5 bg-white/5 rounded text-[10px] text-stone-300 border border-white/10 uppercase tracking-wide"
+                              >
+                                {genre}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="mt-4 pt-4 border-t border-white/5 flex items-center justify-between text-xs text-stone-500 group-hover:text-stone-400 transition-colors">
+                        <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-x-2 group-hover:translate-x-0">view profile</span>
+                        <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-amber-300 group-hover:text-black transition-all duration-300">
+                           <ArrowRight className="w-4 h-4" />
                         </div>
                       </div>
                     </div>
                   </div>
-                </motion.div>
+                </motion.button>
               ))}
             </div>
           )}
         </div>
-      </div>
+      </section>
     </PageLayout>
   );
 }

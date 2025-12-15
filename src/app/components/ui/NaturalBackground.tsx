@@ -6,7 +6,7 @@
  */
 export default function NaturalBackground() {
   return (
-    <div className="fixed inset-0 z-0 pointer-events-none">
+    <div className="fixed inset-0 -z-10 pointer-events-none">
       {/* Deep warm dark base */}
       <div className="absolute inset-0 bg-gradient-to-b from-neutral-950 via-stone-950 to-zinc-950"></div>
       
@@ -33,4 +33,5 @@ export default function NaturalBackground() {
     </div>
   );
 }
+
 

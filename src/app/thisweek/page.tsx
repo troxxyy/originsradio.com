@@ -50,8 +50,26 @@ const getUpcomingFridayAndSaturday = () => {
   const now = new Date();
   const day = now.getDay(); // 0=Sun ... 6=Sat
 
-  const daysUntilFriday = (5 - day + 7) % 7; // Friday=5
-  const daysUntilSaturday = (6 - day + 7) % 7; // Saturday=6
+  // Avoid startDate > endDate when visiting on Saturday.
+  if (day === 6) {
+    const saturday = new Date(now);
+    const friday = new Date(now);
+    friday.setDate(now.getDate() - 1);
+    return { friday, saturday };
+  }
+
+  // On Sundays, jump to the next weekend.
+  if (day === 0) {
+    const friday = new Date(now);
+    friday.setDate(now.getDate() + 5);
+    const saturday = new Date(now);
+    saturday.setDate(now.getDate() + 6);
+    return { friday, saturday };
+  }
+
+  // Default: current week's upcoming Friday/Saturday.
+  const daysUntilFriday = 5 - day; // Friday=5
+  const daysUntilSaturday = 6 - day; // Saturday=6
 
   const friday = new Date(now);
   friday.setDate(now.getDate() + daysUntilFriday);

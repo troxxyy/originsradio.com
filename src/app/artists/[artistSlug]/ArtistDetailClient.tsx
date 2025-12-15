@@ -219,6 +219,25 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
 
   const seoData = generateSEOData()
 
+  const bookingMailto = (() => {
+    const subject = encodeURIComponent(`DJ booking request - ${artist?.name ?? 'artist'}`)
+    const genres = Array.isArray(artist?.genre) && artist?.genre.length > 0 ? artist?.genre.join(', ') : 'open'
+    const location = artist?.location ? ` (${artist.location})` : ''
+    const body = encodeURIComponent(
+      [
+        `artist: ${artist?.name ?? ''}${location}`,
+        `genre / vibe: ${genres}`,
+        '',
+        'event date:',
+        'venue / city:',
+        'set time (warmup / peak / closing):',
+        'budget:',
+        'notes:',
+      ].join('\n')
+    )
+    return `mailto:info@originsradio.com?subject=${subject}&body=${body}`
+  })()
+
   const handlePlaySet = async (index: number) => {
     if (!setsEvents[index]) return
     
@@ -594,7 +613,7 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
                       transition={{ delay: 0.3, duration: 0.8 }}
                       className="absolute top-4 left-4 z-20"
                     >
-                      <div className="bg-gradient-to-r from-red-500 via-red-600 to-red-700 text-white px-6 py-3 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg border border-red-500/30 backdrop-blur-sm">
+                      <div className="bg-amber-300 text-stone-950 px-6 py-3 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg border border-amber-500/40 backdrop-blur-sm">
                         <Star className="w-4 h-4 fill-current" />
                         <span>RESIDENT DJ</span>
                       </div>
@@ -641,19 +660,42 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
                           transition={{ delay: 0.2 }}
                           className="flex flex-wrap gap-3 mb-6"
                         >
-                          {artist.genre.slice(0, 3).map((genre, index) => (
-                            <motion.span
+                          {artist.genre.slice(0, 5).map((genre, index) => (
+                            <motion.button
                               key={genre}
                               initial={{ opacity: 0, scale: 0.8 }}
                               animate={{ opacity: 1, scale: 1 }}
                               transition={{ delay: 0.25 + index * 0.05 }}
-                              className="px-4 py-2 bg-gradient-to-r from-blue-500/20 to-blue-600/20 rounded-full text-sm text-white font-medium border border-blue-500/30 backdrop-blur-sm"
+                              type="button"
+                              onClick={() => router.push(`/artists?genre=${encodeURIComponent(genre)}#booking`)}
+                              className="px-4 py-2 bg-white/5 rounded-full text-sm text-white font-medium border border-white/10 backdrop-blur-sm hover:border-amber-400/40 hover:bg-amber-400/10 transition-colors"
                             >
                               {genre}
-                            </motion.span>
+                            </motion.button>
                           ))}
                         </motion.div>
                       )}
+
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.26 }}
+                        className="flex flex-col sm:flex-row gap-3 mb-8"
+                      >
+                        <a
+                          href={bookingMailto}
+                          className="inline-flex items-center justify-center px-7 py-3 rounded-full bg-amber-300 text-stone-950 font-semibold hover:bg-amber-200 transition-colors"
+                        >
+                          book this DJ
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => router.push(`/artists#booking`)}
+                          className="inline-flex items-center justify-center px-7 py-3 rounded-full bg-white/5 border border-white/15 text-white font-semibold hover:bg-white/10 transition-colors"
+                        >
+                          browse roster by genre
+                        </button>
+                      </motion.div>
 
                       {artist.bio && (
                         <motion.p

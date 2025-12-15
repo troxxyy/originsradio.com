@@ -4,6 +4,8 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
+  // Base path for serving the application from a subdirectory
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH || '/originsradio',
   // Optimize for virtual environments and production builds
   output: 'standalone',
   experimental: {
