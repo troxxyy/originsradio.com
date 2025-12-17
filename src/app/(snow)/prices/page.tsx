@@ -111,7 +111,9 @@ function PackageCard({ pkg, language }: { pkg: any; language: 'en' | 'tr' }) {
 
       <div className="mb-6">
         <h3 className="text-2xl font-bold text-white mb-2">
-          {language === 'en' ? copy.en[pkg.name as keyof typeof copy.en] : copy.tr[pkg.name as keyof typeof copy.tr]}
+          {language === 'en' 
+            ? (copy.en[pkg.name as keyof typeof copy.en] as string)
+            : (copy.tr[pkg.name as keyof typeof copy.tr] as string)}
         </h3>
         <div className="flex items-baseline gap-2">
           <span className="text-4xl font-bold text-cyan-300">{pkg.price}</span>
