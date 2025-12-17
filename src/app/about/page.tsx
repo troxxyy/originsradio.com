@@ -19,8 +19,6 @@ import {
   Target,
   Users,
   Volume2,
-  CheckCircle2,
-  XCircle,
   Languages,
 } from "lucide-react";
 import Link from "next/link";
@@ -41,28 +39,28 @@ const aboutImages = [
 
 const teamMembers = {
   en: [
-  {
-    name: "Kaan",
-    fullName: "Kaan Şimşir",
-    role: "founder, programming",
-    image: "/team/castor.jpeg",
-      quote: "if it's honest, it belongs here.",
-    story:
-      "origins started as a late night idea, then we kept showing up until it became real. no perfect timing, just momentum and stubbornness.",
-    funFact: "keeps way too many drafts and voice notes",
-    favoriteMoment: "the first time a DJ said the set brought them listeners",
-  },
-  {
-    name: "Sina",
-    fullName: "Sina Çetinkaya",
-    role: "tech, product",
-    image: "/team/sina.jpeg",
-    quote: "make it fast. make it simple. make it work at 3am.",
-    story:
-      "builds the site, the stream plumbing, and the boring infrastructure that saves the night when something breaks. obsessed with smooth playback.",
-    funFact: "has opinions about latency that nobody asked for",
-    favoriteMoment: "shipping a small fix that instantly feels better",
-  },
+    {
+      name: "Kaan",
+      fullName: "Kaan Şimşir",
+      role: "founder, programming",
+      image: "/team/castor.jpeg",
+      quote: "if it’s honest, it belongs here.",
+      story:
+        "origins started as a late night idea, then we kept showing up until it became real. no perfect timing, just momentum and stubbornness.",
+      funFact: "keeps way too many drafts and voice notes",
+      favoriteMoment: "the first time a DJ said the set brought them listeners",
+    },
+    {
+      name: "Sina",
+      fullName: "Sina Çetinkaya",
+      role: "tech, product",
+      image: "/team/sina.jpeg",
+      quote: "make it fast. make it simple. make it work at 3am.",
+      story:
+        "builds the site, the stream plumbing, and the boring infrastructure that saves the night when something breaks. obsessed with smooth playback.",
+      funFact: "has opinions about latency that nobody asked for",
+      favoriteMoment: "shipping a small fix that instantly feels better",
+    },
   ],
   tr: [
     {
@@ -70,344 +68,370 @@ const teamMembers = {
       fullName: "Kaan Şimşir",
       role: "kurucu, programlama",
       image: "/team/castor.jpeg",
-      quote: "dürüstse, buraya ait.",
-    story:
-        "origins gece yarısı bir fikir olarak başladı, sonra gerçek olana kadar devam ettik. mükemmel zamanlama yok, sadece momentum ve inatçılık.",
-      funFact: "çok fazla taslak ve ses notu tutuyor",
-      favoriteMoment: "bir DJ'in setin dinleyici getirdiğini söylediği ilk an",
+      quote: "dürüstse, buraya aittir.",
+      story:
+        "Origins, gece yarısı ortaya çıkan bir fikirle başladı. sonra gerçek olana kadar istikrarlı şekilde devam ettik. mükemmel zamanlama yoktu, sadece momentum ve inat.",
+      funFact: "fazlasıyla çok taslak ve ses notu biriktiriyor",
+      favoriteMoment:
+        "bir DJ’in, setin gerçekten dinleyici getirdiğini söylediği ilk an",
     },
     {
       name: "Sina",
       fullName: "Sina Çetinkaya",
       role: "teknoloji, ürün",
       image: "/team/sina.jpeg",
-      quote: "hızlı yap. basit yap. gece 3'te çalışsın.",
+      quote: "hızlı olsun. basit olsun. gece 3’te de çalışsın.",
       story:
-        "siteyi, yayın altyapısını ve bir şeyler bozulduğunda geceyi kurtaran sıkıcı altyapıyı yapıyor. akıcı oynatma takıntısı var.",
-      funFact: "kimsenin sormadığı gecikme hakkında fikirleri var",
-      favoriteMoment: "anında daha iyi hissettiren küçük bir düzeltmeyi yayınlamak",
+        "siteyi, yayın altyapısını ve bir şey bozulduğunda geceyi kurtaran görünmeyen işleri kuruyor. hedefi hep aynı: kesintisiz, akıcı dinleme.",
+      funFact: "kimsenin istemediği kadar gecikme fikri var",
+      favoriteMoment:
+        "küçük bir düzeltmenin anında daha iyi hissettirmesi ve bunu yayına almak",
     },
   ],
 };
 
 const copy = {
   en: {
-  hero: {
-    eyebrow: "a note from the people behind origins",
-    titleTop: "origins radio keeps the night human.",
-    titleMid: "not a brand.",
-    titleBottom: "a small crew building a home for the music we love.",
-    paragraphs: [
-      "we started in 2023 in ankara because we missed spaces that felt real. not polished. not optimized. just taste, sound, and a room with a pulse.",
-      "origins is radio, events, and an archive of nights that meant something. we build it the way we build a night: careful with details, ruthless with the boring parts, always chasing the moment when the room locks in.",
-      "if you get the feeling, you’re already part of it.",
-    ],
-    stats: [
-      { icon: Coffee, label: "started", value: "2023" },
-      { icon: Music, label: "focus", value: "taste first" },
-      { icon: Heart, label: "built for", value: "community" },
-      { icon: Zap, label: "hours", value: "late" },
-    ],
-    actions: [
-      { label: "listen now", href: "/radio", primary: true },
-      { label: "see events", href: "/events", primary: false },
-    ],
-  },
-  origin: {
-    eyebrow: "the real beginning",
-    title: "we started because everything was getting too same",
-    subtitle:
-      "online music was endless, but the spaces around it started to feel empty. scenes turned into content. and the best parts of nightlife did not translate.",
-    paragraphs: [
-      "we did not start with a budget, a plan, or permission. we started with a problem: everything was starting to look and sound like a template.",
-      "the first version was scrappy. borrowed gear. last minute fixes. stress testing streams at stupid hours. flyers made too late. cables that always disappeared.",
-      "then the first night happened. people showed up. not an audience. people. strangers who felt like friends by the end of the set.",
-      "that’s when origins stopped being a project and became a responsibility.",
-    ],
-    calloutTitle: "what surprised us",
-    calloutBody:
-      "the best part was never “growth”. it was messages. moments. people meeting because of a track. at some point it stopped being ours in the way we expected.",
-    calloutLine: "it’s shared now.",
-  },
-  whatThisIs: {
-    eyebrow: "what this is",
-    title: "radio, events, visuals",
-    subtitle: "three parts, one goal: protect a certain kind of night.",
-    cards: [
-      {
-        icon: Radio,
-        title: "radio",
-        text: "shows, residents, guest mixes. no filler. just selections with intention and pacing.",
-        cta: { label: "schedule", href: "/radio/schedule" },
-      },
-      {
-        icon: CalendarDays,
-        title: "events",
-        text: "small rooms, real sound, honest energy. if the vibe is right, you do not need a huge stage.",
-        cta: { label: "events", href: "/events" },
-      },
-      {
-        icon: Sparkles,
-        title: "visuals",
-        text: "identity, posters, motion, details. the stuff you feel before the bass even hits.",
-        cta: { label: "artists", href: "/artists" },
-      },
-    ],
-  },
-  protect: {
-    eyebrow: "what we protect",
-    title: "a night that still feels real",
-    subtitle: "we are not trying to be everywhere. we are trying to keep this alive.",
-    bullets: [
-      { icon: Shield, title: "no phones energy", text: "the kind of moment where you forget your screen exists." },
-      { icon: Users, title: "people over metrics", text: "friends made from one track. community over numbers." },
-      { icon: Volume2, title: "sound is the point", text: "music is not a backdrop here. it’s the reason." },
-      { icon: Target, title: "taste over templates", text: "we’d rather be specific than be generic." },
-    ],
-  },
-  booking: {
-    eyebrow: "how we choose artists",
-    title: "we do not book genres",
-    subtitle: "we book taste, intention, and respect for the room.",
-    list: [
-      "a point of view",
-      "pacing and control",
-      "bravery without ego",
-      "respect for the crowd",
-    ],
-    note:
-      "some nights are peak time. some nights are weird. both matter.",
-  },
-  wont: {
-    eyebrow: "what we will not do",
-    title: "simple rules, no performance",
-    subtitle: "no pretending. no corporate voice. just how we operate.",
-    leftTitle: "we will not",
-    rightTitle: "we do",
-    left: [
-      "chase names we do not believe in",
-      "force artists into a template",
-      "treat people like content",
-      "sacrifice sound for optics",
-      "pretend it is effortless",
-    ],
-    right: [
-      "fix problems fast and keep moving",
-      "pay fairly when we book",
-      "promote properly",
-      "build long term relationships",
-      "keep learning in public",
-    ],
-    ctas: {
-      email: "email us",
-      instagram: "instagram",
-      mailSubject: "origins radio booking or collab",
+    hero: {
+      eyebrow: "a note from the people behind origins",
+      titleTop: "origins radio keeps the night human.",
+      titleMid: "not a brand.",
+      titleBottom: "a small crew making room for the music we love.",
+      paragraphs: [
+        "origins radio brings selection led electronic music and scene culture onto the same line.",
+        "we broadcast, we build events, we shape a visual world.",
+        "everything points to the same thing: a flow that keeps you in, the right moment, the right atmosphere.",
+        "for us it’s not about crowds, it’s about the feeling. selection comes first. details make the difference.",
+      ],
+      stats: [
+        { icon: Coffee, label: "started", value: "2023" },
+        { icon: Music, label: "focus", value: "taste first" },
+        { icon: Heart, label: "built for", value: "community" },
+        { icon: Zap, label: "hours", value: "late" },
+      ],
+      actions: [
+        { label: "listen now", href: "/radio", primary: true },
+        { label: "see events", href: "/events", primary: false },
+      ],
     },
-  },
-  archive: {
-    eyebrow: "archive",
-    title: "some nights we kept",
-    subtitle: "photos you take when you don’t want the night to end.",
-    captions: [
-      "lights down",
-      "hands up",
-      "one more track",
-      "crowd locked in",
-      "afterhours",
-      "new friends",
-      "big bass, small room",
-      "no phones, just dancing",
-      "stayed until the end",
-      "we’ll remember this",
-      "same place next time",
-      "that drop",
-    ],
-    callout:
-      "every photo here is proof that the best nights are not content, they’re shared. that’s what we protect.",
-  },
-  team: {
-    eyebrow: "team",
-    title: "the people doing the work",
-    subtitle: "three roles, one obsession: make it feel right.",
-    hintClosed: "tap for details",
-  },
-  contact: {
-    title: "want to reach us",
-    p1: "pitch a show, suggest an artist, or talk events. send a message.",
-    p2: "we read everything. replies might be slow when we’re building, but we do not ignore people.",
-    p3: "thanks for being here.",
-    email: "info@originsradio.com",
-    instagram: "https://www.instagram.com/origins.radio/",
-    cards: {
-      emailTitle: "email",
-      emailSubtitle: "best for collabs and bookings",
-      instagramTitle: "instagram dm",
-      instagramSubtitle: "quick questions live here",
+    origin: {
+      eyebrow: "the real beginning",
+      title: "after covid, we took it seriously",
+      subtitle:
+        "online music was endless, but the spaces around it started to feel empty. scenes turned into content, and the best parts of nightlife did not translate.",
+      paragraphs: [
+        "when the pandemic ended, everyone rushed to digital. we did not choose to just “exist” online. we chose to be good. we built a clear line: strong selection, consistent taste, clean pacing.",
+        "over time, discipline brought growth. bigger festivals, more stages, a wider portfolio. a circle built with more than forty DJs. a website that keeps a record.",
+        "the core is still the same: a flow that keeps the room alive.",
+      ],
+      calloutTitle: "a space we build together",
+      calloutBody:
+        "our strongest side is not growth. it’s belonging. people meeting in the same moment, even if they do not know each other.",
+      calloutLine: "",
+      buttons: {
+        join: "email us",
+        artists: "browse artists",
+      },
     },
-    orVibe: "or just vibe",
-    buttons: [
-      { label: "events", href: "/events" },
-      { label: "schedule", href: "/radio/schedule" },
-      { label: "artists", href: "/artists" },
-    ],
-    footer: "kaan, sina",
-    thanks: "thanks for reading",
-  },
+    whatThisIs: {
+      eyebrow: "what this is",
+      title: "radio, events, visuals",
+      subtitle: "three parts, one goal: protect a certain kind of night.",
+      cards: [
+        {
+          icon: Radio,
+          title: "radio",
+          text: "shows, resident sets, guest mixes. clean selection, clean tempo.",
+          cta: { label: "shows", href: "/radio/schedule" },
+        },
+        {
+          icon: CalendarDays,
+          title: "events",
+          text: "small rooms or big stages. if sound and flow are right, the night works.",
+          cta: { label: "events", href: "/events" },
+        },
+        {
+          icon: Sparkles,
+          title: "visuals",
+          text: "identity, posters, motion, stage visuals. the feeling before the music hits.",
+          cta: { label: "visuals", href: "/visuals" },
+        },
+      ],
+    },
+    protect: {
+      eyebrow: "what we protect",
+      title: "a night that still feels real",
+      subtitle: "we are not trying to be everywhere. we are trying to keep this alive.",
+      bullets: [
+        { icon: Shield, title: "phone free energy", text: "the kind of moment where you forget your screen exists." },
+        { icon: Users, title: "people over metrics", text: "friends made from one track. community over numbers." },
+        { icon: Volume2, title: "sound is the point", text: "music is not a backdrop here. it’s the reason." },
+        { icon: Target, title: "taste over templates", text: "we’d rather be specific than be generic." },
+      ],
+    },
+    booking: {
+      eyebrow: "how we choose artists",
+      title: "we do not book genres",
+      subtitle: "we book taste, intention, and respect for the room.",
+      list: [
+        "a clear point of view",
+        "pacing and control",
+        "bravery without ego",
+        "respect for the crowd",
+      ],
+      note:
+        "some nights are peak time. some nights are weird. both matter.",
+    },
+    wont: {
+      eyebrow: "what we will not do",
+      title: "simple rules, no performance",
+      subtitle: "no pretending. no corporate voice. just how we operate.",
+      leftTitle: "we will not",
+      rightTitle: "we do",
+      left: [
+        "chase names we do not believe in",
+        "force artists into a template",
+        "treat people like content",
+        "sacrifice sound for optics",
+        "pretend it is effortless",
+      ],
+      right: [
+        "fix problems fast and keep moving",
+        "pay fairly when we book",
+        "promote properly",
+        "build long term relationships",
+        "keep learning and improving",
+      ],
+      ctas: {
+        email: "email us",
+        instagram: "instagram",
+        mailSubject: "origins radio booking or collab",
+      },
+    },
+    archive: {
+      eyebrow: "archive",
+      title: "some nights we kept",
+      subtitle: "photos from moments you did not want to end.",
+      captions: [
+        "lights down",
+        "hands up",
+        "one more track",
+        "crowd locked in",
+        "afterhours",
+        "new friends",
+        "big bass, small room",
+        "no phones, just dancing",
+        "stayed until the end",
+        "we’ll remember this",
+        "same place next time",
+        "that drop",
+      ],
+      callout:
+        "we do not only build the night. we keep some of it here.",
+    },
+    team: {
+      eyebrow: "team",
+      title: "the people doing the work",
+      subtitle: "two roles, one obsession: make it feel right.",
+      hintClosed: "tap for details",
+    },
+    contact: {
+      title: "want to reach us",
+      p1: "pitch a show, suggest an artist, or talk events. send a message.",
+      p2: "we read everything. replies might be slow when we’re building, but we do not ignore people.",
+      p3: "thanks for being here.",
+      email: "info@originsradio.com",
+      instagram: "https://www.instagram.com/origins.radio/",
+      cards: {
+        emailTitle: "email",
+        emailSubtitle: "best for collabs and bookings",
+        instagramTitle: "instagram dm",
+        instagramSubtitle: "quick questions live here",
+      },
+      orVibe: "or just vibe",
+      buttons: [
+        { label: "events", href: "/events" },
+        { label: "schedule", href: "/radio/schedule" },
+        { label: "artists", href: "/artists" },
+      ],
+      footer: "kaan, sina",
+      thanks: "thanks for reading",
+    },
   },
   tr: {
     hero: {
-      eyebrow: "origins'in arkasındaki insanlardan bir not",
-      titleTop: "origins radio geceyi insan tutar.",
+      eyebrow: "Origins’in arkasındaki ekipten bir not",
+      titleTop: "Origins Radio geceyi insan tutar.",
       titleMid: "marka değil.",
-      titleBottom: "sevdiğimiz müzik için bir ev inşa eden küçük bir ekip.",
+      titleBottom: "sevdiğimiz müzik için alan açan küçük bir ekip.",
       paragraphs: [
-        "2023'te ankara'da başladık çünkü gerçek hissettiren mekanları özledik. cilalı değil. optimize edilmiş değil. sadece zevk, ses ve nabzı olan bir oda.",
-        "origins radyo, etkinlikler ve bir şey ifade eden gecelerin arşividir. bunu bir geceyi inşa ettiğimiz gibi inşa ediyoruz: detaylara dikkatli, sıkıcı kısımlarda acımasız, odanın kilitlendiği anı her zaman kovalıyoruz.",
-        "hissediyorsan, zaten bunun bir parçasısın.",
+        "Origins Radio, seçkisi güçlü elektronik müziği sahne kültürüyle aynı çizgide buluşturur.",
+        "yayın yaparız, etkinlik kurgularız, görsel bir dünya inşa ederiz.",
+        "her işin ortak noktası aynıdır: insanı içeride tutan bir akış, doğru an, doğru atmosfer.",
+        "bizim için mesele kalabalık değil, his. seçki önce gelir, detaylar farkı yaratır.",
       ],
       stats: [
-        { icon: Coffee, label: "başladı", value: "2023" },
+        { icon: Coffee, label: "başlangıç", value: "2023" },
         { icon: Music, label: "odak", value: "önce zevk" },
-        { icon: Heart, label: "için yapıldı", value: "topluluk" },
+        { icon: Heart, label: "kimin için", value: "topluluk" },
         { icon: Zap, label: "saatler", value: "gece" },
       ],
       actions: [
         { label: "şimdi dinle", href: "/radio", primary: true },
-        { label: "etkinlikleri gör", href: "/events", primary: false },
+        { label: "etkinliklere bak", href: "/events", primary: false },
       ],
     },
     origin: {
       eyebrow: "gerçek başlangıç",
-      title: "her şey çok aynı olmaya başladığı için başladık",
+      title: "koronadan sonra, işi ciddiye aldık",
       subtitle:
-        "online müzik sonsuzdu, ama etrafındaki mekanlar boş hissettirmeye başladı. sahneler içeriğe dönüştü. ve gece hayatının en iyi kısımları aktarılmadı.",
+        "online müzik sonsuzdu ama etrafındaki alanlar giderek boş hissettirmeye başladı. sahneler içeriğe dönüştü ve gece hayatının en iyi tarafları ekrana sığmadı.",
       paragraphs: [
-        "bütçe, plan veya izinle başlamadık. bir sorunla başladık: her şey bir şablona benzemeye başlıyordu.",
-        "ilk versiyon dağınıktı. ödünç ekipman. son dakika düzeltmeleri. aptal saatlerde yayın stres testleri. çok geç yapılan afişler. her zaman kaybolan kablolar.",
-        "sonra ilk gece oldu. insanlar geldi. izleyici değil. insanlar. setin sonunda arkadaş gibi hissettiren yabancılar.",
-        "işte o zaman origins bir proje olmaktan çıkıp bir sorumluluk haline geldi.",
+        "pandemi bittiğinde herkes dijitale koştu. biz dijitalde sadece “var olmayı” değil, iyi olmayı seçtik. seçkisi güçlü bir hat kurduk. yayın yaptık, etkinlik kurguladık, görsel bir dünya ürettik.",
+        "zamanla bu disiplin büyümeyi getirdi. büyük festivaller, daha çok sahne, daha geniş bir portfolyo. kırkın üzerinde DJ ile oluşan bir çevre. web site ile birlikte kayıt tutan bir yapı.",
+        "origins’in özü hâlâ aynı: insanı tutan bir akış.",
       ],
-      calloutTitle: "bizi şaşırtan şey",
+      calloutTitle: "birlikte kurulan bir alan",
       calloutBody:
-        "en iyi kısım asla 'büyüme' değildi. mesajlardı. anlardı. bir parça yüzünden tanışan insanlar. bir noktada beklediğimiz şekilde bizim olmaktan çıktı.",
-      calloutLine: "artık paylaşılıyor.",
+        "en güçlü tarafımız büyüme değil. aidiyet. insanların birbirini tanımasa bile aynı anda aynı şeyde buluşması.",
+      calloutLine: "",
+      buttons: {
+        join: "bize mail at",
+        artists: "sanatçıları keşfet",
+      },
     },
     whatThisIs: {
-      eyebrow: "bu nedir",
-      title: "radyo, etkinlikler, görseller",
-      subtitle: "üç parça, bir hedef: belirli bir gece türünü korumak.",
+      eyebrow: "origins radio nedir",
+      title: "radyo, etkinlikler, görsel dünya",
+      subtitle: "üç parça, tek amaç: gece hissini korumak.",
       cards: [
         {
           icon: Radio,
           title: "radyo",
-          text: "şovlar, resident'lar, konuk mix'ler. dolgu yok. sadece niyet ve tempo ile seçimler.",
-          cta: { label: "program", href: "/radio/schedule" },
+          text: "programlar, resident setler, konuk miksler. seçki net, tempo temiz.",
+          cta: { label: "yayınlar", href: "/radio/schedule" },
         },
         {
           icon: CalendarDays,
           title: "etkinlikler",
-          text: "küçük odalar, gerçek ses, dürüst enerji. vibe doğruysa, büyük bir sahneye ihtiyacın yok.",
+          text: "küçük oda da olur, büyük sahne de. ses ve akış doğruysa gece çalışır.",
           cta: { label: "etkinlikler", href: "/events" },
         },
         {
           icon: Sparkles,
-          title: "görseller",
-          text: "kimlik, posterler, hareket, detaylar. bass bile vurmadan önce hissettiğin şeyler.",
-          cta: { label: "sanatçılar", href: "/artists" },
+          title: "görsel dünya",
+          text: "kimlik, afiş, hareket, sahne görseli. müzik başlamadan önce gelen his.",
+          cta: { label: "görseller", href: "/visuals" },
         },
       ],
     },
     protect: {
       eyebrow: "koruduğumuz şey",
-      title: "hala gerçek hisseden bir gece",
-      subtitle: "her yerde olmaya çalışmıyoruz. bunu canlı tutmaya çalışıyoruz.",
+      title: "hâlâ gerçek hissettiren bir gece",
+      subtitle:
+        "her yerde olmaya çalışmıyoruz. bunu canlı tutmaya çalışıyoruz.",
       bullets: [
-        { icon: Shield, title: "telefonsuz enerji", text: "ekranının var olduğunu unuttuğun an türü." },
-        { icon: Users, title: "metriklerden önce insanlar", text: "bir parçadan yapılan arkadaşlar. sayılardan önce topluluk." },
-        { icon: Volume2, title: "ses asıl nokta", text: "müzik burada arka plan değil. sebep bu." },
-        { icon: Target, title: "şablonlardan önce zevk", text: "genel olmaktansa spesifik olmayı tercih ederiz." },
+        {
+          icon: Shield,
+          title: "telefonsuz enerji",
+          text: "ekranın varlığını unuttuğun türden anlar.",
+        },
+        {
+          icon: Users,
+          title: "metriklerden önce insanlar",
+          text: "tek bir parçadan çıkan dostluklar. sayılardan önce topluluk.",
+        },
+        {
+          icon: Volume2,
+          title: "asıl mesele ses",
+          text: "müzik burada arka plan değil. sebep bu.",
+        },
+        {
+          icon: Target,
+          title: "şablonlardan önce zevk",
+          text: "genel olmaktansa spesifik olmayı tercih ederiz.",
+        },
       ],
     },
     booking: {
       eyebrow: "sanatçıları nasıl seçiyoruz",
-      title: "tür rezervasyonu yapmıyoruz",
-      subtitle: "zevk, niyet ve odaya saygı rezervasyonu yapıyoruz.",
+      title: "tür değil, yaklaşım seçiyoruz",
+      subtitle: "zevk, niyet ve odaya saygı seçiyoruz.",
       list: [
-        "bir bakış açısı",
+        "net bir bakış açısı",
         "tempo ve kontrol",
         "egosuz cesaret",
         "kalabalığa saygı",
       ],
-      note:
-        "bazı geceler zirve zamanı. bazı geceler garip. ikisi de önemli.",
+      note: "bazı geceler zirve saatler, bazı geceler garip. ikisi de kıymetli.",
     },
     wont: {
       eyebrow: "yapmayacağımız şeyler",
-      title: "basit kurallar, performans yok",
-      subtitle: "rol yapmıyoruz. kurumsal dil yok. sadece nasıl çalıştığımız.",
+      title: "basit prensipler, gösteriş yok",
+      subtitle: "rol yapmıyoruz. kurumsal dil yok. sadece çalışma biçimimiz.",
       leftTitle: "yapmayız",
       rightTitle: "yaparız",
       left: [
-        "inancımız olmayan isimleri kovalamak",
+        "inanmadığımız isimlerin peşinden koşmak",
         "sanatçıları bir şablona zorlamak",
         "insanlara içerik gibi davranmak",
-        "optik için sesten ödün vermek",
-        "çabasız görünmek",
+        "görüntü uğruna sesten ödün vermek",
+        "her şey zahmetsizmiş gibi yapmak",
       ],
       right: [
-        "sorunları hızlı çözmek ve devam etmek",
-        "rezervasyon yaptığımızda adil ödemek",
+        "sorunları hızlı çözmek ve yola devam etmek",
+        "rezervasyon yaptığımızda adil ödeme yapmak",
         "düzgün tanıtmak",
         "uzun vadeli ilişkiler kurmak",
-        "halka açık öğrenmeye devam etmek",
+        "öğrenmeye açık şekilde devam etmek",
       ],
       ctas: {
         email: "bize mail at",
         instagram: "instagram",
-        mailSubject: "origins radio - booking ya da işbirliği",
+        mailSubject: "Origins Radio booking ya da iş birliği",
       },
     },
     archive: {
       eyebrow: "arşiv",
       title: "sakladığımız bazı geceler",
-      subtitle: "gecenin bitmesini istemediğin zaman çektiğin fotoğraflar.",
+      subtitle: "gecenin bitmesini istemediğin anların fotoğrafları.",
       captions: [
-        "ışıklar söndü",
+        "ışıklar indi",
         "eller havada",
         "bir parça daha",
         "kalabalık kilitlendi",
         "afterhours",
-        "yeni arkadaşlar",
+        "yeni tanışmalar",
         "büyük bas, küçük oda",
-        "telefon yok, sadece dans",
+        "telefon yok, dans var",
         "sonuna kadar kaldık",
         "bunu hatırlayacağız",
-        "bir sonraki sefer aynı yer",
-        "o drop",
+        "bir dahaki sefere yine",
+        "o drop anı",
       ],
       callout:
-        "buradaki her fotoğraf, en iyi gecelerin içerik değil, paylaşıldığının kanıtıdır. koruduğumuz şey bu.",
+        "biz geceyi sadece kurmuyoruz. bir kısmını da burada tutuyoruz.",
     },
     team: {
       eyebrow: "ekip",
       title: "işi yapan insanlar",
-      subtitle: "iki rol, bir takıntı: doğru hissettirmek.",
+      subtitle: "iki rol, tek takıntı: doğru hissettirmek.",
       hintClosed: "detaylar için dokun",
     },
     contact: {
       title: "bize ulaşmak ister misin",
-      p1: "bir şov öner, bir sanatçı öner veya etkinlikler hakkında konuş. bir mesaj gönder.",
-      p2: "her şeyi okuyoruz. inşa ederken cevaplar yavaş olabilir, ama insanları görmezden gelmiyoruz.",
+      p1: "bir program öner, bir sanatçı öner ya da etkinlikleri konuşalım. mesaj at.",
+      p2: "her şeyi okuyoruz. üretim dönemlerinde dönüşler yavaş olabilir ama kimseyi görmezden gelmiyoruz.",
       p3: "burada olduğun için teşekkürler.",
       email: "info@originsradio.com",
       instagram: "https://www.instagram.com/origins.radio/",
       cards: {
-        emailTitle: "e-posta",
-        emailSubtitle: "booking ve işbirlikleri için en iyi seçenek",
+        emailTitle: "e posta",
+        emailSubtitle: "iş birlikleri ve booking için en iyisi",
         instagramTitle: "instagram dm",
         instagramSubtitle: "hızlı sorular genelde burada",
       },
-      orVibe: "ya da sadece vibe",
+      orVibe: "ya da sadece ak",
       buttons: [
         { label: "etkinlikler", href: "/events" },
         { label: "program", href: "/radio/schedule" },
@@ -420,17 +444,20 @@ const copy = {
 };
 
 /**
- * deterministic shuffle to avoid weird reorder behavior across renders
+ * deterministic shuffle using Linear Congruential Generator (LCG)
  */
 function seededShuffle<T>(arr: T[], seed: number) {
   const out = [...arr];
-  let s = seed >>> 0;
+  const a = 1103515245;
+  const c = 12345;
+  const m = 2 ** 31;
+  let state = seed >>> 0;
+
   const rand = () => {
-    s ^= s << 13;
-    s ^= s >>> 17;
-    s ^= s << 5;
-    return (s >>> 0) / 4294967296;
+    state = (a * state + c) % m;
+    return state / m;
   };
+
   for (let i = out.length - 1; i > 0; i--) {
     const j = Math.floor(rand() * (i + 1));
     [out[i], out[j]] = [out[j], out[i]];
@@ -461,7 +488,7 @@ function SectionTitle({
   return (
     <div className={center ? "text-center" : ""}>
       {eyebrow ? (
-        <p className="text-amber-300/70 text-xs md:text-sm uppercase tracking-[0.22em] mb-3">
+        <p className="text-rose-300/70 text-xs md:text-sm uppercase tracking-[0.22em] mb-3">
           {eyebrow}
         </p>
       ) : null}
@@ -510,7 +537,7 @@ export default function AboutPage() {
   const currentTeamMembers = teamMembers[language];
 
   const shuffledImages = useMemo(() => {
-    const seed = hashSeed("origins-about-2025");
+    const seed = hashSeed("origins-about-2025-updated");
     return seededShuffle(aboutImages, seed);
   }, []);
 
@@ -543,8 +570,8 @@ export default function AboutPage() {
     <PageLayout backgroundImage="/backgr.jpg">
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-b from-stone-950 via-neutral-950 to-stone-950" />
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-950/15 via-transparent to-stone-900/20" />
-        <div className="absolute -left-40 -top-40 w-[620px] h-[620px] rounded-full bg-amber-900/10 blur-[160px]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-rose-950/15 via-transparent to-stone-900/20" />
+        <div className="absolute -left-40 -top-40 w-[620px] h-[620px] rounded-full bg-rose-900/10 blur-[160px]" />
         <div className="absolute right-0 top-1/3 w-[520px] h-[520px] rounded-full bg-orange-950/10 blur-[140px]" />
         <div className="absolute -left-16 bottom-0 w-[420px] h-[420px] rounded-full bg-stone-800/15 blur-[120px]" />
       </div>
@@ -552,7 +579,6 @@ export default function AboutPage() {
       <SocialBubbles />
       <Navigation />
 
-      {/* Language Switcher */}
       <div className="fixed top-24 right-6 z-50">
         <motion.button
           onClick={() => setLanguage(language === "en" ? "tr" : "en")}
@@ -565,31 +591,65 @@ export default function AboutPage() {
         </motion.button>
       </div>
 
-      {/* hero */}
       <section className="min-h-screen flex items-center justify-center relative z-10 px-6 pt-32 pb-16">
         <motion.div className="max-w-5xl mx-auto" {...motionIn}>
-          {/* Top images gallery */}
-          <div className="mb-12 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+          <div className="mb-10 grid grid-cols-2 gap-2 md:hidden">
             {shuffledImages.slice(0, 4).map((src, index) => (
               <motion.div
-                key={`hero-${index}`}
-                className="relative aspect-[4/3] overflow-hidden rounded-xl bg-white p-1 shadow-lg"
-                style={{ rotate: index % 2 === 0 ? -1.5 : 1.5 }}
-                whileHover={reduceMotion ? undefined : { scale: 1.05, rotate: 0, zIndex: 10 }}
-                transition={{ duration: 0.25 }}
+                key={`hero-mobile-${index}`}
+                className="relative aspect-[4/3] overflow-hidden rounded-xl shadow-lg ring-1 ring-rose-500/20"
+                whileTap={reduceMotion ? undefined : { scale: 0.98 }}
               >
-                <div className="relative w-full h-full overflow-hidden rounded-lg">
-                  <Image
-                    src={src}
-                    alt={`origins moment ${index + 1}`}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 50vw, 25vw"
-                    loading="eager"
-                  />
-            </div>
+                <Image
+                  src={src}
+                  alt={`origins moment ${index + 1}`}
+                  fill
+                  className="object-cover"
+                  sizes="50vw"
+                  loading="eager"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-rose-950/40 to-transparent" />
               </motion.div>
             ))}
+          </div>
+
+          <div className="mb-12 relative h-[320px] hidden md:block">
+            {shuffledImages.slice(0, 4).map((src, index) => {
+              const positions = [
+                { left: '0%', top: '10%', width: '42%', zIndex: 1, rotate: -3 },
+                { left: '22%', top: '0%', width: '38%', zIndex: 3, rotate: 2 },
+                { left: '48%', top: '12%', width: '32%', zIndex: 2, rotate: -1.5 },
+                { left: '68%', top: '2%', width: '34%', zIndex: 4, rotate: 3 },
+              ];
+              const pos = positions[index];
+              return (
+                <motion.div
+                  key={`hero-desktop-${index}`}
+                  className="absolute overflow-hidden rounded-2xl shadow-2xl shadow-rose-950/40 ring-1 ring-rose-500/15"
+                  style={{
+                    left: pos.left,
+                    top: pos.top,
+                    width: pos.width,
+                    zIndex: pos.zIndex,
+                    rotate: pos.rotate,
+                  }}
+                  whileHover={reduceMotion ? undefined : { scale: 1.08, rotate: 0, zIndex: 10 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <div className="relative aspect-[4/3] overflow-hidden">
+                    <Image
+                      src={src}
+                      alt={`origins moment ${index + 1}`}
+                      fill
+                      className="object-cover"
+                      sizes="40vw"
+                      loading="eager"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-rose-950/30 to-transparent" />
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
 
           <div className="text-left md:text-center mb-10 md:mb-12">
@@ -598,7 +658,7 @@ export default function AboutPage() {
               <br />
               <span className="text-stone-400">{currentCopy.hero.titleMid}</span>
               <br />
-              <span className="text-amber-300/85">{currentCopy.hero.titleBottom}</span>
+              <span className="text-rose-300/85">{currentCopy.hero.titleBottom}</span>
             </h1>
           </div>
 
@@ -631,7 +691,6 @@ export default function AboutPage() {
         </motion.div>
       </section>
 
-      {/* origin story */}
       <section className="relative z-10 py-20 md:py-28">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-start">
@@ -654,21 +713,23 @@ export default function AboutPage() {
                   {currentCopy.origin.calloutTitle}
                 </h3>
                 <p className="text-stone-300 leading-relaxed">{currentCopy.origin.calloutBody}</p>
-                <p className="mt-6 text-xl md:text-2xl text-amber-300 font-semibold italic">
-                  {currentCopy.origin.calloutLine}
-                </p>
+                {currentCopy.origin.calloutLine && (
+                  <p className="mt-6 text-xl md:text-2xl text-rose-300 font-semibold italic">
+                    {currentCopy.origin.calloutLine}
+                  </p>
+                )}
                 <div className="mt-8 grid grid-cols-2 gap-3">
                   <a
                     href={`mailto:${currentCopy.contact.email}?subject=origins%20radio%20mix%20or%20show`}
-                    className="inline-flex items-center justify-center px-4 py-3 rounded-xl bg-amber-300 text-stone-950 font-semibold hover:bg-amber-200 transition-colors"
+                    className="inline-flex items-center justify-center px-4 py-3 rounded-xl bg-rose-300 text-stone-950 font-semibold hover:bg-rose-200 transition-colors"
                   >
-                    pitch a show
+                    {currentCopy.origin.buttons?.join || "email us"}
                   </a>
                   <Link
                     href="/artists"
                     className="inline-flex items-center justify-center px-4 py-3 rounded-xl bg-white/5 border border-white/15 text-white font-semibold hover:bg-white/10 transition-colors"
                   >
-                    browse artists
+                    {currentCopy.origin.buttons?.artists || "browse artists"}
                   </Link>
                 </div>
               </div>
@@ -677,7 +738,6 @@ export default function AboutPage() {
 
           <Divider />
 
-          {/* what this is */}
           <div className="mb-10 md:mb-14">
             <SectionTitle
               eyebrow={currentCopy.whatThisIs.eyebrow}
@@ -691,12 +751,12 @@ export default function AboutPage() {
             {currentCopy.whatThisIs.cards.map((item) => (
               <SoftCard key={item.title}>
                 <div className="p-7 md:p-8">
-                  <item.icon className="w-6 h-6 text-amber-400 mb-4" />
+                  <item.icon className="w-6 h-6 text-rose-400 mb-4" />
                   <h3 className="text-xl md:text-2xl font-bold text-white mb-3">{item.title}</h3>
                   <p className="text-stone-300 leading-relaxed mb-5">{item.text}</p>
                   <Link
                     href={item.cta.href}
-                    className="inline-flex items-center gap-2 text-amber-300/90 hover:text-amber-200 font-semibold"
+                    className="inline-flex items-center gap-2 text-rose-300/90 hover:text-rose-200 font-semibold"
                   >
                     {item.cta.label} <ArrowRight className="w-4 h-4" />
                   </Link>
@@ -707,108 +767,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* protect + booking + wont */}
-      <section className="relative z-10 py-20 md:py-28">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-start">
-            <div className="space-y-10">
-              <div>
-                <SectionTitle
-                  eyebrow={currentCopy.protect.eyebrow}
-                  title={currentCopy.protect.title}
-                  subtitle={currentCopy.protect.subtitle}
-                />
-                <div className="mt-8 grid sm:grid-cols-2 gap-4">
-                  {currentCopy.protect.bullets.map((b) => (
-                    <div
-                      key={b.title}
-                      className="p-5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm"
-                    >
-                      <b.icon className="w-5 h-5 text-amber-400 mb-3" />
-                      <p className="text-white font-semibold mb-1">{b.title}</p>
-                      <p className="text-stone-400 text-sm leading-relaxed">{b.text}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <SoftCard>
-                <div className="p-7 md:p-8">
-                  <SectionTitle
-                    eyebrow={currentCopy.booking.eyebrow}
-                    title={currentCopy.booking.title}
-                    subtitle={currentCopy.booking.subtitle}
-                  />
-                  <ul className="mt-6 space-y-3">
-                    {currentCopy.booking.list.map((t) => (
-                      <li key={t} className="flex items-start gap-3 text-stone-300">
-                        <CheckCircle2 className="w-5 h-5 text-amber-400 mt-0.5" />
-                        <span className="leading-relaxed">{t}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="mt-6 text-stone-400 italic">{currentCopy.booking.note}</p>
-                </div>
-              </SoftCard>
-            </div>
-
-            <SoftCard>
-              <div className="p-7 md:p-10">
-                <SectionTitle
-                  eyebrow={currentCopy.wont.eyebrow}
-                  title={currentCopy.wont.title}
-                  subtitle={currentCopy.wont.subtitle}
-                />
-                <div className="mt-8 grid md:grid-cols-2 gap-6">
-                  <div className="rounded-2xl bg-stone-950/30 border border-white/10 p-5">
-                    <p className="text-white font-semibold mb-4">{currentCopy.wont.leftTitle}</p>
-                    <ul className="space-y-3">
-                      {currentCopy.wont.left.map((t) => (
-                        <li key={t} className="flex items-start gap-3 text-stone-300">
-                          <XCircle className="w-5 h-5 text-stone-500 mt-0.5" />
-                          <span className="leading-relaxed">{t}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className="rounded-2xl bg-amber-950/20 border border-amber-900/30 p-5">
-                    <p className="text-white font-semibold mb-4">{currentCopy.wont.rightTitle}</p>
-                    <ul className="space-y-3">
-                      {currentCopy.wont.right.map((t) => (
-                        <li key={t} className="flex items-start gap-3 text-stone-200">
-                          <CheckCircle2 className="w-5 h-5 text-amber-400 mt-0.5" />
-                          <span className="leading-relaxed">{t}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-
-                <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                  <a
-                    href={`mailto:${currentCopy.contact.email}?subject=${encodeURIComponent(
-                      currentCopy.wont.ctas.mailSubject
-                    )}`}
-                    className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-white text-stone-950 font-semibold hover:bg-stone-100 transition-colors"
-                  >
-                    {currentCopy.wont.ctas.email}
-                  </a>
-                  <a
-                    href={currentCopy.contact.instagram}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-stone-900/40 border border-white/15 text-white font-semibold hover:bg-stone-900/60 transition-colors"
-                  >
-                    {currentCopy.wont.ctas.instagram}
-                  </a>
-                </div>
-              </div>
-            </SoftCard>
-          </div>
-        </div>
-      </section>
-
-      {/* archive */}
       <section className="relative z-10 py-16 md:py-24 overflow-hidden">
         <div className="max-w-6xl mx-auto px-6">
           <SectionTitle
@@ -827,7 +785,7 @@ export default function AboutPage() {
                 {[...shuffledImages, ...shuffledImages].map((src, index) => (
                   <motion.div
                     key={`strip-${index}`}
-                    className="relative flex-shrink-0 w-44 md:w-60 aspect-[3/4] bg-white p-2 pb-12 shadow-2xl shadow-black/40 rounded-xl"
+                    className="relative flex-shrink-0 w-44 md:w-60 aspect-[3/4] bg-rose-50 p-2 pb-12 shadow-2xl shadow-rose-950/30 rounded-xl ring-1 ring-rose-200/50"
                     style={{ rotate: `${stripRotations[index]}deg` }}
                     whileHover={reduceMotion ? undefined : { scale: 1.06, rotate: 0, y: -10, zIndex: 10 }}
                     transition={{ duration: 0.25 }}
@@ -852,7 +810,7 @@ export default function AboutPage() {
           </div>
 
           <div className="mt-10 max-w-xl mx-auto">
-            <div className="bg-amber-100/10 p-6 rounded-2xl backdrop-blur-sm border border-amber-600/20">
+            <div className="bg-rose-100/10 p-6 rounded-2xl backdrop-blur-sm border border-rose-600/20">
               <p className="text-stone-300 text-sm md:text-base leading-relaxed">
                 {currentCopy.archive.callout}
               </p>
@@ -861,132 +819,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* team */}
-      <section className="relative z-10 py-20 md:py-32">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-12 md:mb-20">
-            <SectionTitle
-              eyebrow={currentCopy.team.eyebrow}
-              title={currentCopy.team.title}
-              subtitle={currentCopy.team.subtitle}
-              center
-            />
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
-            {currentTeamMembers.map((member, index) => {
-              const isOpen = activeMember === index;
-              return (
-                <motion.div
-                  key={member.name}
-                  className="group"
-                  initial={reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 22 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.12 }}
-                  viewport={{ once: true, margin: "-80px" }}
-                >
-                  <button
-                    type="button"
-                    onClick={() => toggleMember(index)}
-                    className="w-full text-left"
-                    aria-expanded={isOpen}
-                    aria-controls={`member-${index}`}
-                  >
-                    <div className="relative mb-6">
-                      <motion.div
-                        className="relative bg-white p-3 pb-14 shadow-2xl shadow-black/50 rounded-2xl"
-                        style={{ rotate: index === 0 ? -3.5 : index === 1 ? 2.2 : -2.8 }}
-                        whileHover={reduceMotion ? undefined : { rotate: 0, scale: 1.02, y: -6 }}
-                        transition={{ duration: 0.25 }}
-                      >
-                        <div className="relative aspect-square overflow-hidden rounded-xl">
-                          <Image
-                            src={member.image}
-                            alt={member.fullName}
-                            fill
-                            className="object-cover object-top grayscale group-hover:grayscale-0 transition-all duration-500"
-                            sizes="(max-width: 768px) 100vw, 33vw"
-                          />
-                        </div>
-                        <div className="absolute bottom-3 left-3 right-3 text-center">
-                          <p className="text-stone-700 text-sm font-serif italic">
-                            {member.name} {index === 0 ? "✨" : index === 1 ? "🛠️" : "🎨"}
-                          </p>
-                        </div>
-                      </motion.div>
-
-                      {index % 2 === 0 ? (
-                        <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-14 h-6 bg-amber-100/25 backdrop-blur-sm rotate-[-8deg] border border-amber-300/20 rounded-md" />
-                      ) : (
-                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-4 h-4 rounded-full bg-stone-400/60 shadow-lg" />
-                      )}
-                    </div>
-
-                    <div className="space-y-4">
-                      <div>
-                        <h3 className="text-2xl md:text-3xl font-bold text-white mb-1">
-                          {member.fullName}
-                        </h3>
-                        <p className="text-amber-400/70 text-sm font-semibold uppercase tracking-[0.14em]">
-                          {member.role}
-                        </p>
-                      </div>
-
-                      <div className="bg-stone-800/50 border-l-4 border-amber-400/50 p-4 rounded-xl">
-                        <p className="text-stone-300 text-sm italic leading-relaxed">
-                          "{member.quote}"
-                        </p>
-                      </div>
-
-                      <div className="bg-stone-900/30 rounded-xl p-4 border border-stone-800">
-                        <p className="text-xs text-stone-500 uppercase tracking-[0.2em] mb-1">
-                          fun fact
-                        </p>
-                        <p className="text-stone-300 text-sm">{member.funFact}</p>
-                      </div>
-
-                      <div
-                        id={`member-${index}`}
-                        className={`transition-all duration-300 ${
-                          isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-                        }`}
-                        style={{ height: isOpen ? "auto" : 0, overflow: "hidden" }}
-                      >
-                        <div className="pt-2 space-y-3">
-                          <div className="border-t border-stone-800 pt-3">
-                            <p className="text-xs text-stone-500 uppercase tracking-[0.2em] mb-2">
-                              the story
-                            </p>
-                            <p className="text-stone-400 text-sm leading-relaxed">
-                              {member.story}
-                            </p>
-                          </div>
-                          <div className="bg-amber-950/20 rounded-xl p-4 border border-amber-900/30">
-                            <p className="text-xs text-amber-400/70 uppercase tracking-[0.2em] mb-1">
-                              favorite moment
-                            </p>
-                            <p className="text-stone-300 text-sm leading-relaxed">
-                              {member.favoriteMoment}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {!isOpen ? (
-                        <p className="text-xs text-stone-600 text-center italic">
-                          {currentCopy.team.hintClosed}
-                        </p>
-                      ) : null}
-                    </div>
-                  </button>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* contact */}
       <section className="relative z-10 py-24 md:py-40">
         <motion.div
           className="max-w-4xl mx-auto px-6"
@@ -1002,7 +834,7 @@ export default function AboutPage() {
             <div className="max-w-2xl mx-auto space-y-3 text-left md:text-center">
               <p className="text-lg md:text-xl text-stone-300 leading-relaxed">{currentCopy.contact.p1}</p>
               <p className="text-base md:text-lg text-stone-400 leading-relaxed">{currentCopy.contact.p2}</p>
-              <p className="text-lg text-amber-300 font-semibold">{currentCopy.contact.p3}</p>
+              <p className="text-lg text-rose-300 font-semibold">{currentCopy.contact.p3}</p>
             </div>
           </div>
 
@@ -1057,16 +889,6 @@ export default function AboutPage() {
                   </motion.button>
                 </Link>
               ))}
-            </div>
-          </div>
-
-          <div className="mt-16 text-center">
-            <div className="inline-block bg-amber-100/10 border border-amber-600/20 rounded-2xl px-6 py-4 backdrop-blur-sm">
-              <p className="text-stone-400 text-sm italic">
-                {currentCopy.contact.thanks}
-                <br />
-                <span className="text-stone-500 text-xs">{currentCopy.contact.footer}</span>
-              </p>
             </div>
           </div>
         </motion.div>

@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useRef, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -6,12 +8,10 @@ import { useCurrentRadioSlot } from '@/hooks/use-radio';
 import { useSets } from '@/hooks/use-supabase';
 import { buildProxiedUrl } from '@/lib/audioProxy';
 import { useAudioVisualizer } from '@/contexts/AudioVisualizerContext';
-import { useOrbActivation } from '@/contexts/OrbActivationContext';
 
 const MusicPlayer = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const { registerAudioElement } = useAudioVisualizer();
-  const { activateOrb } = useOrbActivation();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isAudioLoading, setIsAudioLoading] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -150,21 +150,21 @@ const MusicPlayer = () => {
   const togglePlayPause = async () => {
     const audio = audioRef.current;
     if (!audio) return;
-    try {
-      // No pause UX: if already playing, toggle mute; otherwise start playback.
-      if (isPlaying) {
-        toggleMute();
-      } else {
+
+    // No pause UX: if already playing, toggle mute immediately
+    if (isPlaying) {
+      toggleMute();
+    } else {
+      try {
         setIsAudioLoading(true);
         await audio.play();
         setIsPlaying(true);
-        activateOrb(); // Activate orb when play is pressed
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error('Playback toggle error', e);
+      } finally {
+        setIsAudioLoading(false);
       }
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error('Playback toggle error', e);
-    } finally {
-      setIsAudioLoading(false);
     }
   };
 
@@ -178,10 +178,6 @@ const MusicPlayer = () => {
     }
     setIsMuted(next);
     localStorage.setItem('or_player_muted', next ? '1' : '0');
-    // Activate orb when unmuting
-    if (!next) {
-      activateOrb();
-    }
   };
 
   // Apply source and initial position when the URL or slot changes
@@ -215,10 +211,7 @@ const MusicPlayer = () => {
              const dur = (isFinite(audio.duration) && audio.duration > 0) ? audio.duration : (setDurationSeconds ?? 0);
              const seekTime = dur > 0 ? (startOffsetSeconds % dur) : 0;
              audio.currentTime = seekTime;
-             audio.play().then(() => {
-               setIsPlaying(true);
-               activateOrb(); // Activate orb when live stream auto-plays
-             }).catch(() => {});
+             audio.play().then(() => setIsPlaying(true)).catch(() => {});
           } else {
             // On-demand playback
             const dur = isFinite(audio.duration) ? audio.duration : (setDurationSeconds ?? undefined);
@@ -250,10 +243,7 @@ const MusicPlayer = () => {
     
     // Ensure playing if live
     if (audio.paused && !isPlaying) {
-       audio.play().then(() => {
-         setIsPlaying(true);
-         activateOrb(); // Activate orb when live stream resumes
-       }).catch(() => {});
+       audio.play().then(() => setIsPlaying(true)).catch(() => {});
     }
   }, [isLive, startOffsetSeconds, setDurationSeconds, streamUrl, isPlaying]);
 
@@ -268,7 +258,7 @@ const MusicPlayer = () => {
       if (isLive) {
         // For live, loop back to start
         audio.currentTime = 0;
-        audio.play().then(() => activateOrb()).catch(() => {});
+        audio.play().catch(() => {});
       } else {
         setIsPlaying(false);
       }
@@ -369,7 +359,6 @@ const MusicPlayer = () => {
                         try {
                           await audio.play();
                           setIsPlaying(true);
-                          activateOrb(); // Activate orb when play is pressed
                         } catch (e) {
                           // eslint-disable-next-line no-console
                           console.error('Failed to start latest set', e);

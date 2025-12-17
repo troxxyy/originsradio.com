@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import React, { useEffect, useState, useRef } from "react";
-import { Ticket, Users, Radio, Navigation, LogIn, BookOpen, Info, Youtube, Instagram, Cloud, Heart } from "lucide-react";
+import { Ticket, Users, Radio, Navigation, BookOpen, Info, Youtube, Instagram, Cloud, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCurrentRadioSlot } from "@/hooks/use-radio";
 import Orb from "@/components/three/Orb";
@@ -92,8 +92,7 @@ const HomeHero: React.FC = () => {
           video.volume = 0;
         }}
       >
-        <source src="/website background.mov" type="video/quicktime" />
-        <source src="/website background.mov" type="video/mp4" />
+        <source src="/website background compres.mp4" type="video/mp4" />
       </video>
       
       {/* Dark overlay for readability */}
@@ -124,22 +123,6 @@ const HomeHero: React.FC = () => {
         </div>
       )}
 
-      {/* Artist Login */}
-      <div className={cn(
-        "fixed z-50",
-        "top-[calc(0.75rem+env(safe-area-inset-top))] right-[calc(0.75rem+env(safe-area-inset-right))]",
-        "sm:top-[calc(1.5rem+env(safe-area-inset-top))] sm:right-[calc(1.5rem+env(safe-area-inset-right))]"
-      )}>
-        <Link 
-          href="/artist/login" 
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 text-white transition-colors group"
-          aria-label="Artist Login"
-          title="Artist Login"
-        >
-          <LogIn className="w-4 h-4 group-hover:scale-110 transition-transform" />
-          <span className="text-sm font-medium">Artist Login</span>
-        </Link>
-      </div>
 
       {/* Main Content */}
       <div className="absolute inset-0 z-[50] flex flex-col items-center justify-center px-4 sm:px-6">
@@ -194,12 +177,13 @@ const HomeHero: React.FC = () => {
         {/* Central Layout Container */}
         <div className={cn(
           "flex flex-col items-center gap-6 sm:gap-8 w-full max-w-4xl mx-auto",
+          "mt-[10vh] sm:mt-0",
           "transition-all duration-700 delay-200",
           mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
         )}>
           {/* Big Navigation Panel */}
           <nav className={cn(
-            "flex flex-nowrap overflow-x-auto items-center justify-between sm:justify-center p-1.5 sm:p-2 rounded-[2rem] sm:rounded-full gap-1 sm:gap-2",
+            "flex flex-nowrap overflow-x-auto items-center justify-center pt-[15px] pb-2 px-2 sm:p-2 rounded-[2rem] sm:rounded-full gap-2 sm:gap-2",
             "bg-white/[0.03] backdrop-blur-xl border border-white/[0.08]",
             "shadow-2xl shadow-black/20",
             "max-w-full w-full sm:w-auto",
@@ -218,20 +202,20 @@ const HomeHero: React.FC = () => {
                   onMouseLeave={() => setHoveredRoute(null)}
                 >
                   <div className={cn(
-                    "relative flex items-center gap-1.5 sm:gap-3 px-2 sm:px-6 py-2 sm:py-4 rounded-full",
+                    "relative flex items-center justify-center gap-2 sm:gap-3 px-3 sm:px-6 py-2.5 sm:py-4 rounded-full",
                     "transition-all duration-300 ease-out",
                     "hover:bg-white/[0.08]",
                     "active:scale-95"
                   )}>
                     <IconComponent 
                       className={cn(
-                        "w-4 h-4 sm:w-5 sm:h-5 transition-colors duration-300",
+                        "w-4 h-4 sm:w-5 sm:h-5 transition-colors duration-300 flex-shrink-0",
                         "text-white/50 group-hover:text-white"
                       )} 
                       strokeWidth={1.5}
                     />
                     <span className={cn(
-                      "font-newake text-xs sm:text-lg tracking-wide uppercase",
+                      "font-newake text-xs sm:text-lg tracking-wide uppercase whitespace-nowrap",
                       "text-white/60 group-hover:text-white",
                       "transition-colors duration-300"
                     )}>

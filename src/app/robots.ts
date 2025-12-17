@@ -9,8 +9,10 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           '/artistcontrolsecret/',
           '/originsradio/adminuploads',
+          '/artist/',
           '/_next/',
           '/api/',
+          '/uploads/',
         ],
       },
     ],

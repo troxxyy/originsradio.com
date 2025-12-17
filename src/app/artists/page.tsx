@@ -3,9 +3,10 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
-import { Search, Music, MapPin, Star, LogIn, Tag, ArrowRight, CheckCircle2, Users, Languages } from 'lucide-react';
+import { Search, Music, MapPin, Star, Tag, ArrowRight, CheckCircle2, Users, Languages } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import PageLayout from '@/components/layout/PageLayout';
 import SocialBubbles from '@/components/social/SocialBubbles';
 import Navigation from '@/components/Navigation';
@@ -204,7 +205,7 @@ function SectionTitle({
   return (
     <div className={center ? 'text-center' : ''}>
       {eyebrow ? (
-        <p className="text-amber-300/70 text-xs md:text-sm uppercase tracking-[0.22em] mb-3">
+        <p className="text-cyan-300/70 text-xs md:text-sm uppercase tracking-[0.22em] mb-3">
           {eyebrow}
         </p>
       ) : null}
@@ -424,19 +425,19 @@ export default function ArtistsPage() {
 
   return (
     <PageLayout>
-      {/* Background to match About page language */}
+      {/* Cyan/teal background for artist pages */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-b from-stone-950 via-neutral-950 to-stone-950" />
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-950/15 via-transparent to-stone-900/20" />
-        <div className="absolute -left-40 -top-40 w-[620px] h-[620px] rounded-full bg-amber-900/10 blur-[160px]" />
-        <div className="absolute right-0 top-1/3 w-[520px] h-[520px] rounded-full bg-orange-950/10 blur-[140px]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-950/15 via-transparent to-teal-900/20" />
+        <div className="absolute -left-40 -top-40 w-[620px] h-[620px] rounded-full bg-cyan-900/10 blur-[160px]" />
+        <div className="absolute right-0 top-1/3 w-[520px] h-[520px] rounded-full bg-teal-950/10 blur-[140px]" />
         <div className="absolute -left-16 bottom-0 w-[420px] h-[420px] rounded-full bg-stone-800/15 blur-[120px]" />
       </div>
 
       <SocialBubbles />
       <Navigation />
 
-      {/* Top-right controls (language + artist login) */}
+      {/* Top-right controls (language) */}
       <div
         className={cn(
           'fixed z-40 flex items-center gap-2',
@@ -456,15 +457,6 @@ export default function ArtistsPage() {
           <Languages className="w-4 h-4" />
           <span className="text-sm font-semibold">{language === 'en' ? 'TR' : 'EN'}</span>
         </motion.button>
-        <Link
-          href="/artist/login"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-stone-900/70 border border-white/20 hover:bg-stone-800/90 text-white transition-colors group"
-          aria-label={copy[language].ui.artistLogin}
-          title={copy[language].ui.artistLogin}
-        >
-          <LogIn className="w-4 h-4 group-hover:scale-110 transition-transform" />
-          <span className="text-sm font-medium">{copy[language].ui.artistLogin}</span>
-        </Link>
       </div>
 
       <Helmet>
@@ -493,7 +485,7 @@ export default function ArtistsPage() {
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 text-white leading-[1.05] text-left md:text-center">
               {copy[language].hero.titleTop}
               <br />
-              <span className="text-amber-300/85">{copy[language].hero.titleBottom}</span>
+              <span className="text-cyan-300/85">{copy[language].hero.titleBottom}</span>
             </h1>
           </div>
 
@@ -511,7 +503,7 @@ export default function ArtistsPage() {
                 key={i}
                 className="text-center p-4 bg-white/5 rounded-xl backdrop-blur-sm border border-white/10"
               >
-                <stat.icon className="w-6 h-6 text-amber-400 mx-auto mb-2" />
+                <stat.icon className="w-6 h-6 text-cyan-400 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-white mb-1">{stat.value}</div>
                 <div className="text-xs text-stone-400 uppercase tracking-[0.18em]">
                   {stat.label}
@@ -546,7 +538,7 @@ export default function ArtistsPage() {
             </motion.button>
             <a href={copy[language].management.ctaPrimaryLink} className="w-full sm:w-auto">
               <motion.div
-                className="w-full px-7 py-3 rounded-full bg-amber-300 text-stone-950 font-semibold hover:bg-amber-200 transition-colors text-center"
+                className="w-full px-7 py-3 rounded-full bg-cyan-300 text-stone-950 font-semibold hover:bg-cyan-200 transition-colors text-center"
                 whileHover={reduceMotion ? undefined : { scale: 1.02 }}
                 whileTap={reduceMotion ? undefined : { scale: 0.98 }}
               >
@@ -573,44 +565,53 @@ export default function ArtistsPage() {
                 ))}
               </div>
               <div>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <a
-                    href={copy[language].management.ctaPrimaryLink}
-                    className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-white text-stone-950 font-semibold hover:bg-stone-100 transition-colors text-base"
-                  >
-                    {copy[language].management.ctaPrimary} <ArrowRight className="ml-2 w-4 h-4" />
-                  </a>
-                  <a
-                    href={copy[language].management.ctaSecondaryLink}
-                    className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-stone-900/40 border border-white/15 text-white font-semibold hover:bg-stone-900/60 transition-colors text-base"
-                  >
-                    {copy[language].management.ctaSecondary} <ArrowRight className="ml-2 w-4 h-4" />
-                  </a>
-                </div>
+                <a
+                  href={copy[language].management.ctaPrimaryLink}
+                  className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-white text-stone-950 font-semibold hover:bg-stone-100 transition-colors text-base"
+                >
+                  {copy[language].management.ctaPrimary} <ArrowRight className="ml-2 w-4 h-4" />
+                </a>
               </div>
             </div>
             
             <div className="order-1 lg:order-2">
                <SoftCard>
                   <div className="p-8 md:p-10 flex flex-col items-center justify-center text-center space-y-6 h-full min-h-[400px]">
-                      <div className="w-24 h-24 rounded-full bg-amber-400/10 flex items-center justify-center mb-4">
-                        <Star className="w-10 h-10 text-amber-400" />
-                      </div>
+                      <motion.div
+                        className="w-62 h-62 rounded-full bg-cyan-400/10 flex items-center justify-center mb-4"
+                        animate={{
+                          y: [0, -10, 0],
+                          rotate: [0, 2, -2, 0],
+                        }}
+                        transition={{
+                          duration: 4,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        }}
+                      >
+                        <Image 
+                          src="/originslogo.png" 
+                          alt="Origins Radio" 
+                          width={220} 
+                          height={220} 
+                          className="object-contain"
+                        />
+                      </motion.div>
                       <h3 className="text-2xl font-bold text-white">{copy[language].management.card.title}</h3>
                       <p className="text-stone-400 leading-relaxed">
                         {copy[language].management.card.body}
                       </p>
                       <ul className="text-left text-stone-300 space-y-3 w-full max-w-xs mx-auto">
                         <li className="flex items-center gap-3">
-                          <CheckCircle2 className="w-5 h-5 text-amber-400" />
+                          <CheckCircle2 className="w-5 h-5 text-cyan-400" />
                           <span>{copy[language].management.card.bullets[0]}</span>
                         </li>
                         <li className="flex items-center gap-3">
-                          <CheckCircle2 className="w-5 h-5 text-amber-400" />
+                          <CheckCircle2 className="w-5 h-5 text-cyan-400" />
                           <span>{copy[language].management.card.bullets[1]}</span>
                         </li>
                         <li className="flex items-center gap-3">
-                          <CheckCircle2 className="w-5 h-5 text-amber-400" />
+                          <CheckCircle2 className="w-5 h-5 text-cyan-400" />
                           <span>{copy[language].management.card.bullets[2]}</span>
                         </li>
                       </ul>
@@ -646,7 +647,7 @@ export default function ArtistsPage() {
                   placeholder={copy[language].ui.searchPlaceholder}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-24 py-4 bg-stone-900/70 border border-white/15 rounded-xl text-white placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-400/30 focus:border-amber-300/40 transition-all text-lg"
+                  className="w-full pl-12 pr-24 py-4 bg-stone-900/70 border border-white/15 rounded-xl text-white placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-cyan-400/30 focus:border-cyan-300/40 transition-all text-lg"
                 />
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-1 text-stone-500 text-xs">
                   <kbd className="px-2 py-1 bg-stone-900/80 rounded border border-white/10 text-[11px] font-mono">
@@ -664,10 +665,6 @@ export default function ArtistsPage() {
 
               {/* Genre Clouds */}
               <div className="flex flex-col items-center gap-4">
-                 <div className="flex items-center gap-2 text-stone-500 text-sm uppercase tracking-widest">
-                    <Tag className="w-4 h-4" />
-                    <span>{copy[language].ui.filterByVibe}</span>
-                 </div>
                  <div className="flex flex-wrap justify-center gap-2">
                     <button
                         onClick={() => setGenreAndSyncUrl(null)}
@@ -689,7 +686,7 @@ export default function ArtistsPage() {
                           className={cn(
                             'px-4 py-2 rounded-full text-sm border transition-all duration-300',
                             selectedGenre === genre
-                              ? 'bg-amber-300 text-stone-950 border-amber-400 font-semibold scale-105 shadow-lg shadow-amber-400/20'
+                              ? 'bg-cyan-300 text-stone-950 border-cyan-400 font-semibold scale-105 shadow-lg shadow-cyan-400/20'
                               : 'bg-stone-900/60 text-stone-300 border-white/10 hover:bg-stone-800/90 hover:border-white/30'
                           )}
                         >
@@ -707,8 +704,8 @@ export default function ArtistsPage() {
                       className={cn(
                         'px-5 py-2 rounded-full text-sm font-medium flex items-center gap-2 border transition-all',
                         showFeaturedOnly
-                          ? 'bg-amber-300 text-stone-950 border-amber-400'
-                          : 'bg-transparent text-amber-200 border-amber-400/30 hover:bg-amber-400/10'
+                          ? 'bg-cyan-300 text-stone-950 border-cyan-400'
+                          : 'bg-transparent text-cyan-200 border-cyan-400/30 hover:bg-cyan-400/10'
                       )}
                     >
                       <Star className="w-4 h-4 fill-current" />
@@ -732,7 +729,7 @@ export default function ArtistsPage() {
               <div className="pt-6 flex justify-center">
                 <a
                   href={bookingMailto}
-                  className="inline-flex items-center justify-center px-7 py-3 rounded-full bg-amber-300 text-stone-950 font-semibold hover:bg-amber-200 transition-colors"
+                  className="inline-flex items-center justify-center px-7 py-3 rounded-full bg-cyan-300 text-stone-950 font-semibold hover:bg-cyan-200 transition-colors"
                 >
                   {copy[language].booking.cta} <ArrowRight className="ml-2 w-4 h-4" />
                 </a>
@@ -793,7 +790,7 @@ export default function ArtistsPage() {
                   onClick={() => handleArtistClick(artist)}
                   className="group cursor-pointer h-full text-left"
                 >
-                  <div className="bg-stone-950/60 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-white/30 transition-all duration-500 hover:shadow-2xl hover:shadow-amber-900/10 transform-gpu hover:-translate-y-2 h-full flex flex-col">
+                  <div className="bg-stone-950/60 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-white/30 transition-all duration-500 hover:shadow-2xl hover:shadow-cyan-900/10 transform-gpu hover:-translate-y-2 h-full flex flex-col">
                     {/* Artist Image */}
                     <div className="relative aspect-[4/5] overflow-hidden flex-shrink-0">
                       <img
@@ -808,7 +805,7 @@ export default function ArtistsPage() {
 
                       {artist.featured && (
                         <div className="absolute top-3 left-3 z-10">
-                          <div className="bg-amber-300 text-stone-950 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 shadow-lg border border-amber-500/40">
+                          <div className="bg-cyan-300 text-stone-950 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 shadow-lg border border-cyan-500/40">
                             <Star className="w-3 h-3 fill-current" />
                             <span>{copy[language].ui.residentBadge}</span>
                           </div>
@@ -818,10 +815,10 @@ export default function ArtistsPage() {
 
                     {/* Artist Info */}
                     <div className="p-6 flex-1 flex flex-col relative">
-                      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent group-hover:via-amber-400/50 transition-all duration-500" />
+                      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent group-hover:via-cyan-400/50 transition-all duration-500" />
                       
                       <div className="mb-auto">
-                        <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-amber-300 transition-colors leading-none">
+                        <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-cyan-300 transition-colors leading-none">
                           {artist.name}
                         </h3>
 
@@ -850,7 +847,7 @@ export default function ArtistsPage() {
 
                       <div className="mt-4 pt-4 border-t border-white/5 flex items-center justify-between text-xs text-stone-500 group-hover:text-stone-400 transition-colors">
                         <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-x-2 group-hover:translate-x-0">{copy[language].ui.viewProfile}</span>
-                        <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-amber-300 group-hover:text-black transition-all duration-300">
+                        <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-cyan-300 group-hover:text-black transition-all duration-300">
                            <ArrowRight className="w-4 h-4" />
                         </div>
                       </div>
