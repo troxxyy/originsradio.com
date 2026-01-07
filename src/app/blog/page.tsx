@@ -14,6 +14,15 @@ import 'swiper/css/free-mode';
 import ParticlesHeader from '@/components/ui/ParticlesHeader';
 import NaturalBackground from '@/components/ui/NaturalBackground';
 
+// Blog images for spacers and fallbacks
+const BLOG_IMAGES = [
+  '/BLOGIMAGES/BLOGIMAGE1.jpeg',
+  '/BLOGIMAGES/BLOGIMAGE2.jpeg',
+  '/BLOGIMAGES/BLOGIMAGE3.jpeg',
+  '/BLOGIMAGES/BLOGIMAGE4.jpeg',
+  '/BLOGIMAGES/BLOGIMAGE5.jpeg',
+];
+
 export default function BlogPage() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -293,21 +302,35 @@ export default function BlogPage() {
               >
                 {blogs.flatMap((blog, index) => {
                   const numSpacers = index % 2 === 0 ? 1 : 2;
-                  const spacers = Array.from({ length: numSpacers }, (_, i) => (
-                    <SwiperSlide key={`spacer-${blog.id}-${index}-${i}`}>
-                      <div className="relative w-full h-full bg-gray-800/30">
-                        {/* Empty spacer image */}
-                      </div>
-                    </SwiperSlide>
-                  ));
+                  
+                  // Calculate starting image index for this blog post
+                  const blogImageIndex = index % BLOG_IMAGES.length;
+                  
+                  const spacers = Array.from({ length: numSpacers }, (_, i) => {
+                    // Cycle through images for spacers
+                    const spacerImageIndex = (blogImageIndex + i + 1) % BLOG_IMAGES.length;
+                    return (
+                      <SwiperSlide key={`spacer-${blog.id}-${index}-${i}`}>
+                        <div className="relative w-full h-full">
+                          <img 
+                            className="w-full h-full object-cover" 
+                            src={BLOG_IMAGES[spacerImageIndex]} 
+                            alt="Blog content" 
+                          />
+                          <div className="absolute inset-0 bg-black/20" />
+                        </div>
+                      </SwiperSlide>
+                    );
+                  });
+                  
+                  // Use blog cover image if available, otherwise fallback to placeholder
+                  const coverImage = blog.cover_image_url || BLOG_IMAGES[blogImageIndex];
                   
                   return [
                     <SwiperSlide key={blog.id}>
                       <Link href={`/blog/${blog.slug}`} className="block h-full">
                         <div className="relative w-full h-full">
-                          {blog.cover_image_url && (
-                            <img className="w-full h-full object-cover" src={blog.cover_image_url} alt={blog.title} />
-                          )}
+                          <img className="w-full h-full object-cover" src={coverImage} alt={blog.title} />
                           <div className="absolute inset-0 bg-black/40 flex items-center justify-center p-6">
                             <h2 className="text-2xl font-bold text-white font-newake leading-tight text-center">
                               {blog.title}

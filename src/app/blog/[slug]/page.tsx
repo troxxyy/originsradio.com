@@ -8,6 +8,15 @@ import PageLayout from '@/components/layout/PageLayout';
 import { getBlogBySlug, getRelatedBlogs, type Blog } from '@/data/blogs-supabase';
 import { supabase } from '@/lib/supabase';
 
+// Blog images for fallbacks
+const BLOG_IMAGES = [
+  '/BLOGIMAGES/BLOGIMAGE1.jpeg',
+  '/BLOGIMAGES/BLOGIMAGE2.jpeg',
+  '/BLOGIMAGES/BLOGIMAGE3.jpeg',
+  '/BLOGIMAGES/BLOGIMAGE4.jpeg',
+  '/BLOGIMAGES/BLOGIMAGE5.jpeg',
+];
+
 export default function BlogDetailPage() {
   const params = useParams();
   const slug = params?.slug as string | undefined;
@@ -143,16 +152,14 @@ export default function BlogDetailPage() {
         </div>
 
         {/* Hero Section */}
-        {blog.cover_image_url && (
-          <div className="relative h-[50vh] overflow-hidden">
-            <img
-              src={blog.cover_image_url}
-              alt={blog.title}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black" />
-          </div>
-        )}
+        <div className="relative h-[50vh] overflow-hidden">
+          <img
+            src={blog.cover_image_url || BLOG_IMAGES[0]}
+            alt={blog.title}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black" />
+        </div>
 
         {/* Content */}
         <div className="relative -mt-16 z-10">
@@ -225,21 +232,19 @@ export default function BlogDetailPage() {
                   Related Stories
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {relatedBlogs.map((relatedBlog) => (
+                  {relatedBlogs.map((relatedBlog, idx) => (
                     <Link
                       key={relatedBlog.id}
                       href={`/blog/${relatedBlog.slug}`}
                       className="block bg-gray-900/90 backdrop-blur-sm rounded-xl overflow-hidden hover:bg-white/10 transition-all group"
                     >
-                      {relatedBlog.cover_image_url && (
-                        <div className="w-full h-48 overflow-hidden">
-                          <img
-                            src={relatedBlog.cover_image_url}
-                            alt={relatedBlog.title}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                          />
-                        </div>
-                      )}
+                      <div className="w-full h-48 overflow-hidden">
+                        <img
+                          src={relatedBlog.cover_image_url || BLOG_IMAGES[idx % BLOG_IMAGES.length]}
+                          alt={relatedBlog.title}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                      </div>
                       <div className="p-6">
                         <h3 className="text-xl font-bold text-white mb-3 group-hover:text-gray-300 transition-colors line-clamp-2">
                           {relatedBlog.title}

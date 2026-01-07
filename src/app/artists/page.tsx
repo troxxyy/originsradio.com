@@ -18,7 +18,7 @@ const copy = {
   en: {
     hero: {
       titleTop: "residents, guests,",
-      titleBottom: "and the future.",
+      titleBottom: "and the magazine.",
       paragraphs: [
         "we do not just book names. we book taste, intention, and respect for the room.",
         "browse the roster, filter by genre, and if you’re a new talent with a point of view—apply for management.",
@@ -105,7 +105,7 @@ const copy = {
   tr: {
     hero: {
       titleTop: "resident’lar, konuklar,",
-      titleBottom: "ve gelecek.",
+      titleBottom: "ve magazin.",
       paragraphs: [
         "biz sadece isimleri book’lamıyoruz. zevki, niyeti ve mekâna saygıyı book’luyoruz.",
         "kadroyu incele, türlere göre filtrele; yeni bir yeteneksen ve bir bakış açın varsa—menajerlik için başvur.",
@@ -205,16 +205,16 @@ function SectionTitle({
   return (
     <div className={center ? 'text-center' : ''}>
       {eyebrow ? (
-        <p className="text-cyan-300/70 text-xs md:text-sm uppercase tracking-[0.22em] mb-3">
+        <p className="text-[#A6B2E1]/70 text-xs md:text-sm uppercase tracking-[0.22em] mb-3">
           {eyebrow}
         </p>
       ) : null}
-      <h2 className="text-3xl md:text-5xl font-bold text-white leading-tight">
+      <h2 className="text-3xl md:text-5xl font-bold text-[#EEEef4] leading-tight">
         {title}
       </h2>
       {subtitle ? (
         <p
-          className={`mt-4 text-base md:text-lg text-stone-400 ${
+          className={`mt-4 text-base md:text-lg text-[#CFC6DB] ${
             center ? 'max-w-2xl mx-auto' : 'max-w-2xl'
           }`}
         >
@@ -227,7 +227,7 @@ function SectionTitle({
 
 function SoftCard({ children }: { children: React.ReactNode }) {
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm shadow-2xl shadow-black/30">
+    <div className="bg-[#555759]/20 border border-[#EEEef4]/10 rounded-2xl backdrop-blur-sm shadow-2xl shadow-[#000000]/30">
       {children}
     </div>
   );
@@ -236,7 +236,7 @@ function SoftCard({ children }: { children: React.ReactNode }) {
 function Divider() {
   return (
     <div className="relative my-14 md:my-20">
-      <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-[#EEEef4]/10 to-transparent" />
     </div>
   );
 }
@@ -425,13 +425,13 @@ export default function ArtistsPage() {
 
   return (
     <PageLayout>
-      {/* Cyan/teal background for artist pages */}
+      {/* Background for artist pages */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-b from-stone-950 via-neutral-950 to-stone-950" />
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-950/15 via-transparent to-teal-900/20" />
-        <div className="absolute -left-40 -top-40 w-[620px] h-[620px] rounded-full bg-cyan-900/10 blur-[160px]" />
-        <div className="absolute right-0 top-1/3 w-[520px] h-[520px] rounded-full bg-teal-950/10 blur-[140px]" />
-        <div className="absolute -left-16 bottom-0 w-[420px] h-[420px] rounded-full bg-stone-800/15 blur-[120px]" />
+        <div className="absolute inset-0 bg-[#000000]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#A6B2E1]/10 via-transparent to-[#7DBEEE]/15" />
+        <div className="absolute -left-40 -top-40 w-[620px] h-[620px] rounded-full bg-[#7DBEEE]/8 blur-[160px]" />
+        <div className="absolute right-0 top-1/3 w-[520px] h-[520px] rounded-full bg-[#A6B2E1]/8 blur-[140px]" />
+        <div className="absolute -left-16 bottom-0 w-[420px] h-[420px] rounded-full bg-[#555759]/20 blur-[120px]" />
       </div>
 
       <SocialBubbles />
@@ -447,7 +447,7 @@ export default function ArtistsPage() {
       >
         <motion.button
           onClick={() => setLanguage(language === 'en' ? 'tr' : 'en')}
-          className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white hover:bg-white/20 transition-colors backdrop-blur-sm"
+          className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#555759]/30 border border-[#EEEef4]/20 text-[#EEEef4] hover:bg-[#555759]/40 transition-colors backdrop-blur-sm"
           whileHover={reduceMotion ? undefined : { scale: 1.05 }}
           whileTap={reduceMotion ? undefined : { scale: 0.95 }}
           type="button"
@@ -482,16 +482,16 @@ export default function ArtistsPage() {
       <section className="min-h-screen flex items-center justify-center relative z-10 px-6 pt-12 pb-16">
         <motion.div className="max-w-5xl mx-auto" {...motionIn}>
           <div className="mb-10 md:mb-12">
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 text-white leading-[1.05] text-left md:text-center">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 text-[#EEEef4] leading-[1.05] text-left md:text-center">
               {copy[language].hero.titleTop}
               <br />
-              <span className="text-cyan-300/85">{copy[language].hero.titleBottom}</span>
+              <span className="text-[#A6B2E1]">{copy[language].hero.titleBottom}</span>
             </h1>
           </div>
 
           <div className="max-w-3xl mx-auto space-y-4 text-left">
             {copy[language].hero.paragraphs.map((p) => (
-              <p key={p} className="text-lg md:text-xl text-stone-300 leading-relaxed">
+              <p key={p} className="text-lg md:text-xl text-[#CFC6DB] leading-relaxed">
                 {p}
               </p>
             ))}
@@ -501,11 +501,11 @@ export default function ArtistsPage() {
             {heroStats.map((stat, i) => (
               <div
                 key={i}
-                className="text-center p-4 bg-white/5 rounded-xl backdrop-blur-sm border border-white/10"
+                className="text-center p-4 bg-[#555759]/20 rounded-xl backdrop-blur-sm border border-[#EEEef4]/10"
               >
-                <stat.icon className="w-6 h-6 text-cyan-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-white mb-1">{stat.value}</div>
-                <div className="text-xs text-stone-400 uppercase tracking-[0.18em]">
+                <stat.icon className="w-6 h-6 text-[#7DBEEE] mx-auto mb-2" />
+                <div className="text-2xl font-bold text-[#EEEef4] mb-1">{stat.value}</div>
+                <div className="text-xs text-[#CFC6DB] uppercase tracking-[0.18em]">
                   {stat.label}
                 </div>
               </div>
@@ -514,7 +514,7 @@ export default function ArtistsPage() {
 
           <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center items-stretch sm:items-center">
             <motion.button
-              className="w-full sm:w-auto px-7 py-3 rounded-full bg-white text-stone-950 font-semibold hover:bg-stone-100 transition-colors"
+              className="w-full sm:w-auto px-7 py-3 rounded-full bg-[#EEEef4] text-[#000000] font-semibold hover:bg-[#CFC6DB] transition-colors"
               whileHover={reduceMotion ? undefined : { scale: 1.02 }}
               whileTap={reduceMotion ? undefined : { scale: 0.98 }}
               type="button"
@@ -525,7 +525,7 @@ export default function ArtistsPage() {
               {copy[language].hero.actions.browseRoster} <ArrowRight className="inline w-4 h-4 ml-2" />
             </motion.button>
             <motion.button
-              className="w-full sm:w-auto px-7 py-3 rounded-full bg-stone-900/40 border border-white/15 text-white font-semibold hover:bg-stone-900/60 transition-colors"
+              className="w-full sm:w-auto px-7 py-3 rounded-full bg-[#555759]/40 border border-[#EEEef4]/15 text-[#EEEef4] font-semibold hover:bg-[#555759]/60 transition-colors"
               whileHover={reduceMotion ? undefined : { scale: 1.02 }}
               whileTap={reduceMotion ? undefined : { scale: 0.98 }}
               type="button"
@@ -538,7 +538,7 @@ export default function ArtistsPage() {
             </motion.button>
             <a href={copy[language].management.ctaPrimaryLink} className="w-full sm:w-auto">
               <motion.div
-                className="w-full px-7 py-3 rounded-full bg-cyan-300 text-stone-950 font-semibold hover:bg-cyan-200 transition-colors text-center"
+                className="w-full px-7 py-3 rounded-full bg-[#7DBEEE] text-[#000000] font-semibold hover:bg-[#A6B2E1] transition-colors text-center"
                 whileHover={reduceMotion ? undefined : { scale: 1.02 }}
                 whileTap={reduceMotion ? undefined : { scale: 0.98 }}
               >
@@ -550,7 +550,7 @@ export default function ArtistsPage() {
       </section>
 
       {/* Management / New Talent Section */}
-      <section className="relative z-10 py-16 md:py-24 bg-black/20">
+      <section className="relative z-10 py-16 md:py-24 bg-[#000000]/20">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
             <div className="space-y-8 order-2 lg:order-1">
@@ -559,7 +559,7 @@ export default function ArtistsPage() {
                 title={copy[language].management.title}
                 subtitle={copy[language].management.subtitle}
               />
-              <div className="space-y-4 text-lg text-stone-300 leading-relaxed">
+              <div className="space-y-4 text-lg text-[#CFC6DB] leading-relaxed">
                 {copy[language].management.paragraphs.map((p, i) => (
                   <p key={i}>{p}</p>
                 ))}
@@ -567,7 +567,7 @@ export default function ArtistsPage() {
               <div>
                 <a
                   href={copy[language].management.ctaPrimaryLink}
-                  className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-white text-stone-950 font-semibold hover:bg-stone-100 transition-colors text-base"
+                  className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-[#EEEef4] text-[#000000] font-semibold hover:bg-[#CFC6DB] transition-colors text-base"
                 >
                   {copy[language].management.ctaPrimary} <ArrowRight className="ml-2 w-4 h-4" />
                 </a>
@@ -578,7 +578,7 @@ export default function ArtistsPage() {
                <SoftCard>
                   <div className="p-8 md:p-10 flex flex-col items-center justify-center text-center space-y-6 h-full min-h-[400px]">
                       <motion.div
-                        className="w-62 h-62 rounded-full bg-cyan-400/10 flex items-center justify-center mb-4"
+                        className="w-62 h-62 rounded-full bg-[#7DBEEE]/10 flex items-center justify-center mb-4"
                         animate={{
                           y: [0, -10, 0],
                           rotate: [0, 2, -2, 0],
@@ -590,28 +590,28 @@ export default function ArtistsPage() {
                         }}
                       >
                         <Image 
-                          src="/origins2026logo.png" 
+                          src="/holoo.png" 
                           alt="Origins Radio" 
                           width={220} 
                           height={220} 
                           className="object-contain"
                         />
                       </motion.div>
-                      <h3 className="text-2xl font-bold text-white">{copy[language].management.card.title}</h3>
-                      <p className="text-stone-400 leading-relaxed">
+                      <h3 className="text-2xl font-bold text-[#EEEef4]">{copy[language].management.card.title}</h3>
+                      <p className="text-[#CFC6DB] leading-relaxed">
                         {copy[language].management.card.body}
                       </p>
-                      <ul className="text-left text-stone-300 space-y-3 w-full max-w-xs mx-auto">
+                      <ul className="text-left text-[#CFC6DB] space-y-3 w-full max-w-xs mx-auto">
                         <li className="flex items-center gap-3">
-                          <CheckCircle2 className="w-5 h-5 text-cyan-400" />
+                          <CheckCircle2 className="w-5 h-5 text-[#7DBEEE]" />
                           <span>{copy[language].management.card.bullets[0]}</span>
                         </li>
                         <li className="flex items-center gap-3">
-                          <CheckCircle2 className="w-5 h-5 text-cyan-400" />
+                          <CheckCircle2 className="w-5 h-5 text-[#7DBEEE]" />
                           <span>{copy[language].management.card.bullets[1]}</span>
                         </li>
                         <li className="flex items-center gap-3">
-                          <CheckCircle2 className="w-5 h-5 text-cyan-400" />
+                          <CheckCircle2 className="w-5 h-5 text-[#7DBEEE]" />
                           <span>{copy[language].management.card.bullets[2]}</span>
                         </li>
                       </ul>
@@ -640,24 +640,24 @@ export default function ArtistsPage() {
             <div className="flex flex-col gap-6">
               {/* Search Bar */}
               <div className="relative w-full max-w-2xl mx-auto">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-stone-500 w-5 h-5" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#555759] w-5 h-5" />
                 <input
                   ref={searchInputRef}
                   type="text"
                   placeholder={copy[language].ui.searchPlaceholder}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-24 py-4 bg-stone-900/70 border border-white/15 rounded-xl text-white placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-cyan-400/30 focus:border-cyan-300/40 transition-all text-lg"
+                  className="w-full pl-12 pr-24 py-4 bg-[#555759]/70 border border-[#EEEef4]/15 rounded-xl text-[#EEEef4] placeholder-[#555759] focus:outline-none focus:ring-2 focus:ring-[#7DBEEE]/30 focus:border-[#A6B2E1]/40 transition-all text-lg"
                 />
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-1 text-stone-500 text-xs">
-                  <kbd className="px-2 py-1 bg-stone-900/80 rounded border border-white/10 text-[11px] font-mono">
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-1 text-[#555759] text-xs">
+                  <kbd className="px-2 py-1 bg-[#555759]/80 rounded border border-[#EEEef4]/10 text-[11px] font-mono">
                     {typeof navigator !== 'undefined' &&
                     navigator.platform.indexOf('Mac') > -1
                       ? '⌘'
                       : 'Ctrl'}
                   </kbd>
                   <span>{copy[language].ui.keyboardHintOr}</span>
-                  <kbd className="px-2 py-1 bg-stone-900/80 rounded border border-white/10 text-[11px] font-mono">
+                  <kbd className="px-2 py-1 bg-[#555759]/80 rounded border border-[#EEEef4]/10 text-[11px] font-mono">
                     K
                   </kbd>
                 </div>
@@ -671,8 +671,8 @@ export default function ArtistsPage() {
                         className={cn(
                           'px-4 py-2 rounded-full text-sm border transition-all duration-300',
                           !selectedGenre
-                            ? 'bg-white text-stone-950 border-white font-semibold scale-105 shadow-lg shadow-white/10'
-                            : 'bg-stone-900/60 text-stone-300 border-white/10 hover:bg-stone-800/90 hover:border-white/30'
+                            ? 'bg-[#EEEef4] text-[#000000] border-[#EEEef4] font-semibold scale-105 shadow-lg shadow-[#EEEef4]/10'
+                            : 'bg-[#555759]/60 text-[#CFC6DB] border-[#EEEef4]/10 hover:bg-[#555759]/90 hover:border-[#EEEef4]/30'
                         )}
                       >
                         {copy[language].ui.allGenres}
@@ -686,8 +686,8 @@ export default function ArtistsPage() {
                           className={cn(
                             'px-4 py-2 rounded-full text-sm border transition-all duration-300',
                             selectedGenre === genre
-                              ? 'bg-cyan-300 text-stone-950 border-cyan-400 font-semibold scale-105 shadow-lg shadow-cyan-400/20'
-                              : 'bg-stone-900/60 text-stone-300 border-white/10 hover:bg-stone-800/90 hover:border-white/30'
+                              ? 'bg-[#7DBEEE] text-[#000000] border-[#A6B2E1] font-semibold scale-105 shadow-lg shadow-[#7DBEEE]/20'
+                              : 'bg-[#555759]/60 text-[#CFC6DB] border-[#EEEef4]/10 hover:bg-[#555759]/90 hover:border-[#EEEef4]/30'
                           )}
                         >
                           {genre}
@@ -704,8 +704,8 @@ export default function ArtistsPage() {
                       className={cn(
                         'px-5 py-2 rounded-full text-sm font-medium flex items-center gap-2 border transition-all',
                         showFeaturedOnly
-                          ? 'bg-cyan-300 text-stone-950 border-cyan-400'
-                          : 'bg-transparent text-cyan-200 border-cyan-400/30 hover:bg-cyan-400/10'
+                          ? 'bg-[#7DBEEE] text-[#000000] border-[#A6B2E1]'
+                          : 'bg-transparent text-[#A6B2E1] border-[#7DBEEE]/30 hover:bg-[#7DBEEE]/10'
                       )}
                     >
                       <Star className="w-4 h-4 fill-current" />
@@ -715,8 +715,8 @@ export default function ArtistsPage() {
               </div>
 
               {(searchTerm || showFeaturedOnly || selectedGenre) && (
-                <div className="pt-4 border-t border-white/10 text-center">
-                  <p className="text-stone-400">
+                <div className="pt-4 border-t border-[#EEEef4]/10 text-center">
+                  <p className="text-[#CFC6DB]">
                     {filteredArtists.length === 0
                       ? copy[language].ui.noMatches
                       : language === 'en'
@@ -729,7 +729,7 @@ export default function ArtistsPage() {
               <div className="pt-6 flex justify-center">
                 <a
                   href={bookingMailto}
-                  className="inline-flex items-center justify-center px-7 py-3 rounded-full bg-cyan-300 text-stone-950 font-semibold hover:bg-cyan-200 transition-colors"
+                  className="inline-flex items-center justify-center px-7 py-3 rounded-full bg-[#7DBEEE] text-[#000000] font-semibold hover:bg-[#A6B2E1] transition-colors"
                 >
                   {copy[language].booking.cta} <ArrowRight className="ml-2 w-4 h-4" />
                 </a>
@@ -746,8 +746,8 @@ export default function ArtistsPage() {
               animate={{ opacity: 1 }}
               className="text-center py-20"
             >
-              <Music className="w-16 h-16 text-stone-500 mx-auto mb-4 animate-pulse" />
-              <h3 className="text-2xl font-semibold text-white mb-2">
+              <Music className="w-16 h-16 text-[#555759] mx-auto mb-4 animate-pulse" />
+              <h3 className="text-2xl font-semibold text-[#EEEef4] mb-2">
                 {copy[language].ui.loading}
               </h3>
             </motion.div>
@@ -758,10 +758,10 @@ export default function ArtistsPage() {
               className="text-center py-20"
             >
               <Music className="w-16 h-16 text-red-500 mx-auto mb-4" />
-              <h3 className="text-2xl font-semibold text-white mb-2">
+              <h3 className="text-2xl font-semibold text-[#EEEef4] mb-2">
                 {copy[language].ui.errorTitle}
               </h3>
-              <p className="text-stone-400">{error.message}</p>
+              <p className="text-[#CFC6DB]">{error.message}</p>
             </motion.div>
           ) : filteredArtists.length === 0 ? (
             <motion.div
@@ -769,11 +769,11 @@ export default function ArtistsPage() {
               animate={{ opacity: 1 }}
               className="text-center py-20"
             >
-              <Music className="w-16 h-16 text-stone-600 mx-auto mb-4" />
-              <h3 className="text-2xl font-semibold text-white mb-2">
+              <Music className="w-16 h-16 text-[#555759] mx-auto mb-4" />
+              <h3 className="text-2xl font-semibold text-[#EEEef4] mb-2">
                 {copy[language].ui.emptyTitle}
               </h3>
-              <p className="text-stone-400">
+              <p className="text-[#CFC6DB]">
                 {copy[language].ui.emptyBody}
               </p>
             </motion.div>
@@ -790,7 +790,7 @@ export default function ArtistsPage() {
                   onClick={() => handleArtistClick(artist)}
                   className="group cursor-pointer h-full text-left"
                 >
-                  <div className="bg-stone-950/60 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-white/30 transition-all duration-500 hover:shadow-2xl hover:shadow-cyan-900/10 transform-gpu hover:-translate-y-2 h-full flex flex-col">
+                  <div className="bg-[#555759]/60 backdrop-blur-sm rounded-2xl overflow-hidden border border-[#EEEef4]/10 hover:border-[#EEEef4]/30 transition-all duration-500 hover:shadow-2xl hover:shadow-[#7DBEEE]/10 transform-gpu hover:-translate-y-2 h-full flex flex-col">
                     {/* Artist Image */}
                     <div className="relative aspect-[4/5] overflow-hidden flex-shrink-0">
                       <img
@@ -801,11 +801,11 @@ export default function ArtistsPage() {
                           (e.target as HTMLImageElement).src = '/placeholder.svg';
                         }}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#000000]/80 via-[#000000]/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
 
                       {artist.featured && (
                         <div className="absolute top-3 left-3 z-10">
-                          <div className="bg-cyan-300 text-stone-950 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 shadow-lg border border-cyan-500/40">
+                          <div className="bg-[#7DBEEE] text-[#000000] px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 shadow-lg border border-[#A6B2E1]/40">
                             <Star className="w-3 h-3 fill-current" />
                             <span>{copy[language].ui.residentBadge}</span>
                           </div>
@@ -815,15 +815,15 @@ export default function ArtistsPage() {
 
                     {/* Artist Info */}
                     <div className="p-6 flex-1 flex flex-col relative">
-                      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent group-hover:via-cyan-400/50 transition-all duration-500" />
+                      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#EEEef4]/10 to-transparent group-hover:via-[#7DBEEE]/50 transition-all duration-500" />
                       
                       <div className="mb-auto">
-                        <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-cyan-300 transition-colors leading-none">
+                        <h3 className="text-2xl font-bold text-[#EEEef4] mb-2 group-hover:text-[#A6B2E1] transition-colors leading-none">
                           {artist.name}
                         </h3>
 
                         {artist.location && (
-                          <div className="flex items-center gap-2 text-stone-400 mb-4">
+                          <div className="flex items-center gap-2 text-[#CFC6DB] mb-4">
                             <MapPin className="w-3 h-3" />
                             <span className="text-xs uppercase tracking-[0.2em] opacity-70">
                               {artist.location}
@@ -836,7 +836,7 @@ export default function ArtistsPage() {
                             {artist.genre.slice(0, 3).map((genre: string) => (
                               <span
                                 key={genre}
-                                className="px-2 py-0.5 bg-white/5 rounded text-[10px] text-stone-300 border border-white/10 uppercase tracking-wide"
+                                className="px-2 py-0.5 bg-[#555759]/30 rounded text-[10px] text-[#CFC6DB] border border-[#EEEef4]/10 uppercase tracking-wide"
                               >
                                 {genre}
                               </span>
@@ -845,9 +845,9 @@ export default function ArtistsPage() {
                         )}
                       </div>
 
-                      <div className="mt-4 pt-4 border-t border-white/5 flex items-center justify-between text-xs text-stone-500 group-hover:text-stone-400 transition-colors">
+                      <div className="mt-4 pt-4 border-t border-[#EEEef4]/5 flex items-center justify-between text-xs text-[#555759] group-hover:text-[#CFC6DB] transition-colors">
                         <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-x-2 group-hover:translate-x-0">{copy[language].ui.viewProfile}</span>
-                        <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-cyan-300 group-hover:text-black transition-all duration-300">
+                        <div className="w-8 h-8 rounded-full bg-[#555759]/30 flex items-center justify-center group-hover:bg-[#7DBEEE] group-hover:text-[#000000] transition-all duration-300">
                            <ArrowRight className="w-4 h-4" />
                         </div>
                       </div>
