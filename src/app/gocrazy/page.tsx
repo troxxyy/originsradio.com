@@ -124,10 +124,18 @@ export default function GoCrazyPage() {
           if (win.CABLES && win.CABLES.patch) {
             if (isPlaying) {
               console.log('Directly playing CABLES patch');
-              win.CABLES.patch.play();
+              if (typeof win.CABLES.patch.play === 'function') {
+                win.CABLES.patch.play();
+              } else {
+                console.warn('CABLES patch.play is not a function');
+              }
             } else {
               console.log('Directly pausing CABLES patch');
-              win.CABLES.patch.pause();
+              if (typeof win.CABLES.patch.pause === 'function') {
+                win.CABLES.patch.pause();
+              } else {
+                console.warn('CABLES patch.pause is not a function');
+              }
             }
           }
         }

@@ -9,16 +9,41 @@
     isPlaying = shouldPlay;
     
     // Wait for CABLES to be fully initialized
-    if (window.CABLES && CABLES.patch) {
+    // Check if patch exists and is not null/undefined
+    if (window.CABLES && CABLES.patch && typeof CABLES.patch === 'object') {
       try {
         if (shouldPlay) {
           // Resume the patch
           console.log('Resuming CABLES patch');
-          CABLES.patch.play();
+          
+          // Use _paused property if play() method doesn't exist
+          if (typeof CABLES.patch.play === 'function') {
+            CABLES.patch.play();
+            console.log('Called CABLES.patch.play()');
+          } else if (CABLES.patch._paused !== undefined) {
+            CABLES.patch._paused = false;
+            console.log('Set _paused to false');
+          } else {
+            console.warn('CABLES.patch does not have play() method or _paused property');
+            console.log('Available CABLES.patch properties:', Object.keys(CABLES.patch));
+          }
           
           // Force a render frame to restart animations
-          if (CABLES.patch._renderOneFrame) {
+          if (typeof CABLES.patch._renderOneFrame === 'function') {
             CABLES.patch._renderOneFrame();
+            console.log('Called _renderOneFrame()');
+          }
+          
+          // Try to start the render loop if it exists
+          if (typeof CABLES.patch.start === 'function') {
+            CABLES.patch.start();
+            console.log('Called CABLES.patch.start()');
+          }
+          
+          // Try to resume if there's a resume method
+          if (typeof CABLES.patch.resume === 'function') {
+            CABLES.patch.resume();
+            console.log('Called CABLES.patch.resume()');
           }
           
           // Resume audio context if it exists
@@ -84,7 +109,23 @@
         } else {
           // Pause the patch
           console.log('Pausing CABLES patch');
-          CABLES.patch.pause();
+          
+          // Use _paused property if pause() method doesn't exist
+          if (typeof CABLES.patch.pause === 'function') {
+            CABLES.patch.pause();
+            console.log('Called CABLES.patch.pause()');
+          } else if (CABLES.patch._paused !== undefined) {
+            CABLES.patch._paused = true;
+            console.log('Set _paused to true');
+          } else {
+            console.warn('CABLES.patch does not have pause() method or _paused property');
+          }
+          
+          // Try to stop if there's a stop method
+          if (typeof CABLES.patch.stop === 'function') {
+            CABLES.patch.stop();
+            console.log('Called CABLES.patch.stop()');
+          }
           
           // Suspend audio context if it exists
           if (window.audioContext && window.audioContext.state === 'running') {
@@ -141,6 +182,12 @@
       console.log('CABLES initialization complete');
       initialized = true;
       
+      // Try to start the patch automatically
+      if (window.CABLES && CABLES.patch) {
+        console.log('Attempting to start CABLES patch automatically');
+        setPlayState(true);
+      }
+      
       // Add a keyboard event listener directly in the iframe
       window.addEventListener('keydown', function(e) {
         if (e.code === 'Space') {
@@ -152,6 +199,19 @@
           }
         }
       });
+      
+      // Add click handler to ensure user interaction for audio context
+      const handleUserInteraction = function() {
+        console.log('User interaction detected, starting patch');
+        setPlayState(true);
+        // Remove listeners after first interaction
+        document.removeEventListener('click', handleUserInteraction);
+        document.removeEventListener('touchstart', handleUserInteraction);
+      };
+      
+      // Listen for user interaction to start audio
+      document.addEventListener('click', handleUserInteraction, { once: true });
+      document.addEventListener('touchstart', handleUserInteraction, { once: true });
     }, 1000);
   });
   

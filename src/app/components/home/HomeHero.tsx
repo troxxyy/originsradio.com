@@ -169,7 +169,7 @@ const HomeHero: React.FC = () => {
               isLive ? "bg-emerald-400" : "bg-white/30"
             )} />
             <span className="text-xs tracking-widest uppercase text-white/50">
-              {isLive ? "Now Live" : "Listen Soon"}
+              {isLive ? "Now Live" : "not live"}
             </span>
           </div>
         </div>
