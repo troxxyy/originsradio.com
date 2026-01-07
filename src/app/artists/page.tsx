@@ -590,7 +590,7 @@ export default function ArtistsPage() {
                         }}
                       >
                         <Image 
-                          src="/originslogo.png" 
+                          src="/origins2026logo.png" 
                           alt="Origins Radio" 
                           width={220} 
                           height={220} 
