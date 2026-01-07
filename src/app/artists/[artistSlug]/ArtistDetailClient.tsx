@@ -457,8 +457,8 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
             animate={{ opacity: 1, y: 0 }}
             className="text-center py-20"
           >
-            <div className="w-24 h-24 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Headphones className="w-12 h-12 text-red-400" />
+            <div className="w-24 h-24 bg-[#d4153e]/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Headphones className="w-12 h-12 text-[#d4153e]" />
             </div>
             <h1 className="text-3xl font-bold text-white mb-4">DJ not found</h1>
             <p className="text-gray-400 mb-8">The DJ you're looking for doesn't exist or has been removed.</p>
@@ -479,7 +479,7 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
   return (
     <PageLayout>
       {/* Cyan/teal background for artist pages */}
-      <div className="fixed inset-0 -z-10 pointer-events-none">
+      <div className="fixed inset-0 -z-10 pointer-events-none will-change-transform">
         {/* Deep dark base */}
         <div className="absolute inset-0 bg-gradient-to-b from-neutral-950 via-stone-950 to-zinc-950"></div>
         
@@ -487,19 +487,19 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
         <div className="absolute inset-0 bg-gradient-to-br from-cyan-950/20 via-transparent to-teal-900/30"></div>
         
         {/* Top left - cyan glow */}
-        <div className="absolute -left-20 -top-20 w-[500px] h-[500px] rounded-full bg-gradient-to-r from-cyan-700/15 to-teal-800/10 blur-[100px] transform-gpu"></div>
+        <div className="absolute -left-20 -top-20 w-[500px] h-[500px] rounded-full bg-gradient-to-r from-cyan-700/15 to-teal-800/10 blur-[100px] transform-gpu will-change-transform"></div>
         
         {/* Top right - soft teal glow */}
-        <div className="absolute -right-20 top-1/4 w-[400px] h-[400px] rounded-full bg-gradient-to-l from-teal-900/12 to-cyan-900/8 blur-[80px] transform-gpu"></div>
+        <div className="absolute -right-20 top-1/4 w-[400px] h-[400px] rounded-full bg-gradient-to-l from-teal-900/12 to-cyan-900/8 blur-[80px] transform-gpu will-change-transform"></div>
         
         {/* Center - cyan neutral glow */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-gradient-to-r from-cyan-700/10 via-teal-600/8 to-cyan-700/10 blur-[120px] transform-gpu"></div>
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-gradient-to-r from-cyan-700/10 via-teal-600/8 to-cyan-700/10 blur-[120px] transform-gpu will-change-transform"></div>
         
         {/* Bottom left - teal tint */}
-        <div className="absolute -left-20 bottom-1/4 w-[350px] h-[350px] rounded-full bg-gradient-to-r from-teal-600/10 to-cyan-700/8 blur-[80px] transform-gpu"></div>
+        <div className="absolute -left-20 bottom-1/4 w-[350px] h-[350px] rounded-full bg-gradient-to-r from-teal-600/10 to-cyan-700/8 blur-[80px] transform-gpu will-change-transform"></div>
         
         {/* Bottom right - cyan glow */}
-        <div className="absolute -right-10 -bottom-20 w-[450px] h-[450px] rounded-full bg-gradient-to-l from-cyan-800/12 via-teal-900/10 to-stone-800/8 blur-[100px] transform-gpu"></div>
+        <div className="absolute -right-10 -bottom-20 w-[450px] h-[450px] rounded-full bg-gradient-to-l from-cyan-800/12 via-teal-900/10 to-stone-800/8 blur-[100px] transform-gpu will-change-transform"></div>
         
         {/* Subtle noise/grain overlay for organic texture */}
         <div className="absolute inset-0 opacity-[0.025] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNhKSIvPjwvc3ZnPg==')]"></div>
@@ -537,9 +537,10 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
             <motion.button
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.15 }}
               whileHover={{ x: -5 }}
               onClick={() => router.push('/artists')}
-              className="flex items-center gap-3 text-white/80 hover:text-white transition-all duration-300 mb-8 group"
+              className="flex items-center gap-3 text-white/80 hover:text-white transition-all duration-200 mb-8 group"
             >
               <div className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center group-hover:bg-white/20 transition-all">
                 <ArrowLeft className="w-5 h-5" />
@@ -551,21 +552,21 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
           {/* Hero Section */}
           <div className="pb-16">
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
+              transition={{ duration: 0.15, ease: "easeOut" }}
               className="relative"
             >
-              <div className="glass backdrop-blur-sm rounded-3xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.1)] transform-gpu">
+              <div className="glass backdrop-blur-sm rounded-3xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-200 hover:shadow-[0_0_30px_rgba(255,255,255,0.1)] transform-gpu">
                 <div className="relative w-full h-[500px] sm:h-[600px] lg:h-[700px] overflow-hidden bg-black">
                   <motion.img
-                    initial={{ scale: 1.1 }}
+                    initial={{ scale: 1.02 }}
                     animate={{ scale: 1 }}
-                    transition={{ duration: 0.5, ease: "easeOut" }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
                     src={artist.photo_url || '/placeholder.svg'}
                     alt={artist.name}
                     className="w-full h-full object-cover"
-                    style={{ objectPosition: 'center center' }}
+                    style={{ objectPosition: 'center center', willChange: 'transform' }}
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = '/placeholder.svg'
                     }}
@@ -582,7 +583,7 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
                         onClick={handleToggleLike}
                         disabled={toggleLikeMutation.isPending}
                         className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full backdrop-blur-sm border border-white/20 flex items-center justify-center transition-all touch-manipulation ${
-                          isLiked ? 'bg-red-500/80 text-white' : 'bg-white/10 text-white hover:bg-white/20'
+                          isLiked ? 'bg-[#d4153e]/80 text-white' : 'bg-white/10 text-white hover:bg-white/20'
                         } ${toggleLikeMutation.isPending ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
                         <Heart className={`w-4 h-4 sm:w-5 sm:h-5 ${isLiked ? 'fill-current' : ''}`} />
@@ -631,12 +632,12 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
                   {/* Resident Badge */}
                   {artist.featured && (
                     <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.3, duration: 0.8 }}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.2, delay: 0.05, ease: "easeOut" }}
                       className="absolute top-4 left-4 z-20"
                     >
-                      <div className="bg-cyan-300 text-stone-950 px-6 py-3 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg border border-cyan-500/40 backdrop-blur-sm">
+                      <div className="bg-[#d4153e] text-[#FFFFFF] px-6 py-3 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg border-2 border-[#d4153e] backdrop-blur-sm">
                         <Star className="w-4 h-4 fill-current" />
                         <span>RESIDENT DJ</span>
                       </div>
@@ -650,18 +651,18 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
                     {/* Main Info */}
                     <div className="lg:col-span-2">
                       <motion.h1
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 }}
+                        transition={{ duration: 0.15, ease: "easeOut" }}
                         className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
                       >
                         {artist.name}
                       </motion.h1>
                       
                       <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.15 }}
+                        transition={{ duration: 0.15, delay: 0.02, ease: "easeOut" }}
                         className="flex flex-wrap items-center gap-2 sm:gap-4 mb-6"
                       >
                         {artist.location && (
@@ -678,20 +679,20 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
 
                       {artist.genre && artist.genre.length > 0 && (
                         <motion.div
-                          initial={{ opacity: 0, y: 20 }}
+                          initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.2 }}
+                          transition={{ duration: 0.15, delay: 0.03, ease: "easeOut" }}
                           className="flex flex-wrap gap-3 mb-6"
                         >
                           {artist.genre.slice(0, 5).map((genre, index) => (
                             <motion.button
                               key={genre}
-                              initial={{ opacity: 0, scale: 0.8 }}
+                              initial={{ opacity: 0, scale: 0.95 }}
                               animate={{ opacity: 1, scale: 1 }}
-                              transition={{ delay: 0.25 + index * 0.05 }}
+                              transition={{ duration: 0.15, delay: 0.05 + index * 0.02, ease: "easeOut" }}
                               type="button"
                               onClick={() => router.push(`/artists?genre=${encodeURIComponent(genre)}#booking`)}
-                              className="px-4 py-2 bg-white/5 rounded-full text-sm text-white font-medium border border-white/10 backdrop-blur-sm hover:border-cyan-400/40 hover:bg-cyan-400/10 transition-colors"
+                              className="px-4 py-2 bg-white/5 rounded-full text-sm text-white font-medium border border-white/10 backdrop-blur-sm hover:border-[#d4153e]/40 hover:bg-[#d4153e]/10 transition-colors"
                             >
                               {genre}
                             </motion.button>
@@ -700,14 +701,14 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
                       )}
 
                       <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.26 }}
+                        transition={{ duration: 0.15, delay: 0.05, ease: "easeOut" }}
                         className="flex flex-col sm:flex-row gap-3 mb-8"
                       >
                         <a
                           href={bookingMailto}
-                          className="inline-flex items-center justify-center px-7 py-3 rounded-full bg-cyan-300 text-stone-950 font-semibold hover:bg-cyan-200 transition-colors"
+                          className="inline-flex items-center justify-center px-7 py-3 rounded-full bg-[#d4153e] text-stone-950 font-semibold hover:bg-[#d4153e] transition-colors"
                         >
                           book this DJ
                         </a>
@@ -716,15 +717,15 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
                           onClick={() => router.push(`/artists#booking`)}
                           className="inline-flex items-center justify-center px-7 py-3 rounded-full bg-white/5 border border-white/15 text-white font-semibold hover:bg-white/10 transition-colors"
                         >
-                          browse roster by genre
+                          browse artist by genre
                         </button>
                       </motion.div>
 
                       {artist.bio && (
                         <motion.p
-                          initial={{ opacity: 0, y: 20 }}
+                          initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.3 }}
+                          transition={{ duration: 0.15, delay: 0.06, ease: "easeOut" }}
                           className="text-gray-300 text-lg leading-relaxed mb-6"
                         >
                           {artist.bio}
@@ -733,9 +734,9 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
 
                       {/* DJ Equipment */}
                       <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.35 }}
+                        transition={{ duration: 0.15, delay: 0.08, ease: "easeOut" }}
                         className="mb-6"
                       >
                         <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
@@ -757,9 +758,9 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
                       {/* Social Links */}
                       {artist.social_links && Object.keys(artist.social_links).length > 0 && (
                         <motion.div
-                          initial={{ opacity: 0, y: 20 }}
+                          initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.4 }}
+                          transition={{ duration: 0.15, delay: 0.1, ease: "easeOut" }}
                           className="flex gap-3"
                         >
                           {Object.entries(artist.social_links)
@@ -785,10 +786,10 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
                     {/* DJ Stats Card */}
                     <div className="space-y-4 sm:space-y-6">
                       <motion.div
-                        initial={{ opacity: 0, x: 20 }}
+                        initial={{ opacity: 0, x: 10 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.4 }}
-                        className="glass backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/10 hover:border-white/20 transition-all duration-300"
+                        transition={{ duration: 0.15, delay: 0.05, ease: "easeOut" }}
+                        className="glass backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/10 hover:border-white/20 transition-all duration-200"
                       >
                         <h3 className="text-lg sm:text-xl font-semibold text-white mb-4 flex items-center gap-2">
                           DJ Stats
@@ -831,9 +832,9 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
           {sets && sets.length > 0 ? (
             <div className="pb-12 sm:pb-16">
               <motion.div
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.1 }}
+                transition={{ duration: 0.2, delay: 0.05 }}
               >
                 <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
                   <div className="w-1 h-6 sm:h-8 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full"></div>
@@ -863,9 +864,9 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
           {tracks && tracks.length > 0 ? (
             <div className="pb-12 sm:pb-16">
               <motion.div
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.2 }}
+                transition={{ duration: 0.2, delay: 0.08 }}
               >
                 <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
                   <div className="w-1 h-6 sm:h-8 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full"></div>
@@ -878,11 +879,11 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
                     {tracks.slice(0, 5).map((track, index) => (
                       <motion.div
                         key={track.id}
-                        initial={{ opacity: 0, x: -30 }}
+                        initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3, delay: index * 0.05 }}
+                        transition={{ duration: 0.2, delay: index * 0.03 }}
                         whileHover={{ scale: 1.02, x: 5 }}
-                        className="glass backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.1)] transform-gpu"
+                        className="glass backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/10 hover:border-white/20 transition-all duration-200 hover:shadow-[0_0_30px_rgba(255,255,255,0.1)] transform-gpu"
                       >
                         <div className="flex items-center gap-4 sm:gap-6">
                           <div className="flex-1 min-w-0">
@@ -935,9 +936,9 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
           {upcomingEvents.length > 0 ? (
             <div className="pb-12 sm:pb-16">
               <motion.div
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.3 }}
+                transition={{ duration: 0.2, delay: 0.1 }}
               >
                 <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
                   <div className="w-1 h-6 sm:h-8 bg-gradient-to-b from-green-500 to-green-600 rounded-full"></div>
@@ -950,11 +951,11 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
                     {upcomingEvents.slice(0, 4).map((event, index) => (
                       <motion.div
                         key={event.id}
-                        initial={{ opacity: 0, y: 30 }}
+                        initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3, delay: index * 0.05 }}
+                        transition={{ duration: 0.2, delay: index * 0.03 }}
                         whileHover={{ scale: 1.02, y: -5 }}
-                        className="glass backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.1)] transform-gpu"
+                        className="glass backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-200 hover:shadow-[0_0_30px_rgba(255,255,255,0.1)] transform-gpu"
                       >
                         <div className="relative h-40 sm:h-48 overflow-hidden">
                           <img
