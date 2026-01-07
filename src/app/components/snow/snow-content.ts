@@ -92,3 +92,4 @@ export const contactInfo = {
   instagram: 'https://www.instagram.com/origins.radio/',
   facebook: 'https://www.facebook.com/originsradio',
 }
+

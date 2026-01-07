@@ -57,7 +57,7 @@ const LoadingScreen = ({
     >
       <div className="relative w-80 h-80 sm:w-96 sm:h-96 mb-8">
         <img 
-          src="/originslogo.png" 
+          src="/origins2026logo.png" 
           alt="Origins Radio" 
           className="w-full h-full object-contain animate-float"
         />

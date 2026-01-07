@@ -71,3 +71,4 @@ The site uses the same design system as the main Origins Radio site:
 - Navigation is fixed at the top with mobile hamburger menu
 - All pages have language toggle buttons
 - Content is structured to be easily updated from the PDF
+
