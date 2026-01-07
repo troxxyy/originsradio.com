@@ -132,26 +132,26 @@ export default function BlogPage() {
           {/* Loading State */}
           {isLoading && (
             <div className="flex justify-center items-center h-screen">
-              <div className="text-white text-xl">Loading posts...</div>
+              <div className="text-[#EEEef4] text-xl">Loading posts...</div>
             </div>
           )}
 
           {/* Error State */}
           {error && (
             <div className="flex justify-center items-center h-screen px-4">
-              <div className="bg-gray-900 rounded-lg p-8 text-center max-w-md">
-                <h2 className="text-xl font-bold text-white mb-4">Database Connection Issue</h2>
-                <p className="text-red-400 mb-4">{error}</p>
+              <div className="bg-[#555759]/20 border border-[#EEEef4]/10 rounded-lg p-8 text-center max-w-md backdrop-blur-sm">
+                <h2 className="text-xl font-bold text-[#EEEef4] mb-4">Database Connection Issue</h2>
+                <p className="text-[#7DBEEE] mb-4">{error}</p>
                 {error.includes('Database connection') && (
-                  <div className="mb-6 p-4 bg-yellow-900/20 border border-yellow-500/30 rounded-lg">
-                    <p className="text-yellow-400 text-sm">
+                  <div className="mb-6 p-4 bg-[#555759]/30 border border-[#7DBEEE]/30 rounded-lg">
+                    <p className="text-[#CFC6DB] text-sm">
                       Please check the SUPABASE_SETUP.md file for configuration instructions.
                     </p>
                   </div>
                 )}
                 <button
                   onClick={() => window.location.reload()}
-                  className="px-6 py-3 bg-blue-500/20 border border-blue-500/30 rounded-lg text-blue-400 hover:bg-blue-500/30 transition-all"
+                  className="px-6 py-3 bg-[#7DBEEE] border border-[#A6B2E1]/40 rounded-lg text-[#000000] hover:bg-[#A6B2E1] transition-all font-semibold"
                 >
                   Try Again
                 </button>
@@ -162,8 +162,8 @@ export default function BlogPage() {
           {/* Empty State */}
           {!isLoading && !error && blogs.length === 0 && (
             <div className="flex justify-center items-center h-screen px-4">
-              <div className="bg-gray-900 rounded-lg p-8 text-center max-w-md">
-                <p className="text-gray-400 text-lg">No blog posts published yet. Check back soon!</p>
+              <div className="bg-[#555759]/20 border border-[#EEEef4]/10 rounded-lg p-8 text-center max-w-md backdrop-blur-sm">
+                <p className="text-[#CFC6DB] text-lg">No blog posts published yet. Check back soon!</p>
               </div>
             </div>
           )}
@@ -173,14 +173,14 @@ export default function BlogPage() {
             <div className="ourworld relative z-10">
               {/* Background Watermark */}
               <div className="absolute inset-0 flex items-start justify-center pointer-events-none select-none z-0 pt-[145px] sm:pt-[145px]">
-                <h2 className="text-[6rem] sm:text-[15rem] font-bold font-newake text-white whitespace-nowrap">
+                <h2 className="text-[6rem] sm:text-[15rem] font-bold font-newake text-[#EEEef4]/20 whitespace-nowrap">
                   ORIGINSRADIO
                 </h2>
               </div>
 
               {/* Bottom Tagline */}
               <div className="absolute bottom-0 left-0 right-0 text-center pointer-events-none z-10 pb-[72px] sm:pb-[150px]">
-                <p className="text-base sm:text-xl font-bold text-white leading-relaxed">
+                <p className="text-base sm:text-xl font-bold text-[#EEEef4] leading-relaxed">
                   Where the latest music news <br /> meets the culture behind it.
                 </p>
               </div>
@@ -317,7 +317,7 @@ export default function BlogPage() {
                             src={BLOG_IMAGES[spacerImageIndex]} 
                             alt="Blog content" 
                           />
-                          <div className="absolute inset-0 bg-black/20" />
+                          <div className="absolute inset-0 bg-[#000000]/20" />
                         </div>
                       </SwiperSlide>
                     );
@@ -331,8 +331,8 @@ export default function BlogPage() {
                       <Link href={`/blog/${blog.slug}`} className="block h-full">
                         <div className="relative w-full h-full">
                           <img className="w-full h-full object-cover" src={coverImage} alt={blog.title} />
-                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center p-6">
-                            <h2 className="text-2xl font-bold text-white font-newake leading-tight text-center">
+                          <div className="absolute inset-0 bg-[#000000]/40 flex items-center justify-center p-6">
+                            <h2 className="text-2xl font-bold text-[#EEEef4] font-newake leading-tight text-center">
                               {blog.title}
                             </h2>
                           </div>
