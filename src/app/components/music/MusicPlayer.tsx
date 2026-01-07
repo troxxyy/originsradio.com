@@ -35,25 +35,53 @@ const MusicPlayer = () => {
     }
   };
 
+  // Check for temporary live stream override in localStorage (date-limited, reversible)
+  const [tempLiveStreamUrl, setTempLiveStreamUrl] = useState<string | null>(null);
+  useEffect(() => {
+    // Check if temp live stream is enabled for today
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const storedDate = localStorage.getItem('or_temp_live_stream_date');
+    const storedUrl = localStorage.getItem('or_temp_live_stream');
+    
+    // Enable Diana Benda Live Set for today (only set if not already set for today)
+    if (!storedDate || storedDate !== today) {
+      const dianaBendaUrl = '/DianaBenda.m4a';
+      localStorage.setItem('or_temp_live_stream', dianaBendaUrl);
+      localStorage.setItem('or_temp_live_stream_date', today);
+      setTempLiveStreamUrl(dianaBendaUrl);
+    } else if (storedDate === today && storedUrl) {
+      // Use existing stored URL if date matches today
+      setTempLiveStreamUrl(storedUrl);
+    } else {
+      // Clear old entries if date doesn't match
+      localStorage.removeItem('or_temp_live_stream');
+      localStorage.removeItem('or_temp_live_stream_date');
+    }
+  }, []);
+
   // Check for both streamUrl (direct stream) and set.audio_url (scheduled set)
   // Prioritize streamUrl over set.audio_url for live streams
-  const scheduledUrl = currentSlot?.item 
-    ? ((currentSlot.item.streamUrl && currentSlot.item.streamUrl.trim()) || (currentSlot.item as any).set?.audio_url)
-    : undefined;
+  // If tempLiveStreamUrl exists, use it as the live stream
+  const scheduledUrl = tempLiveStreamUrl 
+    ? tempLiveStreamUrl
+    : (currentSlot?.item 
+      ? ((currentSlot.item.streamUrl && currentSlot.item.streamUrl.trim()) || (currentSlot.item as any).set?.audio_url)
+      : undefined);
   // Live mode logic:
   // 1. Must NOT be in "on demand" override mode
-  // 2. Must have a valid scheduled URL from current slot (either streamUrl or set.audio_url)
-  // 3. Current slot must actually be active (double check vs schedule loading)
-  // 4. Current slot must indicate it's a live stream
-  const isLive = !onDemandSetUrl && !!scheduledUrl && !isScheduleLoading && !!currentSlot?.isLiveStream;
+  // 2. Must have a valid scheduled URL from current slot (either streamUrl or set.audio_url) OR tempLiveStreamUrl
+  // 3. If tempLiveStreamUrl exists, treat as live (bypass schedule checks)
+  // 4. Otherwise, require active slot and schedule loaded
+  const isLive = !onDemandSetUrl && !!scheduledUrl && (!!tempLiveStreamUrl || (!isScheduleLoading && !!currentSlot?.isLiveStream));
   const rawStreamUrl = onDemandSetUrl || scheduledUrl;
-  const streamUrl = rawStreamUrl ? buildProxiedUrl(rawStreamUrl) : undefined;
+  // Don't proxy local files (files starting with /)
+  const streamUrl = rawStreamUrl ? (rawStreamUrl.startsWith('/') ? rawStreamUrl : buildProxiedUrl(rawStreamUrl)) : undefined;
   const setDurationSeconds = onDemandSetUrl
     ? (latestSet as any)?.duration ?? undefined
     : ((currentSlot?.item as any)?.set?.duration ?? undefined);
   const startOffsetSeconds = onDemandSetUrl ? 0 : (currentSlot?.secondsSinceStart ?? 0);
-  const nowTitle = onDemandSetUrl ? onDemandTitle : (currentSlot?.item?.title ?? 'Radio');
-  const nowArtist = onDemandSetUrl ? onDemandArtist : ((currentSlot?.item as any)?.set?.artists?.name ?? 'Origins Radio');
+  const nowTitle = onDemandSetUrl ? onDemandTitle : (tempLiveStreamUrl ? 'Diana Benda Live Set' : (currentSlot?.item?.title ?? 'Radio'));
+  const nowArtist = onDemandSetUrl ? onDemandArtist : (tempLiveStreamUrl ? 'Diana Benda' : ((currentSlot?.item as any)?.set?.artists?.name ?? 'Origins Radio'));
   const nowDate = onDemandSetUrl 
     ? formatDate((latestSet as any)?.release_date) 
     : (currentSlot?.startedAtUtc ? formatDate(currentSlot.startedAtUtc.toISOString()) : '');
@@ -190,7 +218,8 @@ const MusicPlayer = () => {
     const setup = async () => {
       try {
         if (audio.src !== streamUrl) {
-          audio.crossOrigin = 'anonymous';
+          // Only set crossOrigin for external URLs (not local files)
+          audio.crossOrigin = streamUrl.startsWith('/') ? null : 'anonymous';
           audio.src = streamUrl;
           audio.load();
         }
