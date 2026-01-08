@@ -284,16 +284,6 @@ export default function RadioSchedule() {
       <NaturalBackground />
       
       <div className="min-h-screen text-white">
-        {/* Debug info */}
-        {currentSlot && (
-          <div className="fixed top-20 right-4 z-50 bg-green-500/90 text-white p-4 rounded-lg text-xs max-w-xs">
-            <div className="font-bold mb-2">🔴 LIVE NOW</div>
-            <div>Title: {currentSlot.item.title}</div>
-            <div>Type: {currentSlot.item.contentType}</div>
-            <div>Started: {currentSlot.startedAtUtc.toLocaleTimeString()}</div>
-            {/* Stream capability removed; always set-based */}
-          </div>
-        )}
         <div className="w-full px-0 py-4">
           {isLoading ? (
             <div className="flex items-center justify-center h-[60vh]">Loading…</div>

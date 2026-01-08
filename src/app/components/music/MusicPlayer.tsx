@@ -170,7 +170,8 @@ const MusicPlayer = () => {
 
   const toggleMute = () => {
     const audio = audioRef.current;
-    const next = audio ? !audio.muted : !isMuted;
+    // Always use React state as source of truth, not audio.muted
+    const next = !isMuted;
     // Some browsers can get "stuck" silent if volume is 0; keep both in sync.
     if (audio) {
       audio.muted = next;
