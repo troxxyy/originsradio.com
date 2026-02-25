@@ -20,8 +20,8 @@ export default {
     extend: {
       fontFamily: {
         'sans': ['Avenir', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        'newake': ['Newake', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        'newmark': ['Newake', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        'newake': ['var(--font-newake)', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        'newmark': ['var(--font-newake)', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
       },
       fontWeight: {
         'thin': '100',

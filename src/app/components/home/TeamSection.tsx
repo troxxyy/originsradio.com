@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
+import Image from "next/image";
 
 interface TeamMemberProps {
   name: string;
@@ -11,14 +12,14 @@ interface TeamMemberProps {
 }
 
 const TeamMember = ({ name, role, image, index, onClick }: TeamMemberProps) => (
-  <motion.div 
+  <motion.div
     className="bg-zinc-900/50 backdrop-blur-sm p-8 rounded-xl border border-white/10 group cursor-pointer overflow-hidden"
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
-    transition={{ 
-      duration: 0.3, 
+    transition={{
+      duration: 0.3,
       delay: Math.min(index * 0.03, 0.2),
-      ease: "easeOut" 
+      ease: "easeOut"
     }}
     viewport={{ once: true, margin: "-50px", amount: 0.3 }}
     whileHover={{ y: -5 }}
@@ -27,11 +28,12 @@ const TeamMember = ({ name, role, image, index, onClick }: TeamMemberProps) => (
   >
     <div className="w-24 h-24 rounded-full bg-primary/20 mb-6 overflow-hidden shadow-lg relative">
       {image && (
-        <img 
-          src={image} 
-          alt={name} 
-          className="w-full h-full object-cover will-change-transform transition-transform duration-300 group-hover:scale-110"
-          loading="lazy"
+        <Image
+          src={image}
+          alt={name}
+          fill
+          sizes="96px"
+          className="object-cover will-change-transform transition-transform duration-300 group-hover:scale-110"
           onError={(e) => {
             e.currentTarget.onerror = null; // Prevent infinite loop
             e.currentTarget.style.display = 'none'; // Hide the img element on error
@@ -62,23 +64,23 @@ const TeamSection = () => {
   const [selectedMember, setSelectedMember] = useState<TeamMemberDetail | null>(null);
 
   const teamMembers: TeamMemberDetail[] = [
-    { 
-      name: "Kaan Şimşir", 
-      role: "CEO", 
+    {
+      name: "Kaan Şimşir",
+      role: "CEO",
       image: "/team/castor.jpeg",
 
-      
+
       bio: "Founder and visionary behind Origins Radio, bringing together technology and music to create unique experiences."
     },
-    { 
-      name: "Sina Çetinkaya", 
-      role: "CTO", 
+    {
+      name: "Sina Çetinkaya",
+      role: "CTO",
       image: "/team/sina.jpeg",
       bio: "Drives technological innovation at Origins Radio, developing cutting-edge solutions for immersive experiences."
     },
-    { 
-      name: "Rahmi Mert Üner", 
-      role: "Creative Director", 
+    {
+      name: "Rahmi Mert Üner",
+      role: "Creative Director",
       image: "/team/rahmi.jpeg",
       bio: "Creative visionary behind Origins Radio's visual identity and artistic direction, bringing innovative design concepts to life."
     }
@@ -96,7 +98,7 @@ const TeamSection = () => {
 
   return (
     <section className="w-full max-w-7xl mx-auto">
-      <motion.h1 
+      <motion.h1
         className="text-5xl md:text-6xl lg:text-7xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-500"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -107,7 +109,7 @@ const TeamSection = () => {
         The Team
       </motion.h1>
 
-      <motion.p 
+      <motion.p
         className="text-xl text-gray-400 max-w-3xl mb-16"
         initial={{ opacity: 0, y: 10 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -116,10 +118,10 @@ const TeamSection = () => {
       >
         Meet the creative minds behind Origins Radio, bringing you the finest tech and music in the industry.
       </motion.p>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-12">
         {teamMembers.map((member, i) => (
-          <TeamMember 
+          <TeamMember
             key={i}
             name={member.name}
             role={member.role}
@@ -132,11 +134,11 @@ const TeamSection = () => {
 
       {/* Team Member Modal */}
       {selectedMember && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 md:p-8"
           onClick={closeMemberDetails}
         >
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
@@ -147,15 +149,17 @@ const TeamSection = () => {
           >
             <div className="relative bg-zinc-800 h-64 overflow-hidden">
               {selectedMember.image && (
-                <img 
-                  src={selectedMember.image} 
-                  alt={selectedMember.name} 
-                  className="w-full h-full object-cover object-top"
-                  loading="eager"
+                <Image
+                  src={selectedMember.image}
+                  alt={selectedMember.name}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 800px"
+                  className="object-cover object-top"
+                  priority
                 />
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 to-transparent" />
-              <button 
+              <button
                 onClick={closeMemberDetails}
                 className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm p-2 rounded-full hover:bg-black/70 transition-colors"
                 aria-label="Close member details"
@@ -176,7 +180,7 @@ const TeamSection = () => {
             <div className="p-8">
               <h3 className="text-xl font-semibold mb-4">About</h3>
               <p className="text-gray-300 text-lg mb-8">{selectedMember.bio}</p>
-              
+
               {selectedMember.socialLinks && (
                 <div className="flex gap-4 mt-6">
                   {selectedMember.socialLinks.map((link, index) => (
@@ -201,9 +205,9 @@ const TeamSection = () => {
                   ))}
                 </div>
               )}
-              
+
               <div className="flex justify-end mt-8">
-                <button 
+                <button
                   onClick={closeMemberDetails}
                   className="px-6 py-3 bg-white text-black font-medium rounded-lg hover:bg-gray-200 transition-colors"
                 >

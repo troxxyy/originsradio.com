@@ -56,6 +56,19 @@ const HomeHero: React.FC = () => {
         console.log('Autoplay prevented');
       });
     }
+
+    // Optimization: Pause video when tab is completely hidden/inactive to save CPU/Battery
+    const handleVisibilityChange = () => {
+      if (!videoRef.current) return;
+      if (document.hidden) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play().catch(() => { });
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, []);
 
   useEffect(() => {
@@ -99,13 +112,13 @@ const HomeHero: React.FC = () => {
       >
         <source src="/website background compres.mp4" type="video/mp4" />
       </video>
-      
+
       {/* Dark overlay for readability */}
       <div className="absolute inset-0 z-[1] bg-black/60 sm:bg-black/40" />
-      
+
       {/* Gradient overlay */}
       <div className="absolute inset-0 z-[2] bg-gradient-to-b from-transparent via-transparent to-[#050508]/80" />
-      
+
       {/* Ambient light effects */}
       <div className={cn(
         "absolute w-[800px] h-[800px] rounded-full blur-[150px] transition-opacity duration-700",
@@ -143,7 +156,7 @@ const HomeHero: React.FC = () => {
           )}>
             live everyday at 9pm istanbul time
           </p>
-          
+
           {/* Main Title */}
           <div className="relative">
             <h1 className="font-newake text-6xl sm:text-7xl md:text-8xl lg:text-9xl tracking-tight text-white/80 uppercase leading-none relative z-10">
@@ -153,7 +166,7 @@ const HomeHero: React.FC = () => {
             <div className="absolute inset-0 blur-2xl bg-white/10 -z-10" />
             <div className="absolute inset-0 blur-[60px] bg-gradient-to-r from-cyan-500/20 via-transparent to-teal-500/20 -z-10" />
           </div>
-          
+
           {/* Subtitle with glow */}
           <div className="relative mt-4">
             <p className="text-sm sm:text-base tracking-[0.35em] uppercase text-white/50 font-light">
@@ -197,7 +210,7 @@ const HomeHero: React.FC = () => {
             {routes.map((route, index) => {
               const IconComponent = route.icon;
               const isHovered = hoveredRoute === route.key;
-              
+
               return (
                 <Link
                   key={route.key}
@@ -212,11 +225,11 @@ const HomeHero: React.FC = () => {
                     "hover:bg-white/[0.08]",
                     "active:scale-95"
                   )}>
-                    <IconComponent 
+                    <IconComponent
                       className={cn(
                         "w-4 h-4 sm:w-5 sm:h-5 transition-colors duration-300 flex-shrink-0",
                         "text-white/50 group-hover:text-white"
-                      )} 
+                      )}
                       strokeWidth={1.5}
                     />
                     <span className={cn(
@@ -251,8 +264,8 @@ const HomeHero: React.FC = () => {
                   )}
                   aria-label={link.label}
                 >
-                  <IconComponent 
-                    className="w-4 h-4 sm:w-5 sm:h-5 text-white/40 group-hover:text-white transition-colors" 
+                  <IconComponent
+                    className="w-4 h-4 sm:w-5 sm:h-5 text-white/40 group-hover:text-white transition-colors"
                     strokeWidth={1.5}
                   />
                 </a>

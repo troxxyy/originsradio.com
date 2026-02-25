@@ -15,11 +15,11 @@ const Orb = ({ className = "", rotationSpeed = -0.08 }: OrbProps) => {
   const animationFrameRef = useRef<number | null>(null);
   const rotationAngleRef = useRef<number>(0);
   const rotationSpeedRef = useRef<number>(rotationSpeed);
-  
+
   // Use context for audio visualization
   const { analyser, audioContext } = useAudioVisualizer();
   const freqDataRef = useRef<Uint8Array<ArrayBuffer> | null>(null);
-  
+
   const mousePositionRef = useRef<{ x: number; y: number }>({ x: 0.5, y: 0.5 });
   const mouseCleanupRef = useRef<(() => void) | null>(null);
   // Smoothed mouse position for follower (interpolates toward real cursor)
@@ -28,6 +28,14 @@ const Orb = ({ className = "", rotationSpeed = -0.08 }: OrbProps) => {
   const CURSOR_LERP_FACTOR = 1.2;
   const DEFAULT_Y_FOR_BASS = 120;
   const DEFAULT_TOP_FOR_HIGH = 55;
+
+  // Render throttling limits
+  const lastTickTimeRef = useRef<number>(0);
+  const TARGET_FPS = 30; // Reduced framerate for heavy 3D Spline performance
+  const FRAME_MIN_TIME = 1000 / TARGET_FPS;
+
+  // Visibility tracking
+  const isVisibleRef = useRef<boolean>(true);
 
   // Initialize freqData buffer when analyser is available
   useEffect(() => {
@@ -43,13 +51,13 @@ const Orb = ({ className = "", rotationSpeed = -0.08 }: OrbProps) => {
     try {
       splineRef.current?.setVariable("yforbass", DEFAULT_Y_FOR_BASS);
       splineRef.current?.setVariable("topforhigh", DEFAULT_TOP_FOR_HIGH);
-    } catch {}
+    } catch { }
 
     // Cleanup previous observer if any
     if (watermarkObserverRef.current) {
       watermarkObserverRef.current.disconnect();
     }
-    
+
     // Setup mouse tracking
     const handleMouseMove = (e: MouseEvent) => {
       if (containerRef.current) {
@@ -70,7 +78,18 @@ const Orb = ({ className = "", rotationSpeed = -0.08 }: OrbProps) => {
     mouseCleanupRef.current = cleanupMouseListener;
 
     // Start infinite z-rotation animation at constant speed and feed audio variables
-    const tick = () => {
+    const tick = (timestamp: number) => {
+      animationFrameRef.current = requestAnimationFrame(tick);
+
+      // Stop logic rendering if completely out of view to save battery and GPU
+      if (!isVisibleRef.current) return;
+
+      // Throttle ticking to target FPS
+      const delta = timestamp - lastTickTimeRef.current;
+      if (delta < FRAME_MIN_TIME) return;
+
+      lastTickTimeRef.current = timestamp;
+
       rotationAngleRef.current += rotationSpeedRef.current;
       try {
         splineRef.current?.setVariable("zrotation", rotationAngleRef.current);
@@ -107,30 +126,47 @@ const Orb = ({ className = "", rotationSpeed = -0.08 }: OrbProps) => {
           // Map to defaults plus a visible variation
           splineRef.current?.setVariable("yforbass", DEFAULT_Y_FOR_BASS + bassNorm * 80);
           splineRef.current?.setVariable("topforhigh", highNorm * 25);
-        } catch {}
+        } catch { }
       } else {
         // Fallback to defaults if analyser not available
         try {
           splineRef.current?.setVariable("yforbass", DEFAULT_Y_FOR_BASS);
           splineRef.current?.setVariable("topforhigh", DEFAULT_TOP_FOR_HIGH);
-        } catch {}
+        } catch { }
       }
 
       // Smoothly interpolate a follower position toward the real mouse to control responsiveness
       try {
         const target = mousePositionRef.current;
         const smooth = mouseSmoothRef.current;
-        smooth.x += (target.x - smooth.x) * CURSOR_LERP_FACTOR;
-        smooth.y += (target.y - smooth.y) * CURSOR_LERP_FACTOR;
+        smooth.x += (target.x - smooth.x) * CURSOR_LERP_FACTOR * (delta / 16.66) * 0.1; // normalize delta
+        smooth.y += (target.y - smooth.y) * CURSOR_LERP_FACTOR * (delta / 16.66) * 0.1;
         splineRef.current?.setVariable("ymousefollow", smooth.y);
         splineRef.current?.setVariable("zmousefollow", smooth.x);
-      } catch {}
-      animationFrameRef.current = requestAnimationFrame(tick);
+      } catch { }
     };
+
     // Kick it off
     if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
     animationFrameRef.current = requestAnimationFrame(tick);
   };
+
+  // IntersectionObserver to pause rendering when completely out of viewport
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        isVisibleRef.current = entry.isIntersecting;
+      });
+    }, { rootMargin: '200px' }); // Load ahead
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   // Disconnect observer when unmounting to avoid leaks
   useEffect(() => {

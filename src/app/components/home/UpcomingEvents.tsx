@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { Calendar, MapPin, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { useOurWorkProjects } from '@/hooks/use-supabase'
+import Image from 'next/image'
 
 type UiProject = {
   title: string
@@ -82,12 +83,15 @@ const UpcomingEvents = ({ compact = false, maxItems, title }: UpcomingEventsProp
             >
               <Link href={p.slug ? `/events/${p.slug}` : '/events'} className="block h-full">
                 <div className={`relative ${compact ? 'h-36' : 'h-44'} w-full overflow-hidden`}>
-                  <img
+                  <Image
                     src={p.image_url || '/placeholder.svg'}
                     alt={p.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 25vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/placeholder.svg'
+                      e.currentTarget.srcset = ''
+                      e.currentTarget.src = '/placeholder.svg'
                     }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />

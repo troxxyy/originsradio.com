@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { motion } from 'framer-motion'
 import { useSets } from '@/hooks/use-supabase'
+import Image from 'next/image'
 
 const FeaturedContent = () => {
   const { data: sets } = useSets()
@@ -34,22 +35,24 @@ const FeaturedContent = () => {
         transition={{ duration: 0.5 }}
       >
         <Card className="border-white/[0.08] bg-white/[0.02] backdrop-blur-sm overflow-hidden group relative hover:bg-white/[0.03] hover:border-white/[0.12] transition-all duration-300">
-          
+
           <CardContent className="p-0 relative z-10">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Image section */}
               <div className="relative h-64 md:h-full overflow-hidden">
                 {featuredSet.artists?.photo_url ? (
-                  <img
+                  <Image
                     src={featuredSet.artists.photo_url}
                     alt={featuredSet.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 ) : (
                   <div className="w-full h-full bg-white/10"></div>
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                
+
                 {/* Featured badge */}
                 <div className="absolute top-4 left-4">
                   <Badge className="bg-white hover:bg-white/90 text-black font-bold border-none">

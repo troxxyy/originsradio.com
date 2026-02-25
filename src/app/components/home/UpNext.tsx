@@ -3,6 +3,7 @@ import { useSets } from '../../hooks/use-supabase';
 import { generateSlug } from '../../lib/supabase-utils';
 import { useIsMobile } from '../../hooks/use-mobile';
 import { Play, Pause } from 'lucide-react';
+import Image from 'next/image';
 
 // Add custom CSS for enhanced animations
 const customStyles = `
@@ -148,17 +149,17 @@ export const ProgressBar = ({ progress, onSeek, className = "", thumbSize = "w-3
   const mobileBarHeight = isMobile ? "h-1" : "h-0.5";
 
   return (
-    <div 
+    <div
       ref={progressBarRef}
       className={`${mobileBarHeight} w-full mx-auto mt-1 bg-white/50 relative overflow-visible rounded-full cursor-pointer select-none touch-none ${className}`}
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
     >
-      <div 
+      <div
         className="absolute top-0 left-0 h-full bg-gradient-to-r from-[#383838] to-[#d1d1d1] transition-all duration-100 progress-bar-fill"
         style={{ '--progress-width': `${progress}%` } as React.CSSProperties}
       />
-      <div 
+      <div
         className={`absolute top-1/2 -translate-y-1/2 rounded-full bg-white shadow-[0_0_5px_rgba(255,255,255,0.5)] ${mobileThumbSize} progress-thumb`}
         style={{ '--progress-width': `${progress}%` } as React.CSSProperties}
       />
@@ -169,7 +170,7 @@ export const ProgressBar = ({ progress, onSeek, className = "", thumbSize = "w-3
 // UpNext Item Component with mobile optimizations
 export const UpNextItem = ({ event, index, onPlay, onSeek, isPlaying, progress }: UpNextItemProps) => {
   const isMobile = useIsMobile();
-  
+
   const handlePlayClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
@@ -183,10 +184,10 @@ export const UpNextItem = ({ event, index, onPlay, onSeek, isPlaying, progress }
   const formatDate = (dateStr: string) => {
     try {
       const date = new Date(dateStr);
-      return date.toLocaleDateString('en-US', { 
-        month: 'short', 
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
         day: 'numeric',
-        year: 'numeric' 
+        year: 'numeric'
       });
     } catch {
       return dateStr;
@@ -195,9 +196,8 @@ export const UpNextItem = ({ event, index, onPlay, onSeek, isPlaying, progress }
 
   return (
     <div
-      className={`group relative glass bg-white/[0.03] border-white/10 rounded-3xl p-4 sm:p-5 shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition-colors ${
-        isPlaying ? 'ring-1 ring-white/20' : 'hover:bg-white/[0.05]'
-      }`}
+      className={`group relative glass bg-white/[0.03] border-white/10 rounded-3xl p-4 sm:p-5 shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition-colors ${isPlaying ? 'ring-1 ring-white/20' : 'hover:bg-white/[0.05]'
+        }`}
     >
       {/* Header - Art + Info */}
       <div className="flex gap-4 sm:gap- mb-4">
@@ -208,15 +208,15 @@ export const UpNextItem = ({ event, index, onPlay, onSeek, isPlaying, progress }
             aria-label={isPlaying ? 'Pause set' : 'Play set'}
             className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border border-white/10 focus:outline-none focus:ring-2 focus:ring-white/30 flex-shrink-0"
           >
-            <img
+            <Image
               src={event.artistPhoto}
               alt={event.artist}
-              className="w-full h-full object-cover"
-              loading="lazy"
+              fill
+              sizes="100px"
+              className="object-cover"
             />
-            <div className={`absolute inset-0 flex items-center justify-center transition-colors ${
-              isPlaying ? 'bg-white/70' : 'bg-black/40 hover:bg-black/50'
-            }`}>
+            <div className={`absolute inset-0 flex items-center justify-center transition-colors ${isPlaying ? 'bg-white/70' : 'bg-black/40 hover:bg-black/50'
+              }`}>
               {isPlaying ? (
                 <Pause className="w-6 h-6 text-black" />
               ) : (
@@ -228,11 +228,10 @@ export const UpNextItem = ({ event, index, onPlay, onSeek, isPlaying, progress }
           <button
             onClick={handlePlayClick}
             aria-label={isPlaying ? 'Pause set' : 'Play set'}
-            className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center transition-colors border flex-shrink-0 ${
-              isPlaying
+            className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center transition-colors border flex-shrink-0 ${isPlaying
                 ? 'bg-white text-black border-white/80'
                 : 'bg-white/10 text-white border-white/20 hover:bg-white/15'
-            }`}
+              }`}
           >
             {isPlaying ? (
               <Pause className="w-6 h-6" />
@@ -274,7 +273,7 @@ export const UpNextItem = ({ event, index, onPlay, onSeek, isPlaying, progress }
                 {event.artistLocation}
               </span>
             )}
-            
+
             <span className="text-xs text-white/60">
               {formatDate(event.date)}
             </span>
@@ -440,7 +439,7 @@ type UpNextSectionProps = {
 const UpNextSection = ({ compact = false, maxItems, title }: UpNextSectionProps) => {
   const isMobile = useIsMobile();
   const [showAll, setShowAll] = useState(false);
-  
+
   const {
     audioRef,
     isPlaying,
@@ -494,7 +493,7 @@ const UpNextSection = ({ compact = false, maxItems, title }: UpNextSectionProps)
           <div className="absolute -bottom-10 -right-20 w-128 h-128 bg-[#787878]/20 rounded-full filter blur-3xl animate-slow-pulse animate-delay-2s"></div>
         </>
       )}
-      
+
       <h1 className={`${compact ? 'text-2xl sm:text-3xl' : 'text-3xl sm:text-4xl md:text-5xl'} font-bold mb-2 text-center leading-tight`}>{title || 'Special Sets'}</h1>
       {!compact && (
         <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mb-8 sm:mb-10">
@@ -503,7 +502,7 @@ const UpNextSection = ({ compact = false, maxItems, title }: UpNextSectionProps)
           <div className="h-0.5 w-8 sm:w-12 bg-gradient-to-r from-[#787878] to-[#d1d1d1]"></div>
         </div>
       )}
-      
+
       {isLoading ? (
         <div className="text-center py-8 sm:py-12">
           <div className="inline-block animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-white"></div>
@@ -523,7 +522,7 @@ const UpNextSection = ({ compact = false, maxItems, title }: UpNextSectionProps)
           {/* Regular Sets - responsive grid */}
           <div className={`grid grid-cols-1 md:grid-cols-2 ${compact ? 'gap-3' : 'gap-4 md:gap-6'}`}>
             {setsToShow.map((event, index) => (
-              <UpNextItem 
+              <UpNextItem
                 key={index}
                 event={event}
                 index={index}
@@ -546,23 +545,23 @@ const UpNextSection = ({ compact = false, maxItems, title }: UpNextSectionProps)
           )}
         </>
       )}
-      
+
       {!compact && (
         <div className="mt-8 sm:mt-12 text-center">
-          <a 
-            href="https://www.youtube.com/@originsradiotr" 
-            target="_blank" 
+          <a
+            href="https://www.youtube.com/@originsradiotr"
+            target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-white/70 hover:text-white transition-colors touch-manipulation px-4 py-2 rounded-lg hover:bg-white/10"
           >
             <span className="text-sm sm:text-base">More on YouTube</span>
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
             </svg>
           </a>
         </div>
       )}
-      
+
       <audio ref={audioRef} preload="metadata" />
     </section>
   );

@@ -3,6 +3,13 @@ import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Providers } from './providers'
 import './index.css'
+import localFont from 'next/font/local'
+
+const newake = localFont({
+  src: '../../public/fonts/NewakeFont-Demo.otf',
+  variable: '--font-newake',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://origins.radio'),
@@ -37,7 +44,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${newake.variable}`}>
       <head>
         {/* IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! */}
         <script src="https://cdn.gpteng.co/gptengineer.js" type="module" async></script>
