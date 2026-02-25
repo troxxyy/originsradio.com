@@ -1,6 +1,7 @@
 'use client'
-
+ 
 import { ReactNode, CSSProperties } from "react";
+import Image from "next/image";
 import EventFooter from "@/components/events/EventFooter";
 import { usePathname } from "next/navigation";
 
@@ -39,10 +40,13 @@ const PageLayout = ({
           <>
             <div className="absolute inset-0 bg-[#040406]/60 backdrop-blur-sm z-20"></div>
             <div className="absolute inset-0 bg-gradient-to-b from-[rgba(4,4,6,0.85)] to-[rgba(17,23,38,0.4)] z-30"></div>
-            <img 
-              src={backgroundImage} 
-              alt="Background" 
-              className="absolute inset-0 w-full h-full object-cover animate-fast-pulse z-10"
+            <Image
+              src={backgroundImage}
+              alt="Background"
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover animate-fast-pulse z-10"
             />
           </>
         )}

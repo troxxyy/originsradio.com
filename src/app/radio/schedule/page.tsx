@@ -2,13 +2,14 @@
 
 import { useMemo, useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import PageLayout from '@/components/layout/PageLayout'
 import NaturalBackground from '@/components/ui/NaturalBackground'
 import { useWeeklyRadioSchedule, useCurrentRadioSlot } from '@/hooks/use-radio'
 import { generateSlug } from '@/lib/supabase-utils'
 
-const HOURS = [19,20,21,22,23]
-const DAY_LABELS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
+const HOURS = [19, 20, 21, 22, 23]
+const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
 function getHourLabel(h: number) {
   return `${String(h).padStart(2, '0')}:00`
@@ -31,7 +32,7 @@ export default function RadioSchedule() {
   // Mobile-specific state
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
   const daySelectorRef = useRef<HTMLDivElement>(null)
-  
+
   // Drag/scroll handling for desktop grid (mouse only)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [isScrolling, setIsScrolling] = useState(false)
@@ -167,9 +168,9 @@ export default function RadioSchedule() {
   const handleMouseDown = (e: React.MouseEvent) => {
     // Only handle mouse events on non-touch devices
     if (!window.matchMedia('(pointer: fine)').matches) return
-    
+
     if (!scrollContainerRef.current) return
-    
+
     touchStartX.current = e.clientX
     touchStartY.current = e.clientY
     scrollStartX.current = scrollContainerRef.current.scrollLeft
@@ -183,16 +184,16 @@ export default function RadioSchedule() {
   const handleMouseMove = (e: React.MouseEvent) => {
     // Only handle mouse events on non-touch devices
     if (!window.matchMedia('(pointer: fine)').matches) return
-    
+
     if (!isDragging.current || !scrollContainerRef.current) return
-    
+
     const deltaX = e.clientX - touchStartX.current
     const deltaY = e.clientY - touchStartY.current
-    
+
     // Only handle if this is primarily a horizontal drag
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
       e.preventDefault()
-      
+
       // Calculate velocity for momentum scrolling
       const now = Date.now()
       const timeDelta = now - lastTouchTime.current
@@ -202,12 +203,12 @@ export default function RadioSchedule() {
         lastTouchTime.current = now
         lastTouchX.current = e.clientX
       }
-      
+
       // Apply the scroll with some resistance at the edges
       const container = scrollContainerRef.current
       const maxScroll = container.scrollWidth - container.clientWidth
       const currentScroll = scrollStartX.current - deltaX
-      
+
       // Add resistance at edges
       let newScroll = currentScroll
       if (currentScroll < 0) {
@@ -215,7 +216,7 @@ export default function RadioSchedule() {
       } else if (currentScroll > maxScroll) {
         newScroll = maxScroll + (currentScroll - maxScroll) * 0.3 // Resistance when scrolling past end
       }
-      
+
       container.scrollLeft = newScroll
     }
   }
@@ -223,28 +224,28 @@ export default function RadioSchedule() {
   const handleMouseUp = () => {
     // Only handle mouse events on non-touch devices
     if (!window.matchMedia('(pointer: fine)').matches) return
-    
+
     if (!isDragging.current || !scrollContainerRef.current) return
-    
+
     isDragging.current = false
     setIsScrolling(false)
-    
+
     // Apply momentum scrolling
     if (Math.abs(velocityX.current) > 0.5) {
       const container = scrollContainerRef.current
       const maxScroll = container.scrollWidth - container.clientWidth
       let targetScroll = container.scrollLeft + velocityX.current * 200 // Momentum multiplier
-      
+
       // Clamp to bounds
       targetScroll = Math.max(0, Math.min(targetScroll, maxScroll))
-      
+
       // Smooth scroll to target
       container.scrollTo({
         left: targetScroll,
         behavior: 'smooth'
       })
     }
-    
+
     // Reset velocity
     velocityX.current = 0
   }
@@ -253,7 +254,7 @@ export default function RadioSchedule() {
   const currentPosition = useMemo(() => {
     const day = (currentTime.getDay() + 6) % 7 // Convert Sun=0 to Mon=0
     const hour = currentTime.getHours()
-    
+
     if (hour >= 19 && hour <= 23) {
       return { day, hour }
     }
@@ -282,7 +283,7 @@ export default function RadioSchedule() {
     <PageLayout showFooter={false}>
       {/* Natural warm background */}
       <NaturalBackground />
-      
+
       <div className="min-h-screen text-white">
         <div className="w-full px-0 py-4">
           {isLoading ? (
@@ -299,16 +300,15 @@ export default function RadioSchedule() {
                       const currentDayIdx = (new Date().getDay() + 6) % 7
                       const isToday = dayIdx === currentDayIdx
                       const isSelected = selectedDay === dayIdx || (selectedDay === null && isToday)
-                      
+
                       return (
                         <button
                           key={dayIdx}
                           onClick={() => setSelectedDay(dayIdx)}
-                          className={`flex-shrink-0 px-4 py-2 rounded-xl font-medium text-sm transition-all ${
-                            isSelected
+                          className={`flex-shrink-0 px-4 py-2 rounded-xl font-medium text-sm transition-all ${isSelected
                               ? 'bg-white text-black shadow-lg scale-105'
                               : 'bg-white/10 text-white/70 hover:bg-white/20 hover:text-white'
-                          }`}
+                            }`}
                         >
                           <div className="text-center">
                             <div className="text-xs opacity-60">{label.slice(0, 3)}</div>
@@ -340,117 +340,116 @@ export default function RadioSchedule() {
                           onTouchEnd={handleMobileTouchEnd(currentDayIdx)}
                           style={{ touchAction: 'pan-y' }}
                         >
-                        {/* Day header with today indicator */}
-                        <div className="flex items-center justify-between mb-3 px-2">
-                          <div className="flex items-center gap-2">
-                            <h2 className="text-xl font-bold">{label}</h2>
-                            {dayIdx === currentPosition?.day && (
-                              <span className="px-2 py-0.5 bg-red-500/20 text-red-400 text-xs rounded-full font-semibold animate-pulse">
-                                TODAY
-                              </span>
-                            )}
+                          {/* Day header with today indicator */}
+                          <div className="flex items-center justify-between mb-3 px-2">
+                            <div className="flex items-center gap-2">
+                              <h2 className="text-xl font-bold">{label}</h2>
+                              {dayIdx === currentPosition?.day && (
+                                <span className="px-2 py-0.5 bg-red-500/20 text-red-400 text-xs rounded-full font-semibold animate-pulse">
+                                  TODAY
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-xs text-gray-400">
+                              {HOURS[0]}:00 - {HOURS[HOURS.length - 1]}:00
+                            </div>
                           </div>
-                          <div className="text-xs text-gray-400">
-                            {HOURS[0]}:00 - {HOURS[HOURS.length - 1]}:00
-                          </div>
-                        </div>
 
-                        {/* Time slots */}
-                        <div className="space-y-2.5">
-                          {HOURS.map((h) => {
-                            const key = `${dayIdx}-${h}`
-                            const item = itemsByKey.get(key)
-                            const isCurrent = currentPosition?.day === dayIdx && currentPosition?.hour === h
-                            const isPast = currentPosition?.day === dayIdx && currentPosition?.hour && currentPosition.hour > h
-                            const isUpcoming = !isCurrent && !isPast
-                            
-                            return (
-                              <div
-                                key={key}
-                                className={`relative rounded-xl overflow-hidden transition-all ${
-                                  isCurrent
-                                    ? 'ring-2 ring-red-500/60 shadow-lg shadow-red-500/20 scale-[1.02]'
-                                    : 'border border-white/10 hover:border-white/20'
-                                } ${isPast ? 'opacity-50' : ''}`}
-                              >
-                                <div className="flex items-stretch min-h-[140px]">
-                                  {/* Time badge */}
-                                  <div className={`w-20 shrink-0 flex flex-col items-center justify-center ${
-                                    isCurrent ? 'bg-red-500/20' : 'bg-white/5'
-                                  }`}>
-                                    <div className={`text-xs font-bold ${
-                                      isCurrent ? 'text-red-400' : 'text-gray-400'
-                                    }`}>
-                                      {getHourLabel(h).split(':')[0]}
-                                    </div>
-                                    <div className={`text-[10px] ${
-                                      isCurrent ? 'text-red-400/80' : 'text-gray-500'
-                                    }`}>
-                                      {getHourLabel(h).split(':')[1]}
-                                    </div>
-                                    {isCurrent && (
-                                      <div className="mt-1 w-2 h-2 bg-red-500 rounded-full animate-ping" />
-                                    )}
-                                  </div>
+                          {/* Time slots */}
+                          <div className="space-y-2.5">
+                            {HOURS.map((h) => {
+                              const key = `${dayIdx}-${h}`
+                              const item = itemsByKey.get(key)
+                              const isCurrent = currentPosition?.day === dayIdx && currentPosition?.hour === h
+                              const isPast = currentPosition?.day === dayIdx && currentPosition?.hour && currentPosition.hour > h
+                              const isUpcoming = !isCurrent && !isPast
 
-                                  {/* Content */}
-                                  <div className="flex-1 relative">
-                                    {item ? (
-                                      <div className="relative h-full min-h-[140px]">
-                                        <img 
-                                          src={item.set?.artists?.photo_url || 'https://via.placeholder.com/400?text=' + encodeURIComponent(item.title)} 
-                                          alt={item.set?.artists?.name || item.title}
-                                          className="absolute inset-0 w-full h-full object-cover"
-                                          onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400?text=No+Image' }}
-                                        />
-                                        
-                                        {/* Gradient overlay */}
-                                        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/80" />
-                                        
-                                        {/* Content */}
-                                        <div className="relative h-full flex flex-col justify-between p-4">
-                                          <div>
-                                            {isCurrent && (
-                                              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 mb-2 bg-red-500/30 backdrop-blur rounded-full">
-                                                <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
-                                                <span className="text-[10px] font-bold text-red-400 uppercase tracking-wide">
-                                                  LIVE NOW
-                                                </span>
-                                              </div>
-                                            )}
-                                          </div>
-                                          
-                                          <div onClick={() => {
-                                            if (mobileDidSwipe.current) return
-                                            if (item.set?.artists?.name) {
-                                              router.push(`/artists/${generateSlug(item.set.artists.name)}`)
-                                            }
-                                          }} className={item.set?.artists?.name ? 'cursor-pointer active:scale-95 transition-transform' : ''}>
-                                            <h3 className="text-lg font-bold text-white mb-1 line-clamp-1">
-                                              {item.set?.artists?.name || item.title}
-                                            </h3>
-                                            {item.title && item.set?.artists?.name && (
-                                              <p className="text-xs text-gray-300 line-clamp-1">
-                                                {item.title}
-                                              </p>
-                                            )}
+                              return (
+                                <div
+                                  key={key}
+                                  className={`relative rounded-xl overflow-hidden transition-all ${isCurrent
+                                      ? 'ring-2 ring-red-500/60 shadow-lg shadow-red-500/20 scale-[1.02]'
+                                      : 'border border-white/10 hover:border-white/20'
+                                    } ${isPast ? 'opacity-50' : ''}`}
+                                >
+                                  <div className="flex items-stretch min-h-[140px]">
+                                    {/* Time badge */}
+                                    <div className={`w-20 shrink-0 flex flex-col items-center justify-center ${isCurrent ? 'bg-red-500/20' : 'bg-white/5'
+                                      }`}>
+                                      <div className={`text-xs font-bold ${isCurrent ? 'text-red-400' : 'text-gray-400'
+                                        }`}>
+                                        {getHourLabel(h).split(':')[0]}
+                                      </div>
+                                      <div className={`text-[10px] ${isCurrent ? 'text-red-400/80' : 'text-gray-500'
+                                        }`}>
+                                        {getHourLabel(h).split(':')[1]}
+                                      </div>
+                                      {isCurrent && (
+                                        <div className="mt-1 w-2 h-2 bg-red-500 rounded-full animate-ping" />
+                                      )}
+                                    </div>
+
+                                    {/* Content */}
+                                    <div className="flex-1 relative">
+                                      {item ? (
+                                        <div className="relative h-full min-h-[140px]">
+                                          <Image
+                                            src={item.set?.artists?.photo_url || '/placeholder.svg'}
+                                            alt={item.set?.artists?.name || item.title}
+                                            fill
+                                            sizes="(min-width: 768px) 320px, 100vw"
+                                            quality={60}
+                                            priority={isCurrent}
+                                            className="object-cover"
+                                          />
+
+                                          {/* Gradient overlay */}
+                                          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/80" />
+
+                                          {/* Content */}
+                                          <div className="relative h-full flex flex-col justify-between p-4">
+                                            <div>
+                                              {isCurrent && (
+                                                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 mb-2 bg-red-500/30 backdrop-blur rounded-full">
+                                                  <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
+                                                  <span className="text-[10px] font-bold text-red-400 uppercase tracking-wide">
+                                                    LIVE NOW
+                                                  </span>
+                                                </div>
+                                              )}
+                                            </div>
+
+                                            <div onClick={() => {
+                                              if (mobileDidSwipe.current) return
+                                              if (item.set?.artists?.name) {
+                                                router.push(`/artists/${generateSlug(item.set.artists.name)}`)
+                                              }
+                                            }} className={item.set?.artists?.name ? 'cursor-pointer active:scale-95 transition-transform' : ''}>
+                                              <h3 className="text-lg font-bold text-white mb-1 line-clamp-1">
+                                                {item.set?.artists?.name || item.title}
+                                              </h3>
+                                              {item.title && item.set?.artists?.name && (
+                                                <p className="text-xs text-gray-300 line-clamp-1">
+                                                  {item.title}
+                                                </p>
+                                              )}
+                                            </div>
                                           </div>
                                         </div>
-                                      </div>
-                                    ) : (
-                                      <div className="h-full w-full bg-gradient-to-br from-gray-900/50 to-black/50 flex items-center justify-center min-h-[140px]">
-                                        <div className="text-center">
-                                          <div className="text-gray-600 text-sm mb-1">No show scheduled</div>
-                                          <div className="text-gray-700 text-xs">Next: {HOURS[HOURS.findIndex(x => x > h)] ? getHourLabel(HOURS.find(x => x > h) || HOURS[0]) : 'Tomorrow'}</div>
+                                      ) : (
+                                        <div className="h-full w-full bg-gradient-to-br from-gray-900/50 to-black/50 flex items-center justify-center min-h-[140px]">
+                                          <div className="text-center">
+                                            <div className="text-gray-600 text-sm mb-1">No show scheduled</div>
+                                            <div className="text-gray-700 text-xs">Next: {HOURS[HOURS.findIndex(x => x > h)] ? getHourLabel(HOURS.find(x => x > h) || HOURS[0]) : 'Tomorrow'}</div>
+                                          </div>
                                         </div>
-                                      </div>
-                                    )}
+                                      )}
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            )
-                          })}
-                        </div>
+                              )
+                            })}
+                          </div>
                         </div>
                       )
                     })}
@@ -458,14 +457,14 @@ export default function RadioSchedule() {
                 </div>
               </div>
             ) : (
-              <div 
+              <div
                 ref={scrollContainerRef}
                 className={`relative overflow-x-auto overscroll-x-contain snap-x snap-mandatory ${isScrolling ? 'scroll-smooth' : ''}`}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseUp}
-                style={{ 
+                style={{
                   WebkitOverflowScrolling: 'touch',
                   scrollBehavior: isScrolling ? 'auto' : 'smooth'
                 }}
@@ -518,6 +517,7 @@ export default function RadioSchedule() {
                                   artistName={item.set?.artists?.name || item.title}
                                   photoUrl={item.set?.artists?.photo_url || ''}
                                   artistId={item.set?.artists?.id}
+                                  priority={isCurrent}
                                   onClick={() => {
                                     if (mobileDidSwipe.current) return
                                     if (item.set?.artists?.name) {
@@ -549,7 +549,7 @@ export default function RadioSchedule() {
                   ))}
 
                   {/* 24:00 marker row */}
-                 
+
                 </div>
               </div>
             )
@@ -560,25 +560,35 @@ export default function RadioSchedule() {
   )
 }
 
-function ArtistImageCard({ 
-  artistName, 
-  photoUrl, 
-  artistId, 
-  onClick 
-}: { 
-  artistName: string; 
-  photoUrl?: string; 
+function ArtistImageCard({
+  artistName,
+  photoUrl,
+  artistId,
+  priority,
+  onClick
+}: {
+  artistName: string;
+  photoUrl?: string;
   artistId?: string;
+  priority?: boolean;
   onClick?: () => void;
 }) {
   return (
-    <div 
+    <div
       className={`h-full w-full ${artistId ? 'cursor-pointer group/card' : ''}`}
       onClick={onClick}
     >
       <div className="h-full w-full relative overflow-hidden bg-black transition-transform group-hover/card:scale-105">
         {photoUrl ? (
-          <img src={photoUrl} alt={artistName} className="absolute inset-0 w-full h-full object-cover transition-opacity group-hover/card:opacity-80" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+          <Image
+            src={photoUrl}
+            alt={artistName}
+            fill
+            sizes="(min-width: 1024px) 200px, 33vw"
+            quality={60}
+            priority={priority}
+            className="object-cover transition-opacity group-hover/card:opacity-80"
+          />
         ) : (
           <div className="absolute inset-0 bg-gray-800" />
         )}

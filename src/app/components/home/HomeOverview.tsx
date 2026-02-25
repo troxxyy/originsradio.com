@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Calendar, MapPin, ArrowRight, Star, Music4 } from 'lucide-react'
 import { useSets, useOurWorkProjects, useArtists } from '@/hooks/use-supabase'
@@ -70,12 +71,14 @@ const HomeOverview = () => {
           className="group rounded-xl sm:rounded-2xl overflow-hidden border border-white/[0.05] bg-white/[0.015] hover:bg-white/[0.03] hover:border-white/[0.08] transition-all duration-300"
         >
           <div className="p-4 flex items-center gap-4">
-            <div className="w-16 h-16 rounded-lg overflow-hidden bg-white/[0.03] border border-white/[0.05] flex items-center justify-center">
+            <div className="w-16 h-16 rounded-lg overflow-hidden bg-white/[0.03] border border-white/[0.05] flex items-center justify-center relative">
               {latestSet?.artists?.photo_url ? (
-                <img
+                <Image
                   src={latestSet.artists.photo_url}
                   alt={latestSet.artists.name || 'Artist'}
-                  className="w-full h-full object-cover"
+                  fill
+                  sizes="64px"
+                  className="object-cover"
                 />
               ) : (
                 <Music4 className="w-7 h-7 text-white/70" />
@@ -102,13 +105,14 @@ const HomeOverview = () => {
               className="group rounded-xl sm:rounded-2xl overflow-hidden border border-white/[0.05] bg-white/[0.015] hover:bg-white/[0.03] hover:border-white/[0.08] transition-all duration-300"
             >
               <div className="flex gap-4 p-4">
-                <div className="w-16 h-16 rounded-lg overflow-hidden bg-white/[0.03] border border-white/[0.05] flex-shrink-0">
+                <div className="w-16 h-16 rounded-lg overflow-hidden bg-white/[0.03] border border-white/[0.05] flex-shrink-0 relative">
                   {p ? (
-                    <img
+                    <Image
                       src={p.image_url || '/placeholder.svg'}
                       alt={p.title}
-                      className="w-full h-full object-cover"
-                      onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg' }}
+                      fill
+                      sizes="64px"
+                      className="object-cover"
                     />
                   ) : null}
                 </div>
@@ -144,11 +148,12 @@ const HomeOverview = () => {
             >
               <div className="relative h-24 w-full">
                 {a ? (
-                  <img
+                  <Image
                     src={a.photo_url || '/placeholder.svg'}
                     alt={a.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg' }}
+                    fill
+                    sizes="128px"
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 ) : null}
                 {a?.featured && (

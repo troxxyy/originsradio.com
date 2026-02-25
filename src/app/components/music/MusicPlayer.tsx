@@ -70,37 +70,6 @@ const MusicPlayer = () => {
       .trim() || null
   }, [nowArtist]);
 
-  // #region agent log - debug instrumentation
-  const __orLog = (hypothesisId: string, location: string, message: string, data?: Record<string, unknown>) => {
-    try {
-      fetch("http://127.0.0.1:7242/ingest/d566a5c0-ce65-4742-a027-2a70ece3fc46", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sessionId: "debug-session",
-          runId: "run1",
-          hypothesisId,
-          location,
-          message,
-          data,
-          timestamp: Date.now(),
-        }),
-      }).catch(() => {});
-    } catch {}
-  };
-
-  const __safeUrlInfo = (url?: string) => {
-    if (!url) return null;
-    try {
-      const u = new URL(url, typeof window !== "undefined" ? window.location.href : "http://localhost");
-      const parts = u.pathname.split("/").filter(Boolean);
-      return { origin: u.origin, pathEnd: parts.slice(-2).join("/") || u.pathname };
-    } catch {
-      return { origin: null, pathEnd: String(url).slice(0, 60) };
-    }
-  };
-  // #endregion agent log
-
   // Load mute state from localStorage
   useEffect(() => {
     const muted = localStorage.getItem('or_player_muted');
@@ -121,31 +90,6 @@ const MusicPlayer = () => {
       registerAudioElement(audioRef.current);
     }
   }, [registerAudioElement]);
-
-  // #region agent log - debug instrumentation
-  useEffect(() => {
-    __orLog("C", "src/app/components/music/MusicPlayer.tsx:useEffect(mount)", "MusicPlayer mounted", {
-      pathname,
-    });
-    return () => {
-      __orLog("C", "src/app/components/music/MusicPlayer.tsx:useEffect(unmount)", "MusicPlayer unmounted", {
-        pathname,
-      });
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    __orLog("C", "src/app/components/music/MusicPlayer.tsx:pathname", "Route changed while MusicPlayer mounted", {
-      pathname,
-      isPlaying,
-      audioPaused: audio ? audio.paused : null,
-      audioTime: audio && Number.isFinite(audio.currentTime) ? Math.round(audio.currentTime * 1000) / 1000 : null,
-      audioSrc: audio ? __safeUrlInfo(audio.currentSrc || audio.src) : null,
-    });
-  }, [pathname]); // intentionally only on route change
-  // #endregion agent log
 
   const togglePlayPause = async () => {
     const audio = audioRef.current;
@@ -289,31 +233,6 @@ const MusicPlayer = () => {
       audio.removeEventListener('canplay', onCanPlay);
     };
   }, [isLive, currentSlot]);
-
-  // #region agent log - debug instrumentation
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    const onPlayDbg = () => {
-      __orLog("C", "src/app/components/music/MusicPlayer.tsx:audio(play)", "Audio play event", {
-        pathname,
-        src: __safeUrlInfo(audio.currentSrc || audio.src),
-      });
-    };
-    const onPauseDbg = () => {
-      __orLog("C", "src/app/components/music/MusicPlayer.tsx:audio(pause)", "Audio pause event", {
-        pathname,
-        src: __safeUrlInfo(audio.currentSrc || audio.src),
-      });
-    };
-    audio.addEventListener("play", onPlayDbg);
-    audio.addEventListener("pause", onPauseDbg);
-    return () => {
-      audio.removeEventListener("play", onPlayDbg);
-      audio.removeEventListener("pause", onPauseDbg);
-    };
-  }, [pathname]);
-  // #endregion agent log
 
   // Do not auto-select latest set; require explicit user action when off-air
 

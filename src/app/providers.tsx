@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from "react"
+import dynamic from "next/dynamic"
 import { usePathname } from "next/navigation"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { Toaster } from "@/components/ui/toaster"
@@ -10,9 +11,13 @@ import { HelmetProvider } from "react-helmet-async"
 import LoadingScreen from "@/components/LoadingScreen"
 import Navigation from "@/components/Navigation"
 import TicketPopup from "@/components/TicketPopup"
-import MusicPlayer from "@/components/music/MusicPlayer"
 import { AudioVisualizerProvider } from "@/contexts/AudioVisualizerContext"
 import { OrbActivationProvider } from "@/contexts/OrbActivationContext"
+
+const MusicPlayer = dynamic(() => import("@/components/music/MusicPlayer"), {
+  ssr: false,
+  loading: () => null,
+})
 
 const ONE_HOUR = 60 * 60 * 1000
 

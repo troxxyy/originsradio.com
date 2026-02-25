@@ -2,12 +2,17 @@
 
 import Link from "next/link";
 import React, { useEffect, useState, useRef } from "react";
+import dynamic from "next/dynamic";
 import { Ticket, Users, Radio, Navigation, BookOpen, Info, Youtube, Instagram, Cloud, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCurrentRadioSlot } from "@/hooks/use-radio";
-import Orb from "@/components/three/Orb";
 import { useIsMobile } from "../../hooks/use-mobile";
 import { useOrbActivation } from "@/contexts/OrbActivationContext";
+
+const Orb = dynamic(() => import("@/components/three/Orb"), {
+  ssr: false,
+  loading: () => null,
+});
 
 type RouteKey = "events" | "fm" | "artists" | "blog" | "about" | "thisWeek";
 

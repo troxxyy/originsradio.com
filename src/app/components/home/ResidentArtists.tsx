@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { Star } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { useArtists } from '@/hooks/use-supabase'
 import { generateSlug } from '@/lib/supabase-utils'
 
@@ -56,13 +57,12 @@ const ResidentArtists = ({ compact = false, maxItems, title }: ResidentArtistsPr
               className="group text-left rounded-xl sm:rounded-2xl overflow-hidden border border-white/[0.05] bg-white/[0.015] hover:bg-white/[0.03] hover:border-white/[0.08] transition-all duration-300"
             >
               <div className={`relative ${compact ? 'h-36' : 'h-56'} w-full overflow-hidden`}>
-                <img
+                <Image
                   src={a.photo_url || '/placeholder.svg'}
                   alt={a.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/placeholder.svg'
-                  }}
+                  fill
+                  sizes={compact ? '(min-width: 1024px) 200px, 33vw' : '(min-width: 1024px) 260px, 50vw'}
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 {a.featured && (
