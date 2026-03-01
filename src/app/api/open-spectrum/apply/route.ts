@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAdminClient } from '@/lib/supabase';
 import { Resend } from 'resend';
 
 // Initialize Resend
@@ -7,13 +7,9 @@ import { Resend } from 'resend';
 const resendApiKey = process.env.RESEND_API_KEY;
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
-// Initialize Supabase Admin client to bypass RLS
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-    process.env.SUPABASE_SERVICE_ROLE_KEY as string
-);
-
 export async function POST(request: Request) {
+    // Get Supabase Admin client dynamically
+    const supabaseAdmin = getSupabaseAdminClient();
     try {
         const data = await request.json();
         const { fullName, artistName, email, phone, instagram, genre, trackUrl, agreedToTerms } = data;

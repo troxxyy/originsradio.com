@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+import { supabase, isSupabaseConfigured } from './supabase'
 
 export type Artist = {
   id: string
@@ -16,14 +16,17 @@ export type Artist = {
 
 // Create Supabase client for server-side operations
 const getSupabaseClient = () => {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  return createClient(supabaseUrl, supabaseKey)
+  if (!isSupabaseConfigured() || !supabase) {
+    return null
+  }
+  return supabase
 }
 
 export async function getAllArtistSlugs(): Promise<string[]> {
   try {
     const supabase = getSupabaseClient()
+    if (!supabase) return []
+
     const { data, error } = await supabase
       .from('artists')
       .select('slug')
@@ -43,6 +46,8 @@ export async function getAllArtistSlugs(): Promise<string[]> {
 export async function getArtistBySlug(slug: string): Promise<Artist | null> {
   try {
     const supabase = getSupabaseClient()
+    if (!supabase) return null
+
     const { data, error } = await supabase
       .from('artists')
       .select('*')
@@ -64,6 +69,8 @@ export async function getArtistBySlug(slug: string): Promise<Artist | null> {
 export async function getArtistsForSitemap(): Promise<Array<{ slug: string; lastmod: string; changefreq: string; priority: number }>> {
   try {
     const supabase = getSupabaseClient()
+    if (!supabase) return []
+
     const { data, error } = await supabase
       .from('artists')
       .select('slug, updated_at, created_at, featured')
