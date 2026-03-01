@@ -5,6 +5,10 @@ import { ChevronDown } from 'lucide-react';
 
 const faqs = [
     {
+        question: "Son Başvuru Tarihi Ne Zaman?",
+        answer: "Open Spectrum 2026 için son başvuru tarihi 15 Mart 11:59'dur. Başvuruların zamanında yapılması değerlendirme süreci için kritiktir."
+    },
+    {
         question: "Ön Elemeye Kimler Katılabilir?",
         answer: "Yarışma yalnızca Türkiye'de ikamet eden veya T.C. vatandaşı olan prodüktörlere açıktır."
     },

@@ -5,6 +5,7 @@ import TimelineSection from "./components/TimelineSection";
 import RewardsSection from "./components/RewardsSection";
 import FAQSection from "./components/FAQSection";
 import ApplicationForm from "./components/ApplicationForm";
+import TermsSection from "./components/TermsSection";
 
 export default function OpenSpectrumPage() {
     return (
@@ -16,8 +17,10 @@ export default function OpenSpectrumPage() {
                     <JudgesSection />
                     <TimelineSection />
                     <RewardsSection />
-                    <FAQSection />
+
                     <ApplicationForm />
+                    <TermsSection />
+                    <FAQSection />
                 </div>
             </main>
         </PageLayout>

@@ -83,7 +83,7 @@ const ApplicationForm = () => {
 
     if (submitStatus === 'success') {
         return (
-            <section className="py-16 md:py-24 px-4 bg-[#050510]" id="application_form">
+            <section className="py-16 md:py-24 px-4 bg-black" id="application_form">
                 <div className="max-w-2xl mx-auto text-center bg-white/[0.02] border border-white/[0.05] p-12 rounded-3xl">
                     <CheckCircle2 className="w-20 h-20 text-emerald-400 mx-auto mb-6" />
                     <h2 className="text-3xl font-bold text-white uppercase mb-4">
@@ -99,7 +99,7 @@ const ApplicationForm = () => {
     }
 
     return (
-        <section className="py-16 md:py-24 px-4 bg-[#050510] relative" id="application_form">
+        <section className="py-16 md:py-24 px-4 bg-black relative" id="application_form">
             <div className="max-w-3xl mx-auto relative z-10">
                 <div className="text-center mb-16">
                     <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold text-white uppercase mb-4">
@@ -108,6 +108,10 @@ const ApplicationForm = () => {
                     <p className="text-white/50 tracking-widest uppercase text-sm font-light">
                         Sınırları Kaldır, Sesi Yarat
                     </p>
+                    <div className="mt-4 mb-2 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20">
+                        <span className="w-1 h-1 rounded-full bg-red-400 animate-pulse" />
+                        <span className="text-red-400 text-[10px] font-bold uppercase tracking-wider">Son Başvuru: 15 Mart 11:59</span>
+                    </div>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6 bg-white/[0.02] border border-white/[0.05] p-5 sm:p-10 rounded-3xl shadow-2xl">

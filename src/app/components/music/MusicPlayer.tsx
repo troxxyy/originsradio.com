@@ -242,37 +242,38 @@ const MusicPlayer = () => {
   return (
     <>
       {/* Floating Mini Player */}
-      <div className="fixed left-0 right-0 bottom-2 sm:bottom-4 md:bottom-10 z-[200] flex justify-center pointer-events-auto px-2 sm:px-4 pb-[calc(env(safe-area-inset-bottom)+4px)] sm:pb-[calc(env(safe-area-inset-bottom)+8px)]">
+      <div className="fixed left-0 right-0 bottom-4 sm:bottom-4 md:bottom-10 z-[200] flex justify-center pointer-events-auto px-5 sm:px-4 pb-[calc(env(safe-area-inset-bottom)+8px)] sm:pb-[calc(env(safe-area-inset-bottom)+8px)]">
         <div className="w-full sm:w-[768px] max-w-full">
-          <div className="relative glass rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.35)] bg-white/[0.03] border-white/5">
+          <div className="relative glass rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.45)] bg-black/40 backdrop-blur-xl border border-white/[0.08]">
             {/* Offline fallback content inside music bar */}
             {!streamUrl && !isScheduleLoading ? (
-              <div className="h-12 sm:h-14 md:h-16 px-3 sm:px-4 md:px-6 grid items-center grid-cols-[auto_minmax(0,1fr)_auto] gap-2 sm:gap-4 w-full">
+              <div className="h-[52px] sm:h-14 md:h-16 px-3 sm:px-4 md:px-6 flex items-center gap-3 sm:gap-4 w-full">
                 {/* Left: Not Live Badge */}
-                <div className="flex items-center justify-start flex-shrink-0 w-[60px] sm:w-[80px]">
-                  <div className="flex items-center gap-1 bg-transparent border border-white/20 rounded-full px-1.5 sm:px-2 py-0.5 sm:py-1">
-                    <span className="text-white/60 text-[9px] sm:text-xs font-semibold uppercase tracking-wide whitespace-nowrap">Not Live</span>
+                <div className="flex items-center flex-shrink-0">
+                  <div className="flex items-center gap-1.5 bg-white/[0.06] border border-white/[0.12] rounded-full px-2.5 py-1">
+                    <div className="w-1.5 h-1.5 rounded-full bg-white/30 flex-shrink-0"></div>
+                    <span className="text-white/50 text-[10px] sm:text-xs font-medium uppercase tracking-wider whitespace-nowrap">Offline</span>
                   </div>
                 </div>
 
-                {/* Center: Latest Set Info - minmax(0, 1fr) ensures it truncates instead of pushing out grid boundaries */}
-                <div className="flex flex-col items-center justify-center text-center w-full min-w-0 px-2 overflow-hidden">
+                {/* Center: Latest Set Info */}
+                <div className="flex-1 flex flex-col items-center justify-center text-center min-w-0 overflow-hidden">
                   {latestSet ? (
                     <>
-                      <div className="text-white/90 text-[10px] sm:text-xs md:text-sm truncate w-full pointer-events-auto leading-tight">
+                      <div className="text-white/90 text-[11px] sm:text-xs md:text-sm font-medium truncate w-full pointer-events-auto leading-tight">
                         {(latestSet as any).title || 'Latest Set'}
                       </div>
-                      <div className="text-white/60 text-[9px] sm:text-[10px] md:text-xs truncate w-full pointer-events-auto leading-tight">
+                      <div className="text-white/45 text-[10px] sm:text-[10px] md:text-xs truncate w-full pointer-events-auto leading-tight mt-0.5">
                         {(latestSet as any).artists?.name || 'Origins Radio'}
                       </div>
                     </>
                   ) : (
-                    <div className="text-white/60 text-[10px] sm:text-xs truncate w-full pointer-events-auto leading-tight">No sets available</div>
+                    <div className="text-white/45 text-[11px] sm:text-xs truncate w-full pointer-events-auto leading-tight">No sets available</div>
                   )}
                 </div>
 
                 {/* Right: Play Button */}
-                <div className="flex items-center justify-end flex-shrink-0 w-[60px] sm:w-[80px]">
+                <div className="flex items-center flex-shrink-0">
                   <button
                     disabled={!latestSet || isSetsLoading}
                     onClick={async () => {
@@ -293,69 +294,70 @@ const MusicPlayer = () => {
                         }
                       }, 0);
                     }}
-                    className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/15 border border-white/10 flex items-center justify-center shadow-md disabled:opacity-50 touch-manipulation flex-shrink-0"
+                    className="w-9 h-9 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full bg-white/[0.08] hover:bg-white/[0.15] active:bg-white/[0.12] border border-white/[0.1] flex items-center justify-center shadow-lg disabled:opacity-40 touch-manipulation transition-colors duration-200"
                     aria-label="Play latest set"
                   >
                     {isSetsLoading ? (
-                      <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-white/70 border-t-transparent rounded-full animate-spin" />
                     ) : (
-                      <Play size={16} className="sm:w-[18px] sm:h-[18px] text-white ml-0.5 flex-shrink-0" />
+                      <Play size={14} className="sm:w-[18px] sm:h-[18px] text-white/90 ml-0.5 flex-shrink-0" />
                     )}
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="h-12 sm:h-14 md:h-16 px-3 sm:px-4 md:px-6 grid items-center grid-cols-[auto_minmax(0,1fr)_auto] gap-2 sm:gap-4 w-full">
+              <div className="h-[52px] sm:h-14 md:h-16 px-3 sm:px-4 md:px-6 flex items-center gap-3 sm:gap-4 w-full">
                 {/* Left: Live Badge */}
-                <div className="flex items-center justify-start flex-shrink-0 w-[60px] sm:w-[80px]">
+                <div className="flex items-center flex-shrink-0">
                   {isLive ? (
-                    <div className="flex items-center gap-1 bg-green-500/20 border border-green-500/50 rounded-full px-1.5 sm:px-2 py-0.5 sm:py-1">
-                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse flex-shrink-0"></div>
-                      <span className="text-green-400 text-[9px] sm:text-xs font-semibold uppercase tracking-wide whitespace-nowrap">Live</span>
+                    <div className="flex items-center gap-1.5 bg-emerald-500/15 border border-emerald-500/30 rounded-full px-2.5 py-1">
+                      <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse flex-shrink-0"></div>
+                      <span className="text-emerald-400 text-[10px] sm:text-xs font-medium uppercase tracking-wider whitespace-nowrap">Live</span>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-1 bg-transparent border border-white/20 rounded-full px-1.5 sm:px-2 py-0.5 sm:py-1">
-                      <span className="text-white/60 text-[9px] sm:text-xs font-semibold uppercase tracking-wide whitespace-nowrap">Not Live</span>
+                    <div className="flex items-center gap-1.5 bg-white/[0.06] border border-white/[0.12] rounded-full px-2.5 py-1">
+                      <div className="w-1.5 h-1.5 rounded-full bg-white/30 flex-shrink-0"></div>
+                      <span className="text-white/50 text-[10px] sm:text-xs font-medium uppercase tracking-wider whitespace-nowrap">Offline</span>
                     </div>
                   )}
                 </div>
 
                 {/* Center: Title + Artist */}
-                <div className="flex flex-col items-center justify-center text-center w-full min-w-0 px-2 overflow-hidden">
+                <div className="flex-1 flex items-center justify-center text-center min-w-0 overflow-hidden">
                   {artistSlug ? (
                     <Link
                       href={`/artists/${artistSlug}`}
-                      className="text-white/90 text-[10px] sm:text-xs md:text-sm block truncate w-full hover:text-white underline-offset-4 hover:underline pointer-events-auto leading-tight"
+                      className="text-white/90 text-[11px] sm:text-xs md:text-sm font-medium truncate max-w-full hover:text-white underline-offset-4 hover:underline pointer-events-auto leading-none transition-colors duration-200"
                       title={`Go to ${nowArtist} profile`}
                     >
                       {nowArtist}
                     </Link>
                   ) : (
-                    <div className="text-white/90 text-[10px] sm:text-xs md:text-sm truncate w-full pointer-events-auto leading-tight">
+                    <span className="text-white/90 text-[11px] sm:text-xs md:text-sm font-medium truncate max-w-full pointer-events-auto leading-none">
                       {nowArtist}
-                    </div>
+                    </span>
                   )}
                 </div>
 
                 {/* Right: Play (starts audio) / Mute (while playing) */}
-                <div className="flex items-center justify-end flex-shrink-0 w-[60px] sm:w-[80px]">
+                <div className="flex items-center flex-shrink-0">
                   <button
                     onClick={togglePlayPause}
                     disabled={isPlayDisabled}
-                    className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/15 border border-white/10 flex items-center justify-center shadow-md disabled:opacity-50 touch-manipulation flex-shrink-0"
+                    className="w-9 h-9 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full bg-white/[0.08] hover:bg-white/[0.15] active:bg-white/[0.12] border border-white/[0.1] flex items-center justify-center shadow-lg disabled:opacity-40 touch-manipulation transition-colors duration-200"
                     aria-label={isPlaying ? (isMuted ? "Unmute" : "Mute") : "Play"}
                     title={!streamUrl ? 'Go live or select a set to play' : undefined}
                   >
                     {isAudioLoading ? (
-                      <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0" />
+                      <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-white/70 border-t-transparent rounded-full animate-spin shrink-0" />
                     ) : isPlaying ? (
                       isMuted ? (
-                        <VolumeX size={16} className="sm:w-[18px] sm:h-[18px] text-white shrink-0" />
+                        <VolumeX size={14} className="sm:w-[18px] sm:h-[18px] text-white/90 shrink-0" />
                       ) : (
-                        <Volume2 size={16} className="sm:w-[18px] sm:h-[18px] text-white shrink-0" />
+                        <Volume2 size={14} className="sm:w-[18px] sm:h-[18px] text-white/90 shrink-0" />
                       )
                     ) : (
-                      <Play size={16} className="sm:w-[18px] sm:h-[18px] text-white ml-0.5 shrink-0" />
+                      <Play size={14} className="sm:w-[18px] sm:h-[18px] text-white/90 ml-0.5 shrink-0" />
                     )}
                   </button>
                 </div>

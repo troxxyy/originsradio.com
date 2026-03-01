@@ -112,6 +112,22 @@ const HeroSection = () => {
                     &quot;Sınırları Kaldır, Sesi Yarat&quot;
                 </p>
 
+                <div className={cn(
+                    "mt-8 px-5 py-2.5 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl",
+                    "transition-all duration-1000 delay-300",
+                    mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                )}>
+                    <div className="flex flex-col items-center gap-1">
+                        <span className="text-[10px] uppercase tracking-[0.4em] font-medium text-white/40">Son Başvuru Tarihi</span>
+                        <div className="flex items-center gap-3">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
+                            <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-white via-white to-white/60 bg-clip-text text-transparent">
+                                15 MART • 11:59
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
                 <p className={cn(
                     "mt-8 max-w-2xl text-sm sm:text-base text-white/50 font-light leading-relaxed",
                     "transition-all duration-1000 delay-400",
