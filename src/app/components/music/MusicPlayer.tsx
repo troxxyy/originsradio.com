@@ -256,7 +256,7 @@ const MusicPlayer = () => {
                 </div>
 
                 {/* Center: Latest Set Info - minmax(0, 1fr) ensures it truncates instead of pushing out grid boundaries */}
-                <div className="flex flex-col items-center justify-center text-center w-full min-w-0 px-2">
+                <div className="flex flex-col items-center justify-center text-center w-full min-w-0 px-2 overflow-hidden">
                   {latestSet ? (
                     <>
                       <div className="text-white/90 text-[10px] sm:text-xs md:text-sm truncate w-full pointer-events-auto leading-tight">
@@ -321,7 +321,7 @@ const MusicPlayer = () => {
                 </div>
 
                 {/* Center: Title + Artist */}
-                <div className="flex flex-col items-center justify-center text-center w-full min-w-0 px-2">
+                <div className="flex flex-col items-center justify-center text-center w-full min-w-0 px-2 overflow-hidden">
                   {artistSlug ? (
                     <Link
                       href={`/artists/${artistSlug}`}
@@ -333,11 +333,6 @@ const MusicPlayer = () => {
                   ) : (
                     <div className="text-white/90 text-[10px] sm:text-xs md:text-sm truncate w-full pointer-events-auto leading-tight">
                       {nowArtist}
-                    </div>
-                  )}
-                  {nowDate && (
-                    <div className="text-white/40 text-[9px] sm:text-[10px] md:text-xs truncate w-full pointer-events-auto leading-tight mt-0.5">
-                      {nowDate}
                     </div>
                   )}
                 </div>
