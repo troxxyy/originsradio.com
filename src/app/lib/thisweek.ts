@@ -11,6 +11,10 @@ export interface ThisWeekSheetRow {
 
 export async function fetchThisWeekRows(): Promise<ThisWeekSheetRow[]> {
   const supabase = getSupabaseClient();
+  if (!supabase) {
+    console.warn('Supabase not configured, returning empty thisweek array');
+    return [];
+  }
   const { data, error } = await supabase
     .from("thisweek")
     .select("club_name,event_artist,price,image_url,event_date,event_url")

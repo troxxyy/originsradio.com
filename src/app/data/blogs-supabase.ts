@@ -26,7 +26,8 @@ export const getPublishedBlogs = async (
   limit: number = 10
 ): Promise<{ blogs: Blog[], total: number }> => {
   if (!supabase) {
-    throw new Error('Supabase is not configured');
+    console.warn('Supabase is not configured, returning empty blogs array');
+    return { blogs: [], total: 0 };
   }
 
   const from = (page - 1) * limit;
@@ -53,7 +54,8 @@ export const getAllBlogs = async (
   limit: number = 10
 ): Promise<{ blogs: Blog[], total: number }> => {
   if (!supabaseAdmin) {
-    throw new Error('Supabase admin is not configured');
+    console.warn('Supabase admin is not configured, returning empty blogs array');
+    return { blogs: [], total: 0 };
   }
 
   const from = (page - 1) * limit;
@@ -82,7 +84,8 @@ export const getPaginatedBlogs = async (
   featuredFilter?: boolean
 ): Promise<{ data: Blog[], total: number }> => {
   if (!supabaseAdmin) {
-    throw new Error('Supabase admin is not configured');
+    console.warn('Supabase admin is not configured, returning empty paginated blogs array');
+    return { data: [], total: 0 };
   }
 
   const from = (page - 1) * pageSize;
@@ -121,12 +124,9 @@ export const getPaginatedBlogs = async (
 
 // Get blog by slug (public access)
 export const getBlogBySlug = async (slug: string): Promise<Blog | null> => {
-  console.log('getBlogBySlug called with slug:', slug);
-  console.log('Supabase client available:', !!supabase);
-
   if (!supabase) {
-    console.error('Supabase is not configured');
-    throw new Error('Supabase is not configured');
+    console.warn('Supabase is not configured, returning null for blog by slug');
+    return null;
   }
 
   console.log('Querying blogs table...');

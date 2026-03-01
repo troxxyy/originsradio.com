@@ -17,6 +17,10 @@ const BASE_URL = 'https://origins.radio';
 export const generateArtistSitemap = async (): Promise<SitemapUrl[]> => {
   try {
     const supabase = getSupabaseClient();
+    if (!supabase) {
+      console.warn('Supabase not configured, returning empty artist sitemap');
+      return [];
+    }
     const { data: artists, error } = await supabase
       .from('artists')
       .select('slug, name, updated_at, created_at, featured');
@@ -48,6 +52,10 @@ export const generateArtistSitemap = async (): Promise<SitemapUrl[]> => {
 export const generateEventSitemap = async (): Promise<SitemapUrl[]> => {
   try {
     const supabase = getSupabaseClient();
+    if (!supabase) {
+      console.warn('Supabase not configured, returning empty event sitemap');
+      return [];
+    }
     const { data: events, error } = await supabase
       .from('our_work_projects')
       .select('slug, title, updated_at, created_at, upcoming')
@@ -79,6 +87,10 @@ export const generateEventSitemap = async (): Promise<SitemapUrl[]> => {
 export const generateBlogSitemap = async (): Promise<SitemapUrl[]> => {
   try {
     const supabase = getSupabaseClient();
+    if (!supabase) {
+      console.warn('Supabase not configured, returning empty blog sitemap');
+      return [];
+    }
     const { data: blogs, error } = await supabase
       .from('blogs')
       .select('slug, title, updated_at, published_at, created_at, featured')
@@ -109,7 +121,7 @@ export const generateBlogSitemap = async (): Promise<SitemapUrl[]> => {
  */
 export const generateStaticSitemap = (): SitemapUrl[] => {
   const now = new Date().toISOString();
-  
+
   return [
     {
       url: `${BASE_URL}/`,

@@ -13,7 +13,8 @@ export const isSupabaseConfigured = () => {
 
 export const getSupabaseClient = () => {
     if (!supabase) {
-        throw new Error('Supabase is not configured')
+        console.warn('Supabase is not configured, returning null client')
+        return null
     }
     return supabase
 }

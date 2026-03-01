@@ -22,7 +22,8 @@ export const isSupabaseConfigured = () => {
 // Helper function to get Supabase client with error handling
 export const getSupabaseClient = () => {
   if (!supabase) {
-    throw new Error('Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY environment variables.')
+    console.warn('Supabase is not configured, returning null client')
+    return null
   }
   return supabase
 }
@@ -30,7 +31,8 @@ export const getSupabaseClient = () => {
 // Helper function to get Supabase admin client with error handling
 export const getSupabaseAdminClient = () => {
   if (!supabaseAdmin) {
-    throw new Error('Supabase admin is not configured. Please set SUPABASE_SERVICE_ROLE_KEY environment variable.')
+    console.warn('Supabase admin is not configured, returning null admin client')
+    return null
   }
   return supabaseAdmin
 }
