@@ -7,7 +7,7 @@ const judges = [
     {
         name: "Kenan Olden",
         role: "Prodüktör & DJ / Kenotrax Kurucusu",
-        genre: "House & Tech House",
+        genre: "Hypnotic & Electro",
         bio: "Enerjik setleri ve büyük uluslararası plak şirketlerindeki yayınlarıyla tanınan Ankara merkezli DJ ve prodüktör.",
         videoUrl: "/opencircle2026/kenan.mp4"
     },
