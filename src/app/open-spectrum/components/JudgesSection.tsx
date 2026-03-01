@@ -19,7 +19,7 @@ const judges = [
         videoUrl: "/opencircle2026/sinan.mp4"
     },
     {
-        name: "Ozbek",
+        name: "OZBEK",
         role: "Prodüktör & Extima Kurucusu",
         genre: "Peak-Time & Dark Techno",
         bio: "Maceo Plex gibi isimlerden destek gören, karanlık, sürükleyici sesi ve underground perspektifiyle tanınır.",
