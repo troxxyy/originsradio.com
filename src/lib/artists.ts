@@ -16,23 +16,28 @@ export type Artist = {
 
 // Create Supabase client for server-side operations
 const getSupabaseClient = () => {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  if (!supabaseUrl || !supabaseKey) return null;
   return createClient(supabaseUrl, supabaseKey)
 }
 
 export async function getAllArtistSlugs(): Promise<string[]> {
   try {
     const supabase = getSupabaseClient()
+    if (!supabase) {
+      console.warn('Supabase not configured, returning empty artist slugs')
+      return []
+    }
     const { data, error } = await supabase
       .from('artists')
       .select('slug')
-    
+
     if (error) {
       console.error('Error fetching artist slugs:', error)
       return []
     }
-    
+
     return data?.map(a => a.slug) || []
   } catch (error) {
     console.error('Error in getAllArtistSlugs:', error)
@@ -43,17 +48,18 @@ export async function getAllArtistSlugs(): Promise<string[]> {
 export async function getArtistBySlug(slug: string): Promise<Artist | null> {
   try {
     const supabase = getSupabaseClient()
+    if (!supabase) return null;
     const { data, error } = await supabase
       .from('artists')
       .select('*')
       .eq('slug', slug)
       .maybeSingle()
-    
+
     if (error) {
       console.error('Error fetching artist by slug:', error)
       return null
     }
-    
+
     return data
   } catch (error) {
     console.error('Error in getArtistBySlug:', error)
@@ -64,15 +70,16 @@ export async function getArtistBySlug(slug: string): Promise<Artist | null> {
 export async function getArtistsForSitemap(): Promise<Array<{ slug: string; lastmod: string; changefreq: string; priority: number }>> {
   try {
     const supabase = getSupabaseClient()
+    if (!supabase) return [];
     const { data, error } = await supabase
       .from('artists')
       .select('slug, updated_at, created_at, featured')
-    
+
     if (error) {
       console.error('Error fetching artists for sitemap:', error)
       return []
     }
-    
+
     return data?.map((a) => ({
       slug: a.slug,
       lastmod: a.updated_at || a.created_at,
@@ -119,11 +126,11 @@ export async function getArtistSEOData(slug: string): Promise<{
     const artistLocation = artist.location || ''
     const artistPhoto = artist.photo_url || '/placeholder.svg'
     const currentUrl = `https://origins.radio/artists/${slug}`
-    
+
     // Generate SEO-optimized title and description focusing on "DJ" keywords
     const title = `${artistName} - DJ & Producer | Origins Radio`
     const description = `Listen to DJ ${artistName}'s sets and tracks. ${artistGenres} music producer from ${artistLocation}. Book ${artistName} for events at Origins Radio.`
-    
+
     // Generate comprehensive keywords
     const keywords = [
       artistName,
