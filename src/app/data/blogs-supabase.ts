@@ -22,7 +22,7 @@ export const generateSlug = (title: string): string => {
 
 // Get published blogs (public access)
 export const getPublishedBlogs = async (
-  page: number = 1, 
+  page: number = 1,
   limit: number = 10
 ): Promise<{ blogs: Blog[], total: number }> => {
   if (!supabase) {
@@ -38,18 +38,18 @@ export const getPublishedBlogs = async (
     .eq('status', 'published')
     .order('published_at', { ascending: false })
     .range(from, to);
-  
+
   if (error) {
     console.error('Error fetching published blogs:', error);
     throw error;
   }
-  
+
   return { blogs: data || [], total: count || 0 };
 };
 
 // Get all blogs (admin access)
 export const getAllBlogs = async (
-  page: number = 1, 
+  page: number = 1,
   limit: number = 10
 ): Promise<{ blogs: Blog[], total: number }> => {
   if (!supabaseAdmin) {
@@ -64,12 +64,12 @@ export const getAllBlogs = async (
     .select('*', { count: 'exact' })
     .order('created_at', { ascending: false })
     .range(from, to);
-  
+
   if (error) {
     console.error('Error fetching all blogs:', error);
     throw error;
   }
-  
+
   return { blogs: data || [], total: count || 0 };
 };
 
@@ -123,7 +123,7 @@ export const getPaginatedBlogs = async (
 export const getBlogBySlug = async (slug: string): Promise<Blog | null> => {
   console.log('getBlogBySlug called with slug:', slug);
   console.log('Supabase client available:', !!supabase);
-  
+
   if (!supabase) {
     console.error('Supabase is not configured');
     throw new Error('Supabase is not configured');
@@ -136,14 +136,14 @@ export const getBlogBySlug = async (slug: string): Promise<Blog | null> => {
     .eq('slug', slug)
     .eq('status', 'published')
     .maybeSingle();
-  
+
   console.log('Query result:', { data, error });
-  
+
   if (error) {
     console.error('Error fetching blog by slug:', error);
     return null;
   }
-  
+
   return data;
 };
 
@@ -158,12 +158,12 @@ export const getBlogById = async (id: string): Promise<Blog | null> => {
     .select('*')
     .eq('id', id)
     .maybeSingle();
-  
+
   if (error) {
     console.error('Error fetching blog by ID:', error);
     return null;
   }
-  
+
   return data;
 };
 
@@ -181,12 +181,12 @@ export const getRelatedBlogs = async (blogId: string, tags: string[], limit: num
     .overlaps('tags', tags)
     .order('published_at', { ascending: false })
     .limit(limit);
-  
+
   if (error) {
     console.error('Error fetching related blogs:', error);
     return [];
   }
-  
+
   return data || [];
 };
 
@@ -206,12 +206,12 @@ export const addBlog = async (blogData: BlogInsert): Promise<Blog | null> => {
     .insert(blogData)
     .select()
     .maybeSingle();
-  
+
   if (error) {
     console.error('Error creating blog:', error);
     return null;
   }
-  
+
   return data;
 };
 
@@ -237,12 +237,12 @@ export const updateBlog = async (id: string, updates: BlogUpdate): Promise<Blog 
     .eq('id', id)
     .select()
     .maybeSingle();
-  
+
   if (error) {
     console.error('Error updating blog:', error);
     return null;
   }
-  
+
   return data;
 };
 
@@ -256,12 +256,12 @@ export const deleteBlog = async (id: string): Promise<boolean> => {
     .from('blogs')
     .delete()
     .eq('id', id);
-  
+
   if (error) {
     console.error('Error deleting blog:', error);
     return false;
   }
-  
+
   return true;
 };
 
@@ -275,7 +275,7 @@ export const bulkDeleteBlogs = async (ids: string[]): Promise<void> => {
     .from('blogs')
     .delete()
     .in('id', ids);
-  
+
   if (error) {
     console.error('Error bulk deleting blogs:', error);
     throw error;
