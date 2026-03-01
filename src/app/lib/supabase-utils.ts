@@ -34,18 +34,18 @@ export const getArtists = async (): Promise<Artist[]> => {
     console.warn('Supabase not configured, returning empty artists array')
     return []
   }
-  
+
   const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('artists')
     .select('*')
     .order('name')
-  
+
   if (error) {
     console.error('Error fetching artists:', error)
     throw error
   }
-  
+
   return data || []
 }
 
@@ -54,19 +54,19 @@ export const getArtistById = async (id: string): Promise<Artist | null> => {
     console.warn('Supabase not configured, returning null for artist')
     return null
   }
-  
+
   const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('artists')
     .select('*')
     .eq('id', id)
     .maybeSingle()
-  
+
   if (error) {
     console.error('Error fetching artist:', error)
     return null
   }
-  
+
   return data
 }
 
@@ -76,24 +76,24 @@ export const getArtistBySlug = async (slug: string): Promise<Artist | null> => {
     console.warn('Supabase not configured, returning null for artist by slug')
     return null
   }
-  
+
   const supabase = getSupabaseClient()
   // Get all artists and find the one that matches the slug
   const { data: allArtists, error } = await supabase
     .from('artists')
     .select('*')
-  
+
   if (error) {
     console.error('Error fetching artists:', error)
     return null
   }
-  
+
   // Find artist whose name generates the same slug
   const matchingArtist = allArtists?.find(artist => {
     const artistSlug = generateSlug(artist.name)
     return artistSlug === slug
   })
-  
+
   return matchingArtist || null
 }
 
@@ -102,19 +102,19 @@ export const createArtist = async (artist: Database['public']['Tables']['artists
     console.warn('Supabase not configured, cannot create artist')
     return null
   }
-  
+
   const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('artists')
     .insert(artist)
     .select()
     .maybeSingle()
-  
+
   if (error) {
     console.error('Error creating artist:', error)
     return null
   }
-  
+
   return data
 }
 
@@ -124,7 +124,7 @@ export const getTracks = async (): Promise<Track[]> => {
     console.warn('Supabase not configured, returning empty tracks array')
     return []
   }
-  
+
   const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('tracks')
@@ -137,12 +137,12 @@ export const getTracks = async (): Promise<Track[]> => {
       )
     `)
     .order('created_at', { ascending: false })
-  
+
   if (error) {
     console.error('Error fetching tracks:', error)
     throw error
   }
-  
+
   return data || []
 }
 
@@ -151,19 +151,19 @@ export const getTracksByArtist = async (artistId: string): Promise<Track[]> => {
     console.warn('Supabase not configured, returning empty tracks array')
     return []
   }
-  
+
   const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('tracks')
     .select('*')
     .eq('artist_id', artistId)
     .order('created_at', { ascending: false })
-  
+
   if (error) {
-    console.error('Error fetching tracks by artist:', error)
-    throw error
+    console.error('Error fetching tracks by artist:', error.message || error)
+    throw new Error(error.message || 'Error fetching tracks by artist')
   }
-  
+
   return data || []
 }
 
@@ -172,19 +172,19 @@ export const createTrack = async (track: Database['public']['Tables']['tracks'][
     console.warn('Supabase not configured, cannot create track')
     return null
   }
-  
+
   const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('tracks')
     .insert(track)
     .select()
     .maybeSingle()
-  
+
   if (error) {
     console.error('Error creating track:', error)
     return null
   }
-  
+
   return data
 }
 
@@ -193,7 +193,7 @@ export const updateTrack = async (id: string, track: Database['public']['Tables'
     console.warn('Supabase not configured, cannot update track')
     return null
   }
-  
+
   const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('tracks')
@@ -201,12 +201,12 @@ export const updateTrack = async (id: string, track: Database['public']['Tables'
     .eq('id', id)
     .select()
     .maybeSingle()
-  
+
   if (error) {
     console.error('Error updating track:', error)
     return null
   }
-  
+
   return data
 }
 
@@ -215,18 +215,18 @@ export const deleteTrack = async (id: string): Promise<boolean> => {
     console.warn('Supabase not configured, cannot delete track')
     return false
   }
-  
+
   const supabase = getSupabaseClient()
   const { error } = await supabase
     .from('tracks')
     .delete()
     .eq('id', id)
-  
+
   if (error) {
     console.error('Error deleting track:', error)
     return false
   }
-  
+
   return true
 }
 
@@ -236,7 +236,7 @@ export const getSets = async () => {
     console.warn('Supabase not configured, returning empty sets array')
     return []
   }
-  
+
   const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('sets')
@@ -250,12 +250,12 @@ export const getSets = async () => {
       )
     `)
     .order('release_date', { ascending: false })
-  
+
   if (error) {
     console.error('Error fetching sets:', error)
     throw error
   }
-  
+
   return data || []
 }
 
@@ -264,7 +264,7 @@ export const getSetsByArtist = async (artistId: string) => {
     console.warn('Supabase not configured, returning empty sets array')
     return []
   }
-  
+
   const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('sets')
@@ -279,12 +279,12 @@ export const getSetsByArtist = async (artistId: string) => {
     `)
     .eq('artist_id', artistId)
     .order('release_date', { ascending: false })
-  
+
   if (error) {
-    console.error('Error fetching sets by artist:', error)
-    throw error
+    console.error('Error fetching sets by artist:', error.message || error)
+    throw new Error(error.message || 'Error fetching sets by artist')
   }
-  
+
   return data || []
 }
 
@@ -293,7 +293,7 @@ export const getSetById = async (id: string) => {
     console.warn('Supabase not configured, returning null for set')
     return null
   }
-  
+
   const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('sets')
@@ -308,12 +308,12 @@ export const getSetById = async (id: string) => {
     `)
     .eq('id', id)
     .maybeSingle()
-  
+
   if (error) {
     console.error('Error fetching set:', error)
     return null
   }
-  
+
   return data
 }
 
@@ -322,7 +322,7 @@ export const createSet = async (set: Database['public']['Tables']['sets']['Inser
     console.warn('Supabase not configured, cannot create set')
     return null
   }
-  
+
   const supabase = getSupabaseClient()
   // Ensure we have at least anonymous session to satisfy authenticated policies
   try {
@@ -339,12 +339,12 @@ export const createSet = async (set: Database['public']['Tables']['sets']['Inser
     .insert(set)
     .select()
     .maybeSingle()
-  
+
   if (error) {
     console.error('Error creating set:', error)
     return null
   }
-  
+
   return data
 }
 
@@ -375,7 +375,7 @@ export const updateSet = async (id: string, set: Database['public']['Tables']['s
     console.warn('Supabase not configured, cannot update set')
     return null
   }
-  
+
   const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('sets')
@@ -383,12 +383,12 @@ export const updateSet = async (id: string, set: Database['public']['Tables']['s
     .eq('id', id)
     .select()
     .maybeSingle()
-  
+
   if (error) {
     console.error('Error updating set:', error)
     return null
   }
-  
+
   return data
 }
 
@@ -397,18 +397,18 @@ export const deleteSet = async (id: string): Promise<boolean> => {
     console.warn('Supabase not configured, cannot delete set')
     return false
   }
-  
+
   const supabase = getSupabaseClient()
   const { error } = await supabase
     .from('sets')
     .delete()
     .eq('id', id)
-  
+
   if (error) {
     console.error('Error deleting set:', error)
     return false
   }
-  
+
   return true
 }
 
@@ -418,7 +418,7 @@ export const getEvents = async (): Promise<Event[]> => {
     console.warn('Supabase not configured, returning empty events array')
     return []
   }
-  
+
   const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('events')
@@ -431,12 +431,12 @@ export const getEvents = async (): Promise<Event[]> => {
       )
     `)
     .order('date', { ascending: false })
-  
+
   if (error) {
     console.error('Error fetching events:', error)
     throw error
   }
-  
+
   return data || []
 }
 
@@ -445,7 +445,7 @@ export const getEventsByArtist = async (artistId: string): Promise<Event[]> => {
     console.warn('Supabase not configured, returning empty events array')
     return []
   }
-  
+
   const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('events')
@@ -459,12 +459,12 @@ export const getEventsByArtist = async (artistId: string): Promise<Event[]> => {
     `)
     .eq('artist_id', artistId)
     .order('date', { ascending: false })
-  
+
   if (error) {
-    console.error('Error fetching events by artist:', error)
-    throw error
+    console.error('Error fetching events by artist:', error.message || error)
+    throw new Error(error.message || 'Error fetching events by artist')
   }
-  
+
   return data || []
 }
 
@@ -473,19 +473,19 @@ export const createEvent = async (event: Database['public']['Tables']['events'][
     console.warn('Supabase not configured, cannot create event')
     return null
   }
-  
+
   const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('events')
     .insert(event)
     .select()
     .maybeSingle()
-  
+
   if (error) {
     console.error('Error creating event:', error)
     return null
   }
-  
+
   return data
 }
 
@@ -494,7 +494,7 @@ export const updateEvent = async (id: string, event: Database['public']['Tables'
     console.warn('Supabase not configured, cannot update event')
     return null
   }
-  
+
   const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('events')
@@ -502,12 +502,12 @@ export const updateEvent = async (id: string, event: Database['public']['Tables'
     .eq('id', id)
     .select()
     .maybeSingle()
-  
+
   if (error) {
     console.error('Error updating event:', error)
     return null
   }
-  
+
   return data
 }
 
@@ -516,18 +516,18 @@ export const deleteEvent = async (id: string): Promise<boolean> => {
     console.warn('Supabase not configured, cannot delete event')
     return false
   }
-  
+
   const supabase = getSupabaseClient()
   const { error } = await supabase
     .from('events')
     .delete()
     .eq('id', id)
-  
+
   if (error) {
     console.error('Error deleting event:', error)
     return false
   }
-  
+
   return true
 }
 
@@ -537,7 +537,7 @@ export const uploadAudioFile = async (file: File, path: string): Promise<string 
     console.warn('Supabase not configured, cannot upload audio file')
     return null
   }
-  
+
   const supabase = getSupabaseClient()
   // Ensure we have an authenticated session for storage policies
   try {
@@ -555,16 +555,16 @@ export const uploadAudioFile = async (file: File, path: string): Promise<string 
       contentType: file.type || 'application/octet-stream',
       cacheControl: '3600',
     })
-  
+
   if (error) {
     console.error('Error uploading audio file:', error)
     return null
   }
-  
+
   const { data: urlData } = supabase.storage
     .from('audio')
     .getPublicUrl(data.path)
-  
+
   return urlData.publicUrl
 }
 
@@ -573,7 +573,7 @@ export const uploadImageFile = async (file: File, path: string): Promise<string 
     console.warn('Supabase not configured, cannot upload image file')
     return null
   }
-  
+
   const supabase = getSupabaseClient()
   // Ensure we have an authenticated session for storage policies
   try {
@@ -591,18 +591,18 @@ export const uploadImageFile = async (file: File, path: string): Promise<string 
       contentType: file.type || 'application/octet-stream',
       cacheControl: '3600',
     })
-  
+
   if (error) {
     console.error('Error uploading image file:', error)
     return null
   }
-  
+
   const { data: urlData } = supabase.storage
     .from('images')
     .getPublicUrl(data.path)
-  
+
   return urlData.publicUrl
-} 
+}
 
 // Artist likes functions
 export const toggleArtistLike = async (artistId: string, userId: string): Promise<boolean> => {
@@ -610,19 +610,19 @@ export const toggleArtistLike = async (artistId: string, userId: string): Promis
     console.warn('Supabase not configured, cannot toggle like')
     return false
   }
-  
+
   const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .rpc('toggle_artist_like', {
       artist_uuid: artistId,
       user_identifier: userId
     })
-  
+
   if (error) {
     console.error('Error toggling artist like:', error)
     return false
   }
-  
+
   return data
 }
 
@@ -631,18 +631,18 @@ export const getArtistLikeCount = async (artistId: string): Promise<number> => {
     console.warn('Supabase not configured, returning 0 for like count')
     return 0
   }
-  
+
   const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .rpc('get_artist_like_count', {
       artist_uuid: artistId
     })
-  
+
   if (error) {
     console.error('Error getting artist like count:', error)
     return 0
   }
-  
+
   return data || 0
 }
 
@@ -651,19 +651,19 @@ export const isArtistLikedByUser = async (artistId: string, userId: string): Pro
     console.warn('Supabase not configured, returning false for like status')
     return false
   }
-  
+
   const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .rpc('is_artist_liked_by_user', {
       artist_uuid: artistId,
       user_identifier: userId
     })
-  
+
   if (error) {
     console.error('Error checking artist like status:', error)
     return false
   }
-  
+
   return data || false
 }
 
@@ -671,7 +671,7 @@ export const isArtistLikedByUser = async (artistId: string, userId: string): Pro
 export const generateUserId = (): string => {
   // Try to get existing user ID from localStorage
   let userId = localStorage.getItem('origins_radio_user_id')
-  
+
   if (!userId) {
     // Generate a new user ID based on browser fingerprint
     const fingerprint = [
@@ -681,7 +681,7 @@ export const generateUserId = (): string => {
       screen.height,
       new Date().getTimezoneOffset()
     ].join('|')
-    
+
     // Create a hash of the fingerprint
     let hash = 0
     for (let i = 0; i < fingerprint.length; i++) {
@@ -689,13 +689,13 @@ export const generateUserId = (): string => {
       hash = ((hash << 5) - hash) + char
       hash = hash & hash // Convert to 32-bit integer
     }
-    
+
     userId = `user_${Math.abs(hash)}_${Date.now()}`
     localStorage.setItem('origins_radio_user_id', userId)
   }
-  
+
   return userId
-} 
+}
 
 // Chat message functions
 export const getChatMessages = async (limit = 50): Promise<ChatMessage[]> => {
@@ -703,19 +703,19 @@ export const getChatMessages = async (limit = 50): Promise<ChatMessage[]> => {
     console.warn('Supabase not configured, returning empty chat messages')
     return []
   }
-  
+
   const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('chat_messages')
     .select('*')
     .order('created_at', { ascending: true })
     .limit(limit)
-  
+
   if (error) {
     console.error('Error fetching chat messages:', error)
     return []
   }
-  
+
   return data || []
 }
 
@@ -724,7 +724,7 @@ export const createChatMessage = async (tagName: string, message: string, isEmoj
     console.warn('Supabase not configured, cannot create chat message')
     return null
   }
-  
+
   const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('chat_messages')
@@ -735,12 +735,12 @@ export const createChatMessage = async (tagName: string, message: string, isEmoj
     })
     .select()
     .single()
-  
+
   if (error) {
     console.error('Error creating chat message:', error)
     return null
   }
-  
+
   return data
 }
 
@@ -749,20 +749,20 @@ export const subscribeToChatMessages = (callback: (message: ChatMessage) => void
     console.warn('Supabase not configured, cannot subscribe to chat messages')
     return null
   }
-  
+
   const supabase = getSupabaseClient()
   const subscription = supabase
     .channel('chat_messages')
-    .on('postgres_changes', 
+    .on('postgres_changes',
       { event: 'INSERT', schema: 'public', table: 'chat_messages' },
       (payload) => {
         callback(payload.new as ChatMessage)
       }
     )
     .subscribe()
-  
+
   return subscription
-} 
+}
 
 // Our Work utilities
 export const getOurWorkProjects = async (): Promise<OurWorkProject[]> => {
@@ -934,14 +934,14 @@ export const getCurrentWeekMonday = (): string => {
   // Use Istanbul time to determine the current day of the week
   // This handles the edge case where it's Monday in Istanbul but still Sunday in UTC
   const istanbulTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Istanbul' }))
-  
+
   const day = istanbulTime.getDay()
   const diff = istanbulTime.getDate() - day + (day === 0 ? -6 : 1) // adjust when day is Sunday
-  
+
   // Create date object for the Monday in Istanbul time
   const monday = new Date(istanbulTime)
   monday.setDate(diff)
-  
+
   // Format as YYYY-MM-DD using local time components of the calculated Monday
   const year = monday.getFullYear()
   const month = String(monday.getMonth() + 1).padStart(2, '0')
@@ -1112,19 +1112,19 @@ export const archiveOldRadioSchedules = async (): Promise<{ success: boolean; co
   if (!isSupabaseConfigured()) throw new Error('Supabase not configured')
   const supabaseAdmin = getSupabaseAdminClient()
   const currentWeekMonday = getCurrentWeekMonday()
-  
+
   const { data, error } = await supabaseAdmin
     .from('radio_schedule_weekly')
     .update({ is_active: false })
     .lt('week_start_date', currentWeekMonday)
     .eq('is_active', true)
     .select()
-  
+
   if (error) {
     console.error('Error archiving old schedules:', error)
     return { success: false, count: 0 }
   }
-  
+
   return { success: true, count: data?.length ?? 0 }
 }
 
@@ -1133,28 +1133,28 @@ export const copyScheduleToNextWeek = async (): Promise<{ success: boolean; coun
   if (!isSupabaseConfigured()) throw new Error('Supabase not configured')
   const supabaseAdmin = getSupabaseAdminClient()
   const currentWeekMonday = getCurrentWeekMonday()
-  
+
   // Get next week's Monday
   const nextWeekDate = new Date(currentWeekMonday)
   nextWeekDate.setDate(nextWeekDate.getDate() + 7)
   const nextWeekMonday = nextWeekDate.toISOString().split('T')[0]
-  
+
   // Get current week's active schedule
   const { data: currentSchedule, error: fetchError } = await supabaseAdmin
     .from('radio_schedule_weekly')
     .select('*')
     .eq('week_start_date', currentWeekMonday)
     .eq('is_active', true)
-  
+
   if (fetchError) {
     console.error('Error fetching current schedule:', fetchError)
     return { success: false, count: 0 }
   }
-  
+
   if (!currentSchedule || currentSchedule.length === 0) {
     return { success: true, count: 0 }
   }
-  
+
   // Create new schedule entries for next week
   const newScheduleEntries = currentSchedule.map((item) => ({
     day_of_week: item.day_of_week,
@@ -1168,16 +1168,16 @@ export const copyScheduleToNextWeek = async (): Promise<{ success: boolean; coun
     is_active: true,
     week_start_date: nextWeekMonday,
   }))
-  
+
   const { data: insertedData, error: insertError } = await supabaseAdmin
     .from('radio_schedule_weekly')
     .insert(newScheduleEntries)
     .select()
-  
+
   if (insertError) {
     console.error('Error copying schedule to next week:', insertError)
     return { success: false, count: 0 }
   }
-  
+
   return { success: true, count: insertedData?.length ?? 0 }
 }

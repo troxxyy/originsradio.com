@@ -1,5 +1,5 @@
 'use client'
- 
+
 import { ReactNode, CSSProperties } from "react";
 import Image from "next/image";
 import EventFooter from "@/components/events/EventFooter";
@@ -27,8 +27,8 @@ const PageLayout = ({
 
   return (
     <div className={`min-h-screen flex flex-col items-stretch justify-start relative pt-[env(safe-area-inset-top)]`}>
-  
-      
+
+
       {/* Background image with effects */}
       <div className="absolute inset-0 z-10">
         {customBackground || customBackgroundStyle ? (
@@ -51,11 +51,11 @@ const PageLayout = ({
           </>
         )}
       </div>
-      
+
       {/* Navigation handled at App level */}
-      
+
       {/* Page content - Highest layer */}
-      <div className={`relative z-40 w-full flex-1 flex flex-col items-stretch justify-start ${isHome ? 'pt-0' : 'pt-16 sm:pt-20'} pb-[env(safe-area-inset-bottom)]`}>
+      <div className={`relative z-40 w-full flex-1 flex flex-col items-stretch justify-start ${isHome || pathname === '/open-spectrum' ? 'pt-0' : 'pt-16 sm:pt-20'} pb-[env(safe-area-inset-bottom)]`}>
         {children}
       </div>
 

@@ -8,11 +8,11 @@ const __dirname = path.dirname(__filename);
 
 // Get environment variables
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseServiceKey) {
   console.error('Missing Supabase environment variables');
-  console.error('Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY');
+  console.error('Please set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY');
   process.exit(1);
 }
 
@@ -31,7 +31,7 @@ async function uploadImage(imagePath) {
     const fileName = path.basename(imagePath);
     const fileExt = path.extname(fileName);
     const baseName = path.basename(fileName, fileExt);
-    
+
     // Generate unique filename
     const timestamp = Date.now();
     const uniqueFileName = `tomorrowland-thailand-${timestamp}${fileExt}`;

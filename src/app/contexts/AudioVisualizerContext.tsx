@@ -6,6 +6,7 @@ interface AudioVisualizerContextType {
   audioContext: AudioContext | null;
   analyser: AnalyserNode | null;
   registerAudioElement: (element: HTMLAudioElement) => void;
+  setGlobalVolume: (volume: number) => void;
   isReady: boolean;
 }
 
@@ -22,13 +23,14 @@ export function useAudioVisualizer() {
 export function AudioVisualizerProvider({ children }: { children: React.ReactNode }) {
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
+  const [gainNode, setGainNode] = useState<GainNode | null>(null);
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
-  
+
   // Track the source node and connected element to manage connections
   const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
   const connectedElementRef = useRef<HTMLAudioElement | null>(null);
 
-  // 1. Initialize AudioContext and Analyser (Once)
+  // 1. Initialize AudioContext, Analyser, and GainNode (Once)
   useEffect(() => {
     const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
     if (!AudioCtx) return;
@@ -40,92 +42,104 @@ export function AudioVisualizerProvider({ children }: { children: React.ReactNod
     node.minDecibels = -80;
     node.maxDecibels = -10;
 
+    const gain = ctx.createGain();
+    gain.gain.value = 1;
+
     setAudioContext(ctx);
     setAnalyser(node);
+    setGainNode(gain);
 
     return () => {
       if (ctx.state !== 'closed') {
-        ctx.close().catch(() => {});
+        ctx.close().catch(() => { });
       }
     };
   }, []);
 
   // 2. Connect Audio Element
   useEffect(() => {
-    if (!audioContext || !analyser || !audioElement) return;
-    
+    if (!audioContext || !analyser || !gainNode || !audioElement) return;
+
     // Avoid reconnecting the same element
     if (connectedElementRef.current === audioElement) return;
 
     try {
-        // If we have a previous source, disconnect it from the graph
-        if (sourceRef.current) {
-            try {
-                sourceRef.current.disconnect();
-            } catch (e) {
-                // ignore disconnect errors
-            }
+      // If we have a previous source, disconnect it from the graph
+      if (sourceRef.current) {
+        try {
+          sourceRef.current.disconnect();
+        } catch (e) {
+          // ignore disconnect errors
         }
+      }
 
-        // Ensure CORS is set (crucial for Web Audio with external sources)
-        if (!audioElement.crossOrigin) {
-          audioElement.crossOrigin = "anonymous";
+      // Ensure CORS is set (crucial for Web Audio with external sources)
+      if (!audioElement.crossOrigin) {
+        audioElement.crossOrigin = "anonymous";
+      }
+
+      // Create new source
+      const source = audioContext.createMediaElementSource(audioElement);
+
+      // Connect: Source -> Analyser -> Gain -> Destination (Speakers)
+      source.connect(analyser);
+      analyser.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      sourceRef.current = source;
+      connectedElementRef.current = audioElement;
+
+      // Ensure context is running when this element plays
+      const ensureRunning = () => {
+        if (audioContext.state === 'suspended') {
+          audioContext.resume().catch(err => console.warn('Audio resume failed', err));
         }
+      };
 
-        // Create new source
-        const source = audioContext.createMediaElementSource(audioElement);
-        
-        // Connect: Source -> Analyser -> Destination (Speakers)
-        source.connect(analyser);
-        source.connect(audioContext.destination);
-        
-        sourceRef.current = source;
-        connectedElementRef.current = audioElement;
-        
-        // Ensure context is running when this element plays
-        const ensureRunning = () => {
-            if (audioContext.state === 'suspended') {
-                audioContext.resume().catch(err => console.warn('Audio resume failed', err));
-            }
-        };
-        
-        audioElement.addEventListener('play', ensureRunning);
-        
-        // Cleanup listener only when element changes
-        return () => {
-            audioElement.removeEventListener('play', ensureRunning);
-        };
+      audioElement.addEventListener('play', ensureRunning);
+
+      // Cleanup listener only when element changes
+      return () => {
+        audioElement.removeEventListener('play', ensureRunning);
+      };
 
     } catch (e) {
-        console.error("AudioVisualizer connection error:", e);
+      console.error("AudioVisualizer connection error:", e);
     }
-  }, [audioContext, analyser, audioElement]);
+  }, [audioContext, analyser, gainNode, audioElement]);
 
   // 3. Global Resume Handlers to unlock AudioContext
   useEffect(() => {
-      if (!audioContext) return;
+    if (!audioContext) return;
 
-      const resume = () => {
-          if (audioContext.state === 'suspended') {
-              audioContext.resume().catch(() => {});
-          }
-      };
+    const resume = () => {
+      if (audioContext.state === 'suspended') {
+        audioContext.resume().catch(() => { });
+      }
+    };
 
-      // Add listeners to common interaction events
-      const events = ['click', 'touchstart', 'keydown', 'mousedown'];
-      events.forEach(event => document.addEventListener(event, resume));
+    // Add listeners to common interaction events
+    const events = ['click', 'touchstart', 'keydown', 'mousedown'];
+    events.forEach(event => document.addEventListener(event, resume));
 
-      return () => {
-          events.forEach(event => document.removeEventListener(event, resume));
-      };
+    return () => {
+      events.forEach(event => document.removeEventListener(event, resume));
+    };
   }, [audioContext]);
+
+  const setGlobalVolume = (volume: number) => {
+    if (gainNode) {
+      gainNode.gain.value = volume;
+    }
+  };
 
   return (
     <AudioVisualizerContext.Provider value={{
       audioContext,
       analyser,
       registerAudioElement: setAudioElement,
-      isReady: !!(audioContext && analyser && audioElement)
+      setGlobalVolume,
+      isReady: !!(audioContext && analyser && gainNode && audioElement)
     }}>
       {children}
     </AudioVisualizerContext.Provider>

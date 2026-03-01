@@ -100,6 +100,13 @@ export default {
           '0%': { transform: 'translateX(0%)' },
           '100%': { transform: 'translateX(-50%)' },
         },
+        "spin-reverse": {
+          "to": { transform: "rotate(-360deg)" },
+        },
+        spectrum: {
+          "0%, 100%": { height: "10%" },
+          "50%": { height: "100%" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -111,6 +118,14 @@ export default {
         marquee: "marquee 15s linear infinite",
         "marquee-slow": "marquee 28s linear infinite",
         "marquee-very-slow": "marquee 40s linear infinite",
+        "spin-slow": "spin 20s linear infinite",
+        "spin-slow-reverse": "spin-reverse 25s linear infinite",
+        "pulse-slow": "pulse 8s ease-in-out infinite",
+        "spectrum-1": "spectrum 1.2s ease-in-out infinite alternate",
+        "spectrum-2": "spectrum 0.8s ease-in-out infinite alternate 0.2s",
+        "spectrum-3": "spectrum 1.5s ease-in-out infinite alternate 0.5s",
+        "spectrum-4": "spectrum 0.9s ease-in-out infinite alternate 0.1s",
+        "spectrum-5": "spectrum 1.1s ease-in-out infinite alternate 0.4s",
       },
     },
   },

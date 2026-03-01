@@ -59,8 +59,8 @@ export default function AdminUploadsPage() {
     }
 
     // Filter for audio files
-    const audioFiles = files.filter(file => 
-      file.type.startsWith('audio/') || 
+    const audioFiles = files.filter(file =>
+      file.type.startsWith('audio/') ||
       file.name.match(/\.(mp3|wav|flac|aac|ogg|m4a|opus)$/i)
     );
 
@@ -103,7 +103,7 @@ export default function AdminUploadsPage() {
 
   const uploadFiles = async (files: File[]) => {
     setIsUploading(true);
-    
+
     try {
       const supabase = getSupabaseAdminClient();
       // Ensure waveforms bucket exists and is public
@@ -177,7 +177,7 @@ export default function AdminUploadsPage() {
                 set_number: file === pendingMetaFile && metaSetNumber ? parseInt(metaSetNumber, 10) : currentUpload?.setNumber ?? null,
                 views_count: 0,
               };
-              
+
               const newSet = await createSetAdmin(setData);
               if (newSet) {
                 console.log('Set created successfully:', newSet);
@@ -189,8 +189,8 @@ export default function AdminUploadsPage() {
           }
 
           // Update upload status
-          setUploads(prev => prev.map(upload => 
-            upload.file === file 
+          setUploads(prev => prev.map(upload =>
+            upload.file === file
               ? { ...upload, status: 'success' as const, progress: 100 }
               : upload
           ));
@@ -202,13 +202,13 @@ export default function AdminUploadsPage() {
 
         } catch (error) {
           console.error('Upload error:', error);
-          setUploads(prev => prev.map(upload => 
-            upload.file === file 
-              ? { 
-                  ...upload, 
-                  status: 'error' as const, 
-                  error: error instanceof Error ? error.message : 'Upload failed'
-                }
+          setUploads(prev => prev.map(upload =>
+            upload.file === file
+              ? {
+                ...upload,
+                status: 'error' as const,
+                error: error instanceof Error ? error.message : 'Upload failed'
+              }
               : upload
           ));
 
@@ -223,7 +223,7 @@ export default function AdminUploadsPage() {
       console.error('Supabase admin client error:', error);
       toast({
         title: "Configuration Error",
-        description: "Please set NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY environment variable for admin uploads",
+        description: "Please set SUPABASE_SERVICE_ROLE_KEY environment variable for admin uploads",
         variant: "destructive"
       });
     }
@@ -286,7 +286,7 @@ export default function AdminUploadsPage() {
       ws.on('error', onError);
     });
 
-    try { ws.destroy(); } catch {}
+    try { ws.destroy(); } catch { }
     URL.revokeObjectURL(objectUrl);
     document.body.removeChild(tempContainer);
     return peaks;
@@ -341,7 +341,7 @@ export default function AdminUploadsPage() {
                 Create New Artist
               </Link>
             </div>
-            
+
             <div className="flex items-center gap-4">
               <select
                 value={selectedArtistId}
@@ -364,7 +364,7 @@ export default function AdminUploadsPage() {
                 </div>
               )}
             </div>
-            
+
             {!selectedArtistId && (
               <p className="text-sm text-yellow-400 mt-2">
                 ⚠️ Please select an artist before uploading files
@@ -438,48 +438,48 @@ export default function AdminUploadsPage() {
                     return aNum - bNum;
                   })
                   .map((upload, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-4 bg-gray-700/50 rounded-lg border border-gray-600"
-                  >
-                    <div className="flex items-center space-x-3 flex-1">
-                      {getStatusIcon(upload.status)}
-                      <div className="flex-1">
-                        <p className="font-medium text-sm">{upload.file.name}</p>
-                        {upload.artistName && (
-                          <p className="text-xs text-blue-400">Artist: {upload.artistName}</p>
-                        )}
-                        {/* Show set number if available */}
-                        {upload.setNumber !== undefined && (
-                          <p className="text-xs text-blue-400">Set #{upload.setNumber}</p>
-                        )}
-                        <p className="text-xs text-gray-400">
-                          {(upload.file.size / 1024 / 1024).toFixed(2)} MB
-                        </p>
-                        {upload.status === 'uploading' && (
-                          <div className="w-full bg-gray-600 rounded-full h-2 mt-2">
-                            <div
-                              className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                              style={{ width: `${upload.progress}%` }}
-                            />
-                          </div>
-                        )}
-                        {upload.status === 'error' && upload.error && (
-                          <p className="text-xs text-red-400 mt-1">{upload.error}</p>
-                        )}
-                      </div>
-                    </div>
-
-                    <Button
-                      onClick={() => removeUpload(upload.file)}
-                      variant="ghost"
-                      size="sm"
-                      className="text-gray-400 hover:text-red-400"
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-4 bg-gray-700/50 rounded-lg border border-gray-600"
                     >
-                      <XCircle className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
+                      <div className="flex items-center space-x-3 flex-1">
+                        {getStatusIcon(upload.status)}
+                        <div className="flex-1">
+                          <p className="font-medium text-sm">{upload.file.name}</p>
+                          {upload.artistName && (
+                            <p className="text-xs text-blue-400">Artist: {upload.artistName}</p>
+                          )}
+                          {/* Show set number if available */}
+                          {upload.setNumber !== undefined && (
+                            <p className="text-xs text-blue-400">Set #{upload.setNumber}</p>
+                          )}
+                          <p className="text-xs text-gray-400">
+                            {(upload.file.size / 1024 / 1024).toFixed(2)} MB
+                          </p>
+                          {upload.status === 'uploading' && (
+                            <div className="w-full bg-gray-600 rounded-full h-2 mt-2">
+                              <div
+                                className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                                style={{ width: `${upload.progress}%` }}
+                              />
+                            </div>
+                          )}
+                          {upload.status === 'error' && upload.error && (
+                            <p className="text-xs text-red-400 mt-1">{upload.error}</p>
+                          )}
+                        </div>
+                      </div>
+
+                      <Button
+                        onClick={() => removeUpload(upload.file)}
+                        variant="ghost"
+                        size="sm"
+                        className="text-gray-400 hover:text-red-400"
+                      >
+                        <XCircle className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
               </div>
             </div>
           )}
