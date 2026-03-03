@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react';
+import { useWebHaptics } from "web-haptics/react";
 import Link from 'next/link';
 import PageLayout from '@/components/layout/PageLayout';
 import { getPublishedBlogs, type Blog } from '@/data/blogs-supabase';
@@ -25,6 +26,7 @@ const BLOG_IMAGES = [
 
 export default function BlogPage() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
+  const { trigger } = useWebHaptics();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [swipeDirection, setSwipeDirection] = useState<'horizontal' | 'vertical'>('horizontal');
@@ -39,7 +41,7 @@ export default function BlogPage() {
       setIsLoading(false);
       return;
     }
-    
+
     loadBlogs();
   }, []);
 
@@ -71,7 +73,7 @@ export default function BlogPage() {
   const handleTouchEnd = (swiper: SwiperType, event: MouseEvent | PointerEvent | TouchEvent) => {
     const touchEndTime = Date.now();
     let clientX: number, clientY: number;
-    
+
     if ('changedTouches' in event) {
       const touch = event.changedTouches[0];
       clientX = touch.clientX;
@@ -80,31 +82,31 @@ export default function BlogPage() {
       clientX = event.clientX;
       clientY = event.clientY;
     }
-    
+
     const deltaTime = touchEndTime - touchStartTime.current;
     const deltaX = Math.abs(clientX - touchStartPos.current.x);
     const deltaY = Math.abs(clientY - touchStartPos.current.y);
     const delta = Math.max(deltaX, deltaY);
-    
+
     // Determine swipe direction
     const isVertical = deltaY > deltaX;
     setSwipeDirection(isVertical ? 'vertical' : 'horizontal');
-    
+
     // Calculate velocity (pixels per millisecond)
     const velocity = delta / deltaTime;
-    
+
     // Detect fast swipe (velocity > 1.5 pixels/ms)
     if (velocity > 1.5 && swiper.el) {
       // Remove old classes
       swiper.el.classList.remove('fast-swipe', 'fast-swipe-horizontal', 'fast-swipe-vertical');
-      
+
       // Add appropriate class based on direction
       if (isVertical) {
         swiper.el.classList.add('fast-swipe', 'fast-swipe-vertical');
       } else {
         swiper.el.classList.add('fast-swipe', 'fast-swipe-horizontal');
       }
-      
+
       // Remove the classes after animation
       if (fastSwipeTimer.current) {
         clearTimeout(fastSwipeTimer.current);
@@ -123,12 +125,12 @@ export default function BlogPage() {
         <title>Blog - Electronic Music News | Origins Radio</title>
         <meta name="description" content="Stay updated with the latest electronic music news, artist interviews, and scene insights from Origins Radio." />
       </Helmet>
-      
+
       <PageLayout showFooter={false}>
         <div className="fixed inset-0 blog-page-bg">
           <NaturalBackground />
           <ParticlesHeader />
-          
+
           {/* Loading State */}
           {isLoading && (
             <div className="flex justify-center items-center h-screen">
@@ -302,33 +304,37 @@ export default function BlogPage() {
               >
                 {blogs.flatMap((blog, index) => {
                   const numSpacers = index % 2 === 0 ? 1 : 2;
-                  
+
                   // Calculate starting image index for this blog post
                   const blogImageIndex = index % BLOG_IMAGES.length;
-                  
+
                   const spacers = Array.from({ length: numSpacers }, (_, i) => {
                     // Cycle through images for spacers
                     const spacerImageIndex = (blogImageIndex + i + 1) % BLOG_IMAGES.length;
                     return (
                       <SwiperSlide key={`spacer-${blog.id}-${index}-${i}`}>
                         <div className="relative w-full h-full">
-                          <img 
-                            className="w-full h-full object-cover" 
-                            src={BLOG_IMAGES[spacerImageIndex]} 
-                            alt="Blog content" 
+                          <img
+                            className="w-full h-full object-cover"
+                            src={BLOG_IMAGES[spacerImageIndex]}
+                            alt="Blog content"
                           />
                           <div className="absolute inset-0 bg-[#000000]/20" />
                         </div>
                       </SwiperSlide>
                     );
                   });
-                  
+
                   // Use blog cover image if available, otherwise fallback to placeholder
                   const coverImage = blog.cover_image_url || BLOG_IMAGES[blogImageIndex];
-                  
+
                   return [
                     <SwiperSlide key={blog.id}>
-                      <Link href={`/blog/${blog.slug}`} className="block h-full">
+                      <Link
+                        href={`/blog/${blog.slug}`}
+                        className="block h-full"
+                        onClick={() => trigger('light')}
+                      >
                         <div className="relative w-full h-full">
                           <img className="w-full h-full object-cover" src={coverImage} alt={blog.title} />
                           <div className="absolute inset-0 bg-[#000000]/40 flex items-center justify-center p-6">

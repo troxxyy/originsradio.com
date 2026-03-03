@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useWebHaptics } from "web-haptics/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import EventRules from "@/components/events/EventRules";
@@ -31,6 +32,7 @@ const TicketPurchaseModal = ({
   ticketUrl,
   tiers,
 }: TicketPurchaseModalProps) => {
+  const { trigger } = useWebHaptics();
   const [selectedTierId, setSelectedTierId] = useState<string>(tiers[0]?.id ?? "");
   const [quantity, setQuantity] = useState<number>(1);
   const [email, setEmail] = useState<string>("");
@@ -55,6 +57,7 @@ const TicketPurchaseModal = ({
       if (email) url.searchParams.set("email", email);
       window.open(url.toString(), "_blank");
     } catch {
+      trigger('medium');
       window.open(ticketUrl, "_blank");
     }
   };
@@ -95,8 +98,10 @@ const TicketPurchaseModal = ({
         qr_public_url: string;
       }>;
       if (!tickets || tickets.length === 0) throw new Error("No tickets returned");
+      trigger('success');
       setIssuedTickets(tickets);
     } catch (err: any) {
+      trigger('error');
       setIssueError(err?.message ?? "Failed to issue ticket");
     } finally {
       setIsIssuing(false);
@@ -132,7 +137,7 @@ const TicketPurchaseModal = ({
                   </p>
                 )}
               </div>
-              <button aria-label="Close" onClick={onClose} className="rounded-full p-2 text-white/80 hover:bg-white/10 min-h-[44px] min-w-[44px] flex items-center justify-center">
+              <button aria-label="Close" onClick={() => { trigger('light'); onClose(); }} className="rounded-full p-2 text-white/80 hover:bg-white/10 min-h-[44px] min-w-[44px] flex items-center justify-center">
                 <X size={20} />
               </button>
             </div>
@@ -144,10 +149,12 @@ const TicketPurchaseModal = ({
                   {tiers.map((tier) => (
                     <button
                       key={tier.id}
-                      onClick={() => setSelectedTierId(tier.id)}
-                      className={`w-full rounded-xl border p-4 text-left transition min-h-[56px] ${
-                        (selectedTier?.id ?? "") === tier.id ? "border-white/60 bg-white/10" : "border-white/10 hover:border-white/20"
-                      }`}
+                      onClick={() => {
+                        trigger('light');
+                        setSelectedTierId(tier.id);
+                      }}
+                      className={`w-full rounded-xl border p-4 text-left transition min-h-[56px] ${(selectedTier?.id ?? "") === tier.id ? "border-white/60 bg-white/10" : "border-white/10 hover:border-white/20"
+                        }`}
                     >
                       <div className="flex items-center justify-between">
                         <div>
@@ -171,7 +178,10 @@ const TicketPurchaseModal = ({
                   <div className="flex items-center gap-3">
                     <button
                       className="rounded-lg border border-white/10 px-4 py-3 text-lg hover:border-white/20 min-h-[44px] min-w-[44px] flex items-center justify-center"
-                      onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                      onClick={() => {
+                        trigger('light');
+                        setQuantity((q) => Math.max(1, q - 1));
+                      }}
                     >
                       −
                     </button>
@@ -186,7 +196,10 @@ const TicketPurchaseModal = ({
                     />
                     <button
                       className="rounded-lg border border-white/10 px-4 py-3 text-lg hover:border-white/20 min-h-[44px] min-w-[44px] flex items-center justify-center"
-                      onClick={() => setQuantity((q) => q + 1)}
+                      onClick={() => {
+                        trigger('light');
+                        setQuantity((q) => q + 1);
+                      }}
                     >
                       +
                     </button>
@@ -238,14 +251,15 @@ const TicketPurchaseModal = ({
                   disabled={(total === 0 && !isEmailValid) || (total > 0 && !ticketUrl) || isIssuing}
                   onClick={() => {
                     if (total === 0) {
+                      trigger('medium');
                       issueFreeTickets();
                     } else {
+                      trigger('medium');
                       handleCheckout();
                     }
                   }}
-                  className={`w-full rounded-xl px-5 py-4 font-medium transition min-h-[52px] text-sm sm:text-base ${
-                    (total === 0 ? (isEmailValid ? "bg-white text-black hover:bg-white/90" : "bg-white/10 text-white/50 cursor-not-allowed") : (ticketUrl ? "bg-white text-black hover:bg-white/90" : "bg-white/10 text-white/50 cursor-not-allowed"))
-                  }`}
+                  className={`w-full rounded-xl px-5 py-4 font-medium transition min-h-[52px] text-sm sm:text-base ${(total === 0 ? (isEmailValid ? "bg-white text-black hover:bg-white/90" : "bg-white/10 text-white/50 cursor-not-allowed") : (ticketUrl ? "bg-white text-black hover:bg-white/90" : "bg-white/10 text-white/50 cursor-not-allowed"))
+                    }`}
                 >
                   {isIssuing ? "Issuing..." : total === 0 ? (isEmailValid ? "Get Free Ticket" : "Enter email to get ticket") : "Continue to checkout"}
                 </button>

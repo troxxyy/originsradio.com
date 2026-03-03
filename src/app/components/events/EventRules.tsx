@@ -1,4 +1,5 @@
 import { ShieldAlert, Languages } from "lucide-react";
+import { useWebHaptics } from "web-haptics/react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -37,9 +38,11 @@ const titles = {
 };
 
 const EventRules = ({ className }: EventRulesProps) => {
+  const { trigger } = useWebHaptics();
   const [language, setLanguage] = useState<"en" | "tr">("en");
 
   const toggleLanguage = () => {
+    trigger('light');
     setLanguage(language === "en" ? "tr" : "en");
   };
 

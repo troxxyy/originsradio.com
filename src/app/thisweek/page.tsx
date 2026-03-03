@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from "react";
+import { useWebHaptics } from "web-haptics/react";
 import { Calendar, MapPin, Users, Ticket, Clock, Wrench } from "lucide-react";
 import PageLayout from "@/components/layout/PageLayout";
 import NaturalBackground from "@/components/ui/NaturalBackground";
@@ -153,6 +154,7 @@ const baseClubs: ClubScheduleItem[] = [
 type CityKey = "ankara" | "istanbul" | "izmir" | "antalya";
 
 export default function ThisWeekPage() {
+  const { trigger } = useWebHaptics();
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -169,7 +171,7 @@ export default function ThisWeekPage() {
 
   // Fetch this week's events from Supabase
   const { data: thisWeekEvents, isLoading: isLoadingEvents } = useThisWeekEventsByDate(startDate, endDate);
-  
+
   // Fetch our work projects for our events
   const { data: ourWorkProjects, isLoading: isLoadingOurWork } = useOurWorkProjects();
 
@@ -284,8 +286,8 @@ export default function ThisWeekPage() {
       value === undefined
         ? "TBD"
         : value === 0
-        ? "0.00 Turkish Lira"
-        : `${value.toLocaleString(undefined, { maximumFractionDigits: 0 })} Turkish Lira`;
+          ? "0.00 Turkish Lira"
+          : `${value.toLocaleString(undefined, { maximumFractionDigits: 0 })} Turkish Lira`;
     return (
       <div className="flex items-center gap-2 text-sm text-gray-200">
         <Ticket className="w-4 h-4 text-white/80" />
@@ -316,7 +318,7 @@ export default function ThisWeekPage() {
     <PageLayout>
       {/* Natural warm background */}
       <NaturalBackground />
-      
+
       <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
         {/* Hero */}
         <div className="text-center mb-12">
@@ -339,12 +341,14 @@ export default function ThisWeekPage() {
             ].map((t) => (
               <button
                 key={t.key}
-                onClick={() => setCity(t.key as CityKey)}
-                className={`px-4 py-2 text-sm rounded-full transition-colors ${
-                  city === (t.key as CityKey)
-                    ? "bg-white/10 text-white"
-                    : "text-gray-300 hover:text-white"
-                }`}
+                onClick={() => {
+                  trigger('light');
+                  setCity(t.key as CityKey);
+                }}
+                className={`px-4 py-2 text-sm rounded-full transition-colors ${city === (t.key as CityKey)
+                  ? "bg-white/10 text-white"
+                  : "text-gray-300 hover:text-white"
+                  }`}
               >
                 {t.label}
               </button>
@@ -368,11 +372,10 @@ export default function ThisWeekPage() {
                 <div className="p-5">
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                     {day.items.map((item) => (
-                      <div key={`${day.label}-${item.id}`} className={`group rounded-2xl border transition-all overflow-hidden ${
-                        item.isOurEvent 
-                          ? "border-orange-500/30 bg-gradient-to-br from-orange-500/10 to-orange-600/5 hover:bg-gradient-to-br hover:from-orange-500/15 hover:to-orange-600/10 hover:shadow-[0_0_30px_rgba(255,165,0,0.15)]" 
-                          : "border-white/10 bg-white/[0.06] hover:bg-white/[0.08] hover:shadow-[0_0_30px_rgba(255,255,255,0.08)]"
-                      }`}>
+                      <div key={`${day.label}-${item.id}`} className={`group rounded-2xl border transition-all overflow-hidden ${item.isOurEvent
+                        ? "border-orange-500/30 bg-gradient-to-br from-orange-500/10 to-orange-600/5 hover:bg-gradient-to-br hover:from-orange-500/15 hover:to-orange-600/10 hover:shadow-[0_0_30px_rgba(255,165,0,0.15)]"
+                        : "border-white/10 bg-white/[0.06] hover:bg-white/[0.08] hover:shadow-[0_0_30px_rgba(255,255,255,0.08)]"
+                        }`}>
                         {/* Poster */}
                         <div className="relative bg-white/5 border-b border-white/10 aspect-[4/5] overflow-hidden">
                           {item.eventImageUrl ? (
@@ -416,6 +419,7 @@ export default function ThisWeekPage() {
                               target="_blank"
                               rel="noreferrer"
                               className="absolute inset-0"
+                              onClick={() => trigger('light')}
                               aria-label={`Open ${item.name} event`}
                             />
                           )}
@@ -457,11 +461,13 @@ export default function ThisWeekPage() {
                                   href={item.eventUrl}
                                   target="_blank"
                                   rel="noreferrer"
-                                  className={`inline-flex items-center gap-2 text-sm px-3 py-1 rounded-md border transition-colors ${
-                                    item.isOurEvent
-                                      ? "text-orange-100 bg-orange-500/20 border-orange-400/30 hover:bg-orange-500/30"
-                                      : "text-white/90 bg-white/10 border-white/10 hover:bg-white/15"
-                                  }`}
+                                  onClick={() => {
+                                    trigger('medium');
+                                  }}
+                                  className={`inline-flex items-center gap-2 text-sm px-3 py-1 rounded-md border transition-colors ${item.isOurEvent
+                                    ? "text-orange-100 bg-orange-500/20 border-orange-400/30 hover:bg-orange-500/30"
+                                    : "text-white/90 bg-white/10 border-white/10 hover:bg-white/15"
+                                    }`}
                                 >
                                   {item.isOurEvent ? "Get Tickets" : "View event"}
                                 </a>

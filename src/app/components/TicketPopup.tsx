@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { useWebHaptics } from 'web-haptics/react';
 
 const TicketPopup = () => {
+  const { trigger } = useWebHaptics();
   // Temporarily disabled
   return null;
 
@@ -26,10 +28,12 @@ const TicketPopup = () => {
   }, []);
 
   const handleClose = () => {
+    trigger('light');
     setIsOpen(false);
   };
 
   const handleImageClick = () => {
+    trigger('medium');
     window.open('https://biletino.com/tr/e-126q/eczodia-originsradio-presents-pixel-ankara/', '_blank');
   };
 

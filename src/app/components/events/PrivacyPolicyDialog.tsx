@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Shield, Languages } from "lucide-react";
+import { useWebHaptics } from "web-haptics/react";
 import { useState } from "react";
 
 interface PrivacyPolicyDialogProps {
@@ -16,12 +17,13 @@ interface PrivacyPolicyDialogProps {
   buttonClassName?: string;
 }
 
-const PrivacyPolicyDialog = ({ 
-  triggerLabel = 'Privacy Policy', 
-  variant = 'outline', 
-  size = 'default', 
-  buttonClassName 
+const PrivacyPolicyDialog = ({
+  triggerLabel = 'Privacy Policy',
+  variant = 'outline',
+  size = 'default',
+  buttonClassName
 }: PrivacyPolicyDialogProps) => {
+  const { trigger } = useWebHaptics();
   const [language, setLanguage] = useState<'en' | 'tr'>('en');
 
   const englishPrivacyPolicy = (
@@ -181,9 +183,10 @@ const PrivacyPolicyDialog = ({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button 
+        <Button
           variant={variant}
           size={size}
+          onClick={() => trigger('light')}
           className={buttonClassName ?? "border-white/20 bg-white/5 text-white hover:bg-white/10"}
         >
           <Shield className="w-4 h-4 mr-2" />
@@ -201,7 +204,10 @@ const PrivacyPolicyDialog = ({
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
               <Button
-                onClick={() => setLanguage(language === 'en' ? 'tr' : 'en')}
+                onClick={() => {
+                  trigger('light');
+                  setLanguage(language === 'en' ? 'tr' : 'en');
+                }}
                 variant="outline"
                 size="sm"
                 className="flex items-center gap-2 border-white/20 bg-white/5 text-white hover:bg-white/10 min-h-[44px] min-w-[60px]"
@@ -212,7 +218,7 @@ const PrivacyPolicyDialog = ({
             </div>
           </div>
         </DialogHeader>
-        
+
         <div className="mt-4 sm:mt-6 rounded-xl border border-white/10 bg-white/5 p-4 sm:p-6 max-h-[65vh] overflow-y-auto">
           {language === 'en' ? englishPrivacyPolicy : turkishPrivacyPolicy}
         </div>

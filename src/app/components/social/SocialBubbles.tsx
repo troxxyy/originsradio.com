@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from "react";
+import { useWebHaptics } from "web-haptics/react";
 import { Youtube, Instagram, Cloud, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -13,6 +14,7 @@ const socialLinks = [
 
 const SocialBubbles = () => {
   const [mounted, setMounted] = useState(false);
+  const { trigger } = useWebHaptics();
 
   useEffect(() => {
     const timer = setTimeout(() => setMounted(true), 600);
@@ -28,7 +30,7 @@ const SocialBubbles = () => {
       <div className="flex items-center gap-1">
         {socialLinks.map((link, index) => {
           const IconComponent = link.icon;
-          
+
           return (
             <a
               key={link.key}
@@ -42,13 +44,14 @@ const SocialBubbles = () => {
                 "hover:scale-110 hover:-translate-y-1",
                 "group"
               )}
-              style={{ 
+              style={{
                 transitionDelay: `${index * 50}ms`
               }}
+              onClick={() => trigger('light')}
               aria-label={link.label}
             >
-              <IconComponent 
-                className="w-4 h-4 text-white/40 group-hover:text-white/70 transition-colors" 
+              <IconComponent
+                className="w-4 h-4 text-white/40 group-hover:text-white/70 transition-colors"
                 strokeWidth={1.5}
               />
             </a>

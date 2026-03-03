@@ -1,14 +1,16 @@
 'use client'
 
 import { Mail, Youtube, Instagram, Cloud, Radio, MapPin, Calendar, Music } from "lucide-react";
+import { useWebHaptics } from "web-haptics/react";
 import { Button } from "@/components/ui/button";
 import PrivacyPolicyDialog from "./PrivacyPolicyDialog";
 import ConsumerDisclosureDialog from "./ConsumerDisclosureDialog";
 import Link from "next/link";
 
-interface EventFooterProps {}
+interface EventFooterProps { }
 
-const EventFooter = ({}: EventFooterProps) => {
+const EventFooter = ({ }: EventFooterProps) => {
+  const { trigger } = useWebHaptics();
   const currentYear = new Date().getFullYear();
 
   return (
@@ -16,7 +18,7 @@ const EventFooter = ({}: EventFooterProps) => {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-12">
         {/* Decorative top border with gradient */}
         <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent mb-8 sm:mb-12" />
-        
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-12 py-8 sm:py-12">
           {/* About Section */}
           <div className="space-y-4">
@@ -37,19 +39,19 @@ const EventFooter = ({}: EventFooterProps) => {
           <div className="space-y-4">
             <h3 className="text-sm sm:text-base font-semibold uppercase tracking-wide text-white/90">Explore</h3>
             <div className="flex flex-col gap-4">
-              <Link href="/" className="text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 flex items-center gap-2 py-1">
+              <Link href="/" onClick={() => trigger('light')} className="text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 flex items-center gap-2 py-1">
                 <Music className="h-4 w-4" />
                 Live Radio
               </Link>
-              <Link href="/events" className="text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 flex items-center gap-2 py-1">
+              <Link href="/events" onClick={() => trigger('light')} className="text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 flex items-center gap-2 py-1">
                 <Calendar className="h-4 w-4" />
                 Events
               </Link>
-              <Link href="/artists" className="text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 flex items-center gap-2 py-1">
+              <Link href="/artists" onClick={() => trigger('light')} className="text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 flex items-center gap-2 py-1">
                 <Radio className="h-4 w-4" />
                 Artists
               </Link>
-              <Link href="/about" className="text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 py-1">
+              <Link href="/about" onClick={() => trigger('light')} className="text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 py-1">
                 About Us
               </Link>
             </div>
@@ -59,39 +61,43 @@ const EventFooter = ({}: EventFooterProps) => {
           <div className="space-y-4">
             <h3 className="text-sm sm:text-base font-semibold uppercase tracking-wide text-white/90">Connect</h3>
             <div className="space-y-4">
-              <a 
-                href="mailto:info@originsradio.com" 
+              <a
+                href="mailto:info@originsradio.com"
+                onClick={() => trigger('light')}
                 className="inline-flex items-center gap-2 text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 py-1 min-h-[44px]"
               >
-                <Mail className="h-4 w-4" /> 
+                <Mail className="h-4 w-4" />
                 info@originsradio.com
               </a>
-              
+
               <div className="space-y-3">
                 <div className="text-xs sm:text-sm uppercase tracking-wide text-white/60 mb-3">Follow Us</div>
                 <div className="flex flex-col gap-3">
-                  <a 
-                    href="https://www.youtube.com/@originsradiotr" 
-                    target="_blank" 
+                  <a
+                    href="https://www.youtube.com/@originsradiotr"
+                    target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => trigger('light')}
                     className="inline-flex items-center gap-2 text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 py-1 min-h-[44px]"
                   >
                     <Youtube className="h-4 w-4" />
                     YouTube
                   </a>
-                  <a 
-                    href="https://www.instagram.com/origins.radio/" 
-                    target="_blank" 
+                  <a
+                    href="https://www.instagram.com/origins.radio/"
+                    target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => trigger('light')}
                     className="inline-flex items-center gap-2 text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 py-1 min-h-[44px]"
                   >
                     <Instagram className="h-4 w-4" />
                     Instagram
                   </a>
-                  <a 
-                    href="https://on.soundcloud.com/RAQQfrZ27sD539NXA" 
-                    target="_blank" 
+                  <a
+                    href="https://on.soundcloud.com/RAQQfrZ27sD539NXA"
+                    target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => trigger('light')}
                     className="inline-flex items-center gap-2 text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 py-1 min-h-[44px]"
                   >
                     <Cloud className="h-4 w-4" />

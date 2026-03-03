@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useState, useEffect, useMemo } from "react";
+import { useWebHaptics } from "web-haptics/react";
 import { Calendar, MapPin } from "lucide-react";
 import PageLayout from "@/components/layout/PageLayout";
 import NaturalBackground from "@/components/ui/NaturalBackground";
@@ -50,7 +51,7 @@ const staticProjects: ProjectUiModel[] = [
       { id: "door", name: "At The Door", price: 550, currency: "TRY" },
     ],
   },
-  
+
   {
     title: "NADIDANE - CATAMARAN SESSIONS",
     description: "The ultimate sea party took over Kuşadası, Aydın, bringing together hundreds of partygoers for an unforgettable experience! Hosted by us, the event was filled with high-energy music, endless dancing, and incredible vibes. Under the shining sun and on the wavy sea, we created memories that will last a lifetime.Missed it? Stay tuned for our next adventure in 2025 summer.",
@@ -124,7 +125,7 @@ const staticProjects: ProjectUiModel[] = [
     "date": "January 20, 2023",
     upcoming: false
   },
-  
+
   {
     "title": "DISCO NIGHT AT IF PERFORMANCE HALL",
     "description": "Taking a step back in time, Disco Night on April 2nd at IF Performance Hall was a dazzling tribute to the golden era of disco. Featuring AUF's special disco set alongside CASTOR and SUNTER, the event brought groovy basslines, glittering outfits, and a dance floor packed with nostalgia-fueled energy. The 70s-themed decor, complete with disco balls and psychedelic visuals, created an immersive atmosphere where every guest felt like they had stepped into a Studio 54 dreamscape. A night of pure joy and retro vibes!",
@@ -138,14 +139,15 @@ const staticProjects: ProjectUiModel[] = [
 export default function EventsPage() {
   const [isNavigating, setIsNavigating] = useState(false);
   const { data: remoteProjects, isLoading } = useOurWorkProjects();
-  
+  const { trigger } = useWebHaptics();
+
   // Scroll to top when component mounts
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-  
 
-  
+
+
   // Get all unique tags - memoized to prevent recalculation
   const projects: ProjectUiModel[] = useMemo(() => {
     if (remoteProjects && remoteProjects.length > 0) {
@@ -171,31 +173,31 @@ export default function EventsPage() {
   const upcomingEvents = useMemo(() => {
     return projects.filter(project => project.upcoming);
   }, [projects]);
-  
+
   const pastEvents = useMemo(() => {
     return projects.filter(project => !project.upcoming);
   }, [projects]);
-  
+
   // Helper function to parse date strings
   const parseDate = (dateStr: string): Date => {
     // Handle "Every Friday" and similar recurring events
     if (dateStr.toLowerCase().includes('every') || dateStr.toLowerCase().includes('weekly')) {
       return new Date('2099-12-31'); // Put recurring events at the top
     }
-    
+
     // Parse formats like "April 2, 2023", "March 28, 2024", "August 29, Friday — Doors 22:00"
     // Extract the date part before any "—" or extra text
     const cleanDateStr = dateStr.split('—')[0].split('-')[0].trim();
-    
+
     // Try to match month name, day, year pattern
-    const monthNames = ['january', 'february', 'march', 'april', 'may', 'june', 
-                       'july', 'august', 'september', 'october', 'november', 'december'];
-    
+    const monthNames = ['january', 'february', 'march', 'april', 'may', 'june',
+      'july', 'august', 'september', 'october', 'november', 'december'];
+
     const monthAbbr = ['jan', 'feb', 'mar', 'apr', 'may', 'jun',
-                      'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
-    
+      'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+
     const lowerDateStr = cleanDateStr.toLowerCase();
-    
+
     // Find month index
     let monthIndex = -1;
     for (let i = 0; i < monthNames.length; i++) {
@@ -204,12 +206,12 @@ export default function EventsPage() {
         break;
       }
     }
-    
+
     if (monthIndex !== -1) {
       // Extract day and year using regex
       const dayMatch = cleanDateStr.match(/\b(\d{1,2})\b/);
       const yearMatch = cleanDateStr.match(/\b(20\d{2})\b/);
-      
+
       if (dayMatch && yearMatch) {
         const day = parseInt(dayMatch[1], 10);
         const year = parseInt(yearMatch[1], 10);
@@ -221,13 +223,13 @@ export default function EventsPage() {
         return new Date(currentYear, monthIndex, day);
       }
     }
-    
+
     // Fallback: Try to parse with native Date constructor
     const date = new Date(cleanDateStr);
     if (!isNaN(date.getTime())) {
       return date;
     }
-    
+
     // If parsing fails, return a very old date
     return new Date('1900-01-01');
   };
@@ -264,9 +266,12 @@ export default function EventsPage() {
       transition={{ duration: 0.5, delay: index * 0.1 }}
       className="group cursor-pointer h-full"
     >
-      <Link 
+      <Link
         href={`/events/${project.slug || generateSlug(project.title)}`}
-        onClick={() => setIsNavigating(true)}
+        onClick={() => {
+          trigger('light');
+          setIsNavigating(true);
+        }}
       >
         <div className={`glass backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.1)] transform-gpu hover:scale-105 h-full flex flex-col min-h-[28rem] sm:min-h-[30rem] md:min-h-[32rem] lg:min-h-[34rem] ${isPast ? 'opacity-60' : ''}`}>
           {/* Project Image */}
@@ -280,7 +285,7 @@ export default function EventsPage() {
               }}
             />
             <div className={`absolute inset-0 ${isPast ? 'bg-black/40' : 'bg-gradient-to-t from-black/60 via-transparent to-transparent'}`} />
-            
+
             {/* Upcoming marquee strip */}
             {project.upcoming && !isNavigating && (
               <div className="absolute top-0 left-0 right-0 h-10 bg-black/60 border-b border-white/10 overflow-hidden">
@@ -313,7 +318,7 @@ export default function EventsPage() {
             <h3 className={`text-xl font-semibold mb-1 group-hover:text-white/90 transition-colors line-clamp-2 min-h-[3.25rem] ${isPast ? 'text-gray-400' : 'text-white'}`}>
               {project.title}
             </h3>
-            
+
             {project.date && (
               <div className="flex items-center gap-2 text-gray-400 mb-3">
                 <Calendar className="w-4 h-4" />
@@ -340,7 +345,7 @@ export default function EventsPage() {
     <PageLayout>
       {/* Natural warm background */}
       <NaturalBackground />
-      
+
       <div className={`min-h-screen ${isNavigating ? 'navigating' : ''}`}>
         {/* Hero Section */}
         <div className="relative py-20 px-4 sm:px-6 lg:px-8">
@@ -388,7 +393,7 @@ export default function EventsPage() {
                   <h2 className="text-3xl font-bold text-white mb-4">Upcoming Events</h2>
                   <div className="w-24 h-1 bg-gradient-to-r from-white to-gray-400 rounded-full"></div>
                 </motion.div>
-                
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8">
                   {sortedUpcomingEvents.map((project, index) => (
                     <EventCard key={project.title} project={project} index={index} />
@@ -409,7 +414,7 @@ export default function EventsPage() {
                   <h2 className="text-3xl font-bold text-gray-400 mb-4">Past Events</h2>
                   <div className="w-24 h-1 bg-gradient-to-r from-gray-400 to-gray-600 rounded-full"></div>
                 </motion.div>
-                
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8">
                   {sortedPastEvents.map((project, index) => (
                     <EventCard key={project.title} project={project} index={index} isPast={true} />

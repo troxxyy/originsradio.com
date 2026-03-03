@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import React, { useEffect, useState, useRef } from "react";
+import { useWebHaptics } from "web-haptics/react";
 import dynamic from "next/dynamic";
 import { Ticket, Users, Radio, Navigation, BookOpen, Info, Youtube, Instagram, Cloud, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -42,6 +43,7 @@ const socialLinks = [
 const HomeHero: React.FC = () => {
   const [mounted, setMounted] = useState(false);
   const [hoveredRoute, setHoveredRoute] = useState<RouteKey | null>(null);
+  const { trigger } = useWebHaptics();
   const [videoOpacity, setVideoOpacity] = useState(1.0);
   const { currentSlot } = useCurrentRadioSlot(5000);
   const isMobile = useIsMobile();
@@ -218,6 +220,7 @@ const HomeHero: React.FC = () => {
                   className="group relative outline-none flex-shrink-0 snap-center"
                   onMouseEnter={() => setHoveredRoute(route.key)}
                   onMouseLeave={() => setHoveredRoute(null)}
+                  onClick={() => trigger('light')}
                 >
                   <div className={cn(
                     "relative flex items-center justify-center gap-2 sm:gap-3 px-3 sm:px-6 py-2.5 sm:py-4 rounded-full",
@@ -262,6 +265,7 @@ const HomeHero: React.FC = () => {
                     "transition-all duration-300 ease-out",
                     "group"
                   )}
+                  onClick={() => trigger('light')}
                   aria-label={link.label}
                 >
                   <IconComponent
@@ -286,6 +290,7 @@ const HomeHero: React.FC = () => {
                 "backdrop-blur-md overflow-hidden transition-all duration-500",
                 "hover:scale-105 hover:from-cyan-500/20 hover:to-teal-500/20 hover:border-cyan-400/50 hover:shadow-[0_0_30px_rgba(34,211,238,0.2)]"
               )}
+              onClick={() => trigger('medium')}
             >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer" />
               <span className="relative flex h-2 w-2">

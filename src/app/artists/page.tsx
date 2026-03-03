@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo, useRef } from 'react';
+import { useWebHaptics } from "web-haptics/react";
 import { motion, useReducedMotion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
 import { Search, Music, MapPin, Star, Tag, ArrowRight, CheckCircle2, Users, Languages } from 'lucide-react';
@@ -216,9 +217,8 @@ function SectionTitle({
       </h2>
       {subtitle ? (
         <p
-          className={`mt-4 text-base md:text-lg text-[#CFC6DB] ${
-            center ? 'max-w-2xl mx-auto' : 'max-w-2xl'
-          }`}
+          className={`mt-4 text-base md:text-lg text-[#CFC6DB] ${center ? 'max-w-2xl mx-auto' : 'max-w-2xl'
+            }`}
         >
           {subtitle}
         </p>
@@ -245,6 +245,7 @@ function Divider() {
 
 export default function ArtistsPage() {
   const [searchTerm, setSearchTerm] = useState('');
+  const { trigger } = useWebHaptics();
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
   const [showOtherGenres, setShowOtherGenres] = useState(false);
@@ -430,15 +431,15 @@ export default function ArtistsPage() {
 
   const motionIn = reduceMotion
     ? {
-        initial: { opacity: 1, y: 0 },
-        animate: { opacity: 1, y: 0 },
-        transition: { duration: 0 },
-      }
+      initial: { opacity: 1, y: 0 },
+      animate: { opacity: 1, y: 0 },
+      transition: { duration: 0 },
+    }
     : {
-        initial: { opacity: 0, y: 20 },
-        animate: { opacity: 1, y: 0 },
-        transition: { duration: 0.2, ease: 'easeOut' as const },
-      };
+      initial: { opacity: 0, y: 20 },
+      animate: { opacity: 1, y: 0 },
+      transition: { duration: 0.2, ease: 'easeOut' as const },
+    };
 
   return (
     <PageLayout>
@@ -463,7 +464,10 @@ export default function ArtistsPage() {
         )}
       >
         <motion.button
-          onClick={() => setLanguage(language === 'en' ? 'tr' : 'en')}
+          onClick={() => {
+            trigger('light');
+            setLanguage(language === 'en' ? 'tr' : 'en');
+          }}
           className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#555759]/30 border border-[#EEEef4]/20 text-[#EEEef4] hover:bg-[#555759]/40 transition-colors backdrop-blur-sm"
           whileHover={reduceMotion ? undefined : { scale: 1.05 }}
           whileTap={reduceMotion ? undefined : { scale: 0.95 }}
@@ -536,6 +540,7 @@ export default function ArtistsPage() {
               whileTap={reduceMotion ? undefined : { scale: 0.98 }}
               type="button"
               onClick={() => {
+                trigger('light');
                 rosterRef.current?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
               }}
             >
@@ -547,6 +552,7 @@ export default function ArtistsPage() {
               whileTap={reduceMotion ? undefined : { scale: 0.98 }}
               type="button"
               onClick={() => {
+                trigger('light');
                 const el = document.getElementById('booking');
                 el?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
               }}
@@ -590,50 +596,50 @@ export default function ArtistsPage() {
                 </a>
               </div>
             </div>
-            
+
             <div className="order-1 lg:order-2">
-               <SoftCard>
-                  <div className="p-8 md:p-10 flex flex-col items-center justify-center text-center space-y-6 h-full min-h-[400px]">
-                      <motion.div
-                        className="w-62 h-62 rounded-full bg-[#7DBEEE]/10 flex items-center justify-center mb-4"
-                        animate={{
-                          y: [0, -10, 0],
-                          rotate: [0, 2, -2, 0],
-                        }}
-                        transition={{
-                          duration: 4,
-                          repeat: Infinity,
-                          ease: "easeInOut",
-                        }}
-                      >
-                        <Image 
-                          src="/holoo.png" 
-                          alt="Origins Radio" 
-                          width={220} 
-                          height={220} 
-                          className="object-contain"
-                        />
-                      </motion.div>
-                      <h3 className="text-2xl font-bold text-[#EEEef4]">{copy[language].management.card.title}</h3>
-                      <p className="text-[#CFC6DB] leading-relaxed">
-                        {copy[language].management.card.body}
-                      </p>
-                      <ul className="text-left text-[#CFC6DB] space-y-3 w-full max-w-xs mx-auto">
-                        <li className="flex items-center gap-3">
-                          <CheckCircle2 className="w-5 h-5 text-[#7DBEEE]" />
-                          <span>{copy[language].management.card.bullets[0]}</span>
-                        </li>
-                        <li className="flex items-center gap-3">
-                          <CheckCircle2 className="w-5 h-5 text-[#7DBEEE]" />
-                          <span>{copy[language].management.card.bullets[1]}</span>
-                        </li>
-                        <li className="flex items-center gap-3">
-                          <CheckCircle2 className="w-5 h-5 text-[#7DBEEE]" />
-                          <span>{copy[language].management.card.bullets[2]}</span>
-                        </li>
-                      </ul>
-                  </div>
-               </SoftCard>
+              <SoftCard>
+                <div className="p-8 md:p-10 flex flex-col items-center justify-center text-center space-y-6 h-full min-h-[400px]">
+                  <motion.div
+                    className="w-62 h-62 rounded-full bg-[#7DBEEE]/10 flex items-center justify-center mb-4"
+                    animate={{
+                      y: [0, -10, 0],
+                      rotate: [0, 2, -2, 0],
+                    }}
+                    transition={{
+                      duration: 4,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  >
+                    <Image
+                      src="/holoo.png"
+                      alt="Origins Radio"
+                      width={220}
+                      height={220}
+                      className="object-contain"
+                    />
+                  </motion.div>
+                  <h3 className="text-2xl font-bold text-[#EEEef4]">{copy[language].management.card.title}</h3>
+                  <p className="text-[#CFC6DB] leading-relaxed">
+                    {copy[language].management.card.body}
+                  </p>
+                  <ul className="text-left text-[#CFC6DB] space-y-3 w-full max-w-xs mx-auto">
+                    <li className="flex items-center gap-3">
+                      <CheckCircle2 className="w-5 h-5 text-[#7DBEEE]" />
+                      <span>{copy[language].management.card.bullets[0]}</span>
+                    </li>
+                    <li className="flex items-center gap-3">
+                      <CheckCircle2 className="w-5 h-5 text-[#7DBEEE]" />
+                      <span>{copy[language].management.card.bullets[1]}</span>
+                    </li>
+                    <li className="flex items-center gap-3">
+                      <CheckCircle2 className="w-5 h-5 text-[#7DBEEE]" />
+                      <span>{copy[language].management.card.bullets[2]}</span>
+                    </li>
+                  </ul>
+                </div>
+              </SoftCard>
             </div>
           </div>
         </div>
@@ -644,12 +650,12 @@ export default function ArtistsPage() {
       {/* Booking / Filtering Section */}
       <section className="max-w-6xl mx-auto px-6" id="booking">
         <div className="text-center mb-12">
-           <SectionTitle 
-              eyebrow={copy[language].booking.eyebrow}
-              title={copy[language].booking.title}
-              subtitle={copy[language].booking.subtitle}
-              center
-           />
+          <SectionTitle
+            eyebrow={copy[language].booking.eyebrow}
+            title={copy[language].booking.title}
+            subtitle={copy[language].booking.subtitle}
+            center
+          />
         </div>
 
         <SoftCard>
@@ -669,7 +675,7 @@ export default function ArtistsPage() {
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-1 text-[#CFC6DB]/70 text-xs">
                   <kbd className="px-2 py-1 bg-[#555759]/90 rounded border border-[#EEEef4]/20 text-[#CFC6DB] text-[11px] font-mono">
                     {typeof navigator !== 'undefined' &&
-                    navigator.platform.indexOf('Mac') > -1
+                      navigator.platform.indexOf('Mac') > -1
                       ? '⌘'
                       : 'Ctrl'}
                   </kbd>
@@ -682,112 +688,121 @@ export default function ArtistsPage() {
 
               {/* Genre Clouds */}
               <div className="flex flex-col items-center gap-4">
-                 <div className="flex flex-wrap justify-center gap-2">
+                <div className="flex flex-wrap justify-center gap-2">
+                  <button
+                    onClick={() => {
+                      trigger('light');
+                      setGenreAndSyncUrl(null);
+                      setShowOtherGenres(false);
+                    }}
+                    className={cn(
+                      'px-4 py-2 rounded-full text-sm border transition-all duration-200',
+                      !selectedGenre
+                        ? 'bg-[#EEEef4] text-[#000000] border-[#EEEef4] font-semibold scale-105 shadow-lg shadow-[#EEEef4]/10'
+                        : 'bg-[#555759]/60 text-[#CFC6DB] border-[#EEEef4]/10 hover:bg-[#555759]/90 hover:border-[#EEEef4]/30'
+                    )}
+                  >
+                    {copy[language].ui.allGenres}
+                  </button>
+                  {topGenres.map((genre) => (
                     <button
+                      key={genre}
+                      onClick={() => {
+                        trigger('light');
+                        setGenreAndSyncUrl(selectedGenre === genre ? null : genre);
+                      }}
+                      className={cn(
+                        'px-4 py-2 rounded-full text-sm border transition-all duration-200',
+                        selectedGenre === genre
+                          ? 'bg-[#7DBEEE] text-[#000000] border-[#A6B2E1] font-semibold scale-105 shadow-lg shadow-[#7DBEEE]/20'
+                          : 'bg-[#555759]/60 text-[#CFC6DB] border-[#EEEef4]/10 hover:bg-[#555759]/90 hover:border-[#EEEef4]/30'
+                      )}
+                    >
+                      {genre}
+                      <span className="ml-2 opacity-70 text-xs">
+                        {genreCounts.get(genre) ?? 0}
+                      </span>
+                    </button>
+                  ))}
+                  {otherGenres.length > 0 && (
+                    <>
+                      <button
                         onClick={() => {
-                          setGenreAndSyncUrl(null);
-                          setShowOtherGenres(false);
+                          trigger('light');
+                          setShowOtherGenres(!showOtherGenres);
                         }}
                         className={cn(
                           'px-4 py-2 rounded-full text-sm border transition-all duration-200',
-                          !selectedGenre
-                            ? 'bg-[#EEEef4] text-[#000000] border-[#EEEef4] font-semibold scale-105 shadow-lg shadow-[#EEEef4]/10'
+                          showOtherGenres
+                            ? 'bg-[#7DBEEE] text-[#000000] border-[#A6B2E1] font-semibold scale-105 shadow-lg shadow-[#7DBEEE]/20'
                             : 'bg-[#555759]/60 text-[#CFC6DB] border-[#EEEef4]/10 hover:bg-[#555759]/90 hover:border-[#EEEef4]/30'
                         )}
                       >
-                        {copy[language].ui.allGenres}
+                        Others ({otherGenres.length})
                       </button>
-                      {topGenres.map((genre) => (
-                        <button
-                          key={genre}
-                          onClick={() =>
-                            setGenreAndSyncUrl(selectedGenre === genre ? null : genre)
-                          }
-                          className={cn(
-                            'px-4 py-2 rounded-full text-sm border transition-all duration-200',
-                            selectedGenre === genre
-                              ? 'bg-[#7DBEEE] text-[#000000] border-[#A6B2E1] font-semibold scale-105 shadow-lg shadow-[#7DBEEE]/20'
-                              : 'bg-[#555759]/60 text-[#CFC6DB] border-[#EEEef4]/10 hover:bg-[#555759]/90 hover:border-[#EEEef4]/30'
-                          )}
-                        >
-                          {genre}
-                          <span className="ml-2 opacity-70 text-xs">
-                            {genreCounts.get(genre) ?? 0}
-                          </span>
-                        </button>
-                      ))}
-                      {otherGenres.length > 0 && (
+                      {showOtherGenres && (
                         <>
-                          <button
-                            onClick={() => setShowOtherGenres(!showOtherGenres)}
-                            className={cn(
-                              'px-4 py-2 rounded-full text-sm border transition-all duration-200',
-                              showOtherGenres
-                                ? 'bg-[#7DBEEE] text-[#000000] border-[#A6B2E1] font-semibold scale-105 shadow-lg shadow-[#7DBEEE]/20'
-                                : 'bg-[#555759]/60 text-[#CFC6DB] border-[#EEEef4]/10 hover:bg-[#555759]/90 hover:border-[#EEEef4]/30'
-                            )}
-                          >
-                            Others ({otherGenres.length})
-                          </button>
-                          {showOtherGenres && (
-                            <>
-                              {otherGenres.map((genre) => (
-                                <button
-                                  key={genre}
-                                  onClick={() =>
-                                    setGenreAndSyncUrl(selectedGenre === genre ? null : genre)
-                                  }
-                                  className={cn(
-                                    'px-4 py-2 rounded-full text-sm border transition-all duration-200',
-                                    selectedGenre === genre
-                                      ? 'bg-[#7DBEEE] text-[#000000] border-[#A6B2E1] font-semibold scale-105 shadow-lg shadow-[#7DBEEE]/20'
-                                      : 'bg-[#555759]/60 text-[#CFC6DB] border-[#EEEef4]/10 hover:bg-[#555759]/90 hover:border-[#EEEef4]/30'
-                                  )}
-                                >
-                                  {genre}
-                                  <span className="ml-2 opacity-70 text-xs">
-                                    {genreCounts.get(genre) ?? 0}
-                                  </span>
-                                </button>
-                              ))}
-                            </>
-                          )}
+                          {otherGenres.map((genre) => (
+                            <button
+                              key={genre}
+                              onClick={() => {
+                                trigger('light');
+                                setGenreAndSyncUrl(selectedGenre === genre ? null : genre);
+                              }}
+                              className={cn(
+                                'px-4 py-2 rounded-full text-sm border transition-all duration-200',
+                                selectedGenre === genre
+                                  ? 'bg-[#7DBEEE] text-[#000000] border-[#A6B2E1] font-semibold scale-105 shadow-lg shadow-[#7DBEEE]/20'
+                                  : 'bg-[#555759]/60 text-[#CFC6DB] border-[#EEEef4]/10 hover:bg-[#555759]/90 hover:border-[#EEEef4]/30'
+                              )}
+                            >
+                              {genre}
+                              <span className="ml-2 opacity-70 text-xs">
+                                {genreCounts.get(genre) ?? 0}
+                              </span>
+                            </button>
+                          ))}
                         </>
                       )}
-                 </div>
-                 
-                 <div className="mt-4 relative group">
-                    <button
-                      onClick={() => setShowFeaturedOnly((v) => !v)}
-                      className={cn(
-                        'px-8 py-4 rounded-full text-base font-bold font-sans tracking-wide uppercase flex items-center gap-3 border-2 transition-all shadow-lg',
-                        showFeaturedOnly
-                          ? 'bg-[#d4153e] text-[#FFFFFF] border-[#d4153e] scale-105 shadow-[#d4153e]/40'
-                          : 'bg-[#d4153e]/20 text-[#FFFFFF] border-[#d4153e] hover:bg-[#d4153e]/30 hover:scale-105 hover:shadow-[#d4153e]/30'
-                      )}
-                    >
-                      <div className={cn(
-                        'p-1.5 rounded-full transition-all',
-                        showFeaturedOnly
-                          ? 'bg-[#FFFFFF]/20'
-                          : 'bg-[#d4153e]/20'
-                      )}>
-                        <Star className={cn(
-                          'w-5 h-5 transition-all',
-                          showFeaturedOnly ? 'fill-[#FFFFFF] text-[#FFFFFF]' : 'fill-[#FFFFFF] text-[#FFFFFF]'
-                        )} />
-                      </div>
-                      {showFeaturedOnly ? copy[language].ui.showingResidentsOnly : copy[language].ui.showResidentsOnly}
-                    </button>
-                    {/* Tooltip */}
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-2 bg-[#000000]/95 backdrop-blur-sm border border-[#EEEef4]/20 rounded-lg text-sm text-[#EEEef4] opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 shadow-xl max-w-xs sm:max-w-sm text-center leading-relaxed">
-                      {copy[language].ui.residentTooltip}
-                      {/* Tooltip arrow */}
-                      <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px">
-                        <div className="w-2 h-2 bg-[#000000]/95 border-r border-b border-[#EEEef4]/20 rotate-45"></div>
-                      </div>
+                    </>
+                  )}
+                </div>
+
+                <div className="mt-4 relative group">
+                  <button
+                    onClick={() => {
+                      trigger('medium');
+                      setShowFeaturedOnly((v) => !v);
+                    }}
+                    className={cn(
+                      'px-8 py-4 rounded-full text-base font-bold font-sans tracking-wide uppercase flex items-center gap-3 border-2 transition-all shadow-lg',
+                      showFeaturedOnly
+                        ? 'bg-[#d4153e] text-[#FFFFFF] border-[#d4153e] scale-105 shadow-[#d4153e]/40'
+                        : 'bg-[#d4153e]/20 text-[#FFFFFF] border-[#d4153e] hover:bg-[#d4153e]/30 hover:scale-105 hover:shadow-[#d4153e]/30'
+                    )}
+                  >
+                    <div className={cn(
+                      'p-1.5 rounded-full transition-all',
+                      showFeaturedOnly
+                        ? 'bg-[#FFFFFF]/20'
+                        : 'bg-[#d4153e]/20'
+                    )}>
+                      <Star className={cn(
+                        'w-5 h-5 transition-all',
+                        showFeaturedOnly ? 'fill-[#FFFFFF] text-[#FFFFFF]' : 'fill-[#FFFFFF] text-[#FFFFFF]'
+                      )} />
                     </div>
-                 </div>
+                    {showFeaturedOnly ? copy[language].ui.showingResidentsOnly : copy[language].ui.showResidentsOnly}
+                  </button>
+                  {/* Tooltip */}
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-2 bg-[#000000]/95 backdrop-blur-sm border border-[#EEEef4]/20 rounded-lg text-sm text-[#EEEef4] opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 shadow-xl max-w-xs sm:max-w-sm text-center leading-relaxed">
+                    {copy[language].ui.residentTooltip}
+                    {/* Tooltip arrow */}
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px">
+                      <div className="w-2 h-2 bg-[#000000]/95 border-r border-b border-[#EEEef4]/20 rotate-45"></div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {(searchTerm || showFeaturedOnly || selectedGenre) && (
@@ -867,7 +882,7 @@ export default function ArtistsPage() {
                     {artist.featured && (
                       <div className="absolute inset-0 bg-gradient-to-br from-[#d4153e]/10 via-transparent to-[#d4153e]/10 rounded-2xl pointer-events-none" />
                     )}
-                    
+
                     {/* Artist Image */}
                     <div className="relative aspect-[4/5] overflow-hidden flex-shrink-0">
                       <img
@@ -903,7 +918,7 @@ export default function ArtistsPage() {
                           ? "from-[#d4153e]/30 via-[#d4153e]/60 to-[#d4153e]/30 group-hover:via-[#d4153e]"
                           : "from-transparent via-[#EEEef4]/10 to-transparent group-hover:via-[#7DBEEE]/50"
                       )} />
-                      
+
                       <div className="mb-auto">
                         <h3 className={cn(
                           "text-2xl font-bold mb-2 transition-colors leading-none",
@@ -962,7 +977,7 @@ export default function ArtistsPage() {
                             ? "bg-[#d4153e]/40 text-[#FFFFFF] group-hover:bg-[#d4153e] group-hover:scale-110 shadow-lg shadow-[#d4153e]/30"
                             : "bg-[#555759]/30 group-hover:bg-[#7DBEEE] group-hover:text-[#000000]"
                         )}>
-                           <ArrowRight className="w-4 h-4" />
+                          <ArrowRight className="w-4 h-4" />
                         </div>
                       </div>
                     </div>
