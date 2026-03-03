@@ -47,7 +47,7 @@ const SocialBubbles = () => {
               style={{
                 transitionDelay: `${index * 50}ms`
               }}
-              onClick={() => trigger('light')}
+              onClick={() => trigger('heavy')}
               aria-label={link.label}
             >
               <IconComponent
