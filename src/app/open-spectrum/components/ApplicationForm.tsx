@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useWebHaptics } from 'web-haptics/react';
 import { supabase } from '@/lib/supabase';
 import { CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -8,6 +9,7 @@ import { toast } from 'sonner';
 
 const ApplicationForm = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const { trigger } = useWebHaptics();
     const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
     // Form states
@@ -38,6 +40,7 @@ const ApplicationForm = () => {
         setSubmitStatus('idle');
 
         if (!formData.agreedToTerms) {
+            trigger('error');
             toast.error('Lütfen KVKK ve Kuralları onaylayın.');
             setIsSubmitting(false);
             return;
@@ -58,6 +61,7 @@ const ApplicationForm = () => {
             }
 
             setSubmitStatus('success');
+            trigger('success');
             toast.success('Başvurunuz başarıyla alındı!');
 
             // Reset form
@@ -75,6 +79,7 @@ const ApplicationForm = () => {
         } catch (err) {
             console.error('Submission error:', err);
             setSubmitStatus('error');
+            trigger('error');
             toast.error(err instanceof Error ? err.message : 'Bir hata oluştu. Lütfen tekrar deneyin.');
         } finally {
             setIsSubmitting(false);
@@ -247,6 +252,11 @@ const ApplicationForm = () => {
                     <div className="pt-8 flex justify-center">
                         <button
                             type="submit"
+                            onClick={() => {
+                                if (formData.agreedToTerms && !isSubmitting) {
+                                    trigger('medium');
+                                }
+                            }}
                             disabled={isSubmitting || !formData.agreedToTerms}
                             className={cn(
                                 "px-12 py-4 rounded-full font-semibold tracking-[0.2em] uppercase transition-all duration-300 flex items-center justify-center gap-2",

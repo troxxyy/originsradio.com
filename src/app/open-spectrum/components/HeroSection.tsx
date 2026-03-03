@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useWebHaptics } from 'web-haptics/react';
 import { cn } from "@/lib/utils";
 
 const HeroSection = () => {
     const [mounted, setMounted] = useState(false);
+    const { trigger } = useWebHaptics();
     const videoRef = useRef<HTMLVideoElement>(null);
     const animationRef = useRef<number>();
     const lastTimeRef = useRef<number>();
@@ -138,7 +140,10 @@ const HeroSection = () => {
                 </p>
 
                 <button
-                    onClick={scrollToForm}
+                    onClick={() => {
+                        trigger('medium');
+                        scrollToForm();
+                    }}
                     className={cn(
                         "mt-12 px-8 py-4 sm:px-12 sm:py-5 rounded-full",
                         "bg-white text-black font-semibold text-sm sm:text-base tracking-[0.2em] uppercase",

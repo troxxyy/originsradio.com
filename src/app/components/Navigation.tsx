@@ -5,17 +5,19 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
+import { useWebHaptics } from "web-haptics/react";
 
 const Navigation = () => {
   const pathname = usePathname();
   const isHomePage = pathname === "/";
   const [mounted, setMounted] = useState(false);
+  const { trigger } = useWebHaptics();
 
   useEffect(() => {
     const timer = setTimeout(() => setMounted(true), 200);
     return () => clearTimeout(timer);
   }, []);
-  
+
   const links = [
     { name: "", icon: Home, href: "/" },
     { name: "Events", icon: Ticket, href: "/events" },
@@ -35,6 +37,7 @@ const Navigation = () => {
       {/* Home button */}
       <Link
         href="/"
+        onClick={() => trigger('light')}
         className={cn(
           "flex items-center justify-center w-10 h-10 rounded-full",
           "bg-white/[0.04] hover:bg-white/[0.08]",
@@ -56,17 +59,18 @@ const Navigation = () => {
       )}>
         {links.slice(1).map((link) => {
           const isActive = pathname === link.href;
-          
+
           return (
             <Link
               key={link.name}
               href={link.href}
+              onClick={() => trigger('light')}
               className={cn(
                 "flex items-center gap-1.5 px-3 py-2 rounded-full",
                 "transition-all duration-300",
                 "hover:bg-white/[0.06]",
-                isActive 
-                  ? "bg-white/[0.06] text-white/90" 
+                isActive
+                  ? "bg-white/[0.06] text-white/90"
                   : "text-white/50 hover:text-white/80"
               )}
             >

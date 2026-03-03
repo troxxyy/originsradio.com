@@ -5,6 +5,7 @@ import PageLayout from "@/components/layout/PageLayout";
 import Navigation from "@/components/Navigation";
 import SocialBubbles from "@/components/social/SocialBubbles";
 import { useEffect, useMemo, useState, useCallback } from "react";
+import { useWebHaptics } from "web-haptics/react";
 import Image from "next/image";
 import {
   Heart,
@@ -497,9 +498,8 @@ function SectionTitle({
       </h2>
       {subtitle ? (
         <p
-          className={`mt-4 text-base md:text-lg text-stone-400 ${
-            center ? "max-w-2xl mx-auto" : "max-w-2xl"
-          }`}
+          className={`mt-4 text-base md:text-lg text-stone-400 ${center ? "max-w-2xl mx-auto" : "max-w-2xl"
+            }`}
         >
           {subtitle}
         </p>
@@ -526,6 +526,7 @@ function Divider() {
 
 export default function AboutPage() {
   const reduceMotion = useReducedMotion();
+  const { trigger } = useWebHaptics();
   const [activeMember, setActiveMember] = useState<number | null>(null);
   const [language, setLanguage] = useState<"en" | "tr">("en");
 
@@ -551,20 +552,21 @@ export default function AboutPage() {
   }, [shuffledImages.length]);
 
   const toggleMember = useCallback((index: number) => {
+    trigger('medium');
     setActiveMember((prev) => (prev === index ? null : index));
-  }, []);
+  }, [trigger]);
 
   const motionIn = reduceMotion
     ? {
-        initial: { opacity: 1, y: 0 },
-        animate: { opacity: 1, y: 0 },
-        transition: { duration: 0 },
-      }
+      initial: { opacity: 1, y: 0 },
+      animate: { opacity: 1, y: 0 },
+      transition: { duration: 0 },
+    }
     : {
-        initial: { opacity: 0, y: 24 },
-        animate: { opacity: 1, y: 0 },
-        transition: { duration: 0.7, ease: "easeOut" as const },
-      };
+      initial: { opacity: 0, y: 24 },
+      animate: { opacity: 1, y: 0 },
+      transition: { duration: 0.7, ease: "easeOut" as const },
+    };
 
   return (
     <PageLayout backgroundImage="/backgr.jpg">
@@ -581,7 +583,10 @@ export default function AboutPage() {
 
       <div className="fixed top-24 right-6 z-50">
         <motion.button
-          onClick={() => setLanguage(language === "en" ? "tr" : "en")}
+          onClick={() => {
+            trigger('light');
+            setLanguage(language === "en" ? "tr" : "en");
+          }}
           className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white hover:bg-white/20 transition-colors backdrop-blur-sm"
           whileHover={reduceMotion ? undefined : { scale: 1.05 }}
           whileTap={reduceMotion ? undefined : { scale: 0.95 }}
@@ -599,6 +604,7 @@ export default function AboutPage() {
                 key={`hero-mobile-${index}`}
                 className="relative aspect-[4/3] overflow-hidden rounded-xl shadow-lg ring-1 ring-rose-500/20"
                 whileTap={reduceMotion ? undefined : { scale: 0.98 }}
+                onClick={() => trigger('light')}
               >
                 <Image
                   src={src}
@@ -681,6 +687,7 @@ export default function AboutPage() {
                   }
                   whileHover={reduceMotion ? undefined : { scale: 1.02 }}
                   whileTap={reduceMotion ? undefined : { scale: 0.98 }}
+                  onClick={() => trigger(a.primary ? 'success' : 'light')}
                   type="button"
                 >
                   {a.label} {!a.primary ? <ArrowRight className="inline w-4 h-4 ml-2" /> : null}

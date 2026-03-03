@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useMemo } from 'react';
+import { useWebHaptics } from "web-haptics/react";
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Play, VolumeX, Volume2 } from 'lucide-react';
@@ -12,6 +13,7 @@ import { useAudioVisualizer } from '@/contexts/AudioVisualizerContext';
 const MusicPlayer = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const { registerAudioElement, setGlobalVolume } = useAudioVisualizer();
+  const { trigger } = useWebHaptics();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isAudioLoading, setIsAudioLoading] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -100,10 +102,12 @@ const MusicPlayer = () => {
 
     // No pause UX: if already playing, toggle mute immediately
     if (isPlaying) {
+      trigger('light');
       toggleMute();
     } else {
       try {
         setIsAudioLoading(true);
+        trigger('medium');
         await audio.play();
         setIsPlaying(true);
       } catch (e) {
@@ -278,6 +282,7 @@ const MusicPlayer = () => {
                     disabled={!latestSet || isSetsLoading}
                     onClick={async () => {
                       if (!latestSet) return;
+                      trigger('medium');
                       setOnDemandSetUrl(latestSet.audio_url);
                       setOnDemandTitle((latestSet as any).title || 'Latest Set');
                       const artistName = (latestSet as any).artists?.name || 'Origins Radio';
