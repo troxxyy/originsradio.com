@@ -120,11 +120,11 @@ const HeroSection = () => {
                     mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
                 )}>
                     <div className="flex flex-col items-center gap-1">
-                        <span className="text-[10px] uppercase tracking-[0.4em] font-medium text-white/40">Son Başvuru Tarihi</span>
+                        <span className="text-[10px] uppercase tracking-[0.4em] font-medium text-white/40">Durum</span>
                         <div className="flex items-center gap-3">
-                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
+                            <span className="w-1.5 h-1.5 rounded-full bg-cyan-500" />
                             <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-white via-white to-white/60 bg-clip-text text-transparent">
-                                15 MART • 11:59
+                                BAŞVURULAR KAPANDI
                             </span>
                         </div>
                     </div>
@@ -140,20 +140,16 @@ const HeroSection = () => {
                 </p>
 
                 <button
-                    onClick={() => {
-                        trigger('medium');
-                        scrollToForm();
-                    }}
+                    disabled
                     className={cn(
                         "mt-12 px-8 py-4 sm:px-12 sm:py-5 rounded-full",
-                        "bg-white text-black font-semibold text-sm sm:text-base tracking-[0.2em] uppercase",
-                        "hover:bg-white/90 hover:scale-105 active:scale-95",
-                        "transition-all duration-300 shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:shadow-[0_0_60px_rgba(255,255,255,0.4)]",
+                        "bg-white/10 text-white/50 font-semibold text-sm sm:text-base tracking-[0.2em] uppercase cursor-not-allowed",
+                        "transition-all duration-300",
                         mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
                     )}
                     style={{ transitionDelay: '500ms' }}
                 >
-                    Başvur
+                    Başvurular Kapandı
                 </button>
             </div>
 
