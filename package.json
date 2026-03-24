@@ -9,7 +9,10 @@
     "start": "next start",
     "lint": "eslint .",
     "generate-sitemap": "node scripts/generate-sitemap.js",
-    "migrate:events": "node scripts/migrate-ourwork-images.js"
+    "migrate:events": "node scripts/migrate-ourwork-images.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -110,6 +113,7 @@
     "@types/node": "^20.11.24",
     "@types/react": "^18.2.61",
     "@types/react-dom": "^18.2.19",
+    "@vitest/coverage-v8": "^4.1.1",
     "autoprefixer": "^10.4.20",
     "chai": "^4.3.10",
     "esbuild": "^0.27.3",
@@ -129,7 +133,8 @@
     "terser": "^5.39.0",
     "typescript": "^5.3.3",
     "typescript-eslint": "^8.0.1",
-    "vite": "^7.3.1"
+    "vite": "^7.3.1",
+    "vitest": "^4.1.1"
   },
   "overrides": {
     "serialize-javascript": "^7.0.3"
