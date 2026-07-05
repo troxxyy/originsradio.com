@@ -4,7 +4,7 @@ import Link from "next/link";
 import React, { useEffect, useState, useRef } from "react";
 import { useWebHaptics } from "web-haptics/react";
 import dynamic from "next/dynamic";
-import { Ticket, Users, Radio, Navigation, BookOpen, Info, Youtube, Instagram, Cloud, Heart } from "lucide-react";
+import { Ticket, Users, Radio, Navigation, Info, Youtube, Instagram, Cloud, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCurrentRadioSlot } from "@/hooks/use-radio";
 import { useIsMobile } from "../../hooks/use-mobile";
@@ -277,31 +277,6 @@ const HomeHero: React.FC = () => {
             })}
           </div>
 
-          {/* Special Open Spectrum Button */}
-          <div className={cn(
-            "mt-4 sm:mt-6 transition-all duration-700 delay-300",
-            mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-          )}>
-            <Link
-              href="/open-spectrum"
-              className={cn(
-                "group relative inline-flex items-center justify-center gap-3 px-6 sm:px-8 py-2.5 sm:py-3 rounded-full",
-                "bg-gradient-to-r from-cyan-500/10 to-teal-500/10 border border-cyan-500/30",
-                "backdrop-blur-md overflow-hidden transition-all duration-500",
-                "hover:scale-105 hover:from-cyan-500/20 hover:to-teal-500/20 hover:border-cyan-400/50 hover:shadow-[0_0_30px_rgba(34,211,238,0.2)]"
-              )}
-              onClick={() => trigger('medium')}
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer" />
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
-              </span>
-              <span className="relative font-newake text-xs sm:text-sm tracking-[0.2em] text-white uppercase mt-0.5 sm:mt-1">
-                Open Spectrum &apos;26
-              </span>
-            </Link>
-          </div>
         </div>
 
         {/* Bottom text */}
