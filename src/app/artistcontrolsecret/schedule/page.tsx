@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import PageLayout from '@/components/layout/PageLayout'
 import { getAllWeeklyRadioSchedule, upsertWeeklyRadioSchedule, deleteWeeklyRadioSchedule, getSets, getArtists, archiveOldRadioSchedules, copyScheduleToNextWeek, getCurrentWeekMonday } from '@/lib/supabase-utils'
+import { getSupabaseClient } from '@/lib/supabase'
+import ArtistControlGuard from '@/components/admin/ArtistControlGuard'
 
 const HOURS = [19,20,21,22,23]
 const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
@@ -19,6 +21,14 @@ export default function AdminRadioSchedule() {
     const load = async () => {
       setLoading(true)
       try {
+        const supabase = getSupabaseClient()
+        if (!supabase) throw new Error('Supabase is not configured')
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        if (sessionError) throw sessionError
+        if (!session) {
+          const { error: signInError } = await supabase.auth.signInAnonymously()
+          if (signInError) throw signInError
+        }
         const weekMonday = getCurrentWeekMonday()
         setCurrentWeek(weekMonday)
         const [allRows, allSets, allArtists] = await Promise.all([
@@ -114,7 +124,8 @@ export default function AdminRadioSchedule() {
   }, [rows])
 
   return (
-    <PageLayout>
+    <ArtistControlGuard>
+      <PageLayout>
       <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black text-white">
         <div className="max-w-6xl mx-auto px-4 py-10">
           <div className="flex items-center justify-between mb-6">
@@ -187,7 +198,8 @@ export default function AdminRadioSchedule() {
           )}
         </div>
       </div>
-    </PageLayout>
+      </PageLayout>
+    </ArtistControlGuard>
   )
 }
 
@@ -322,5 +334,4 @@ function EditableRow({ dayIdx, hour, sets, artists, existing, onSave, onDelete }
     </tr>
   )
 }
-
 

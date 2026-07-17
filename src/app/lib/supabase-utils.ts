@@ -1067,7 +1067,7 @@ export const getAllWeeklyRadioSchedule = async (): Promise<RadioScheduleWeeklyRo
 
 export const upsertWeeklyRadioSchedule = async (row: Partial<RadioScheduleWeeklyRow> & { id?: string }) => {
   if (!isSupabaseConfigured()) throw new Error('Supabase not configured')
-  const supabaseAdmin = getSupabaseAdminClient()
+  const supabase = getSupabaseClient()
   const payload: any = {
     id: row.id,
     day_of_week: row.day_of_week,
@@ -1081,7 +1081,7 @@ export const upsertWeeklyRadioSchedule = async (row: Partial<RadioScheduleWeekly
     is_active: row.is_active ?? true,
     week_start_date: row.week_start_date ?? getCurrentWeekMonday(),
   }
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabase
     .from('radio_schedule_weekly')
     .upsert(payload, { onConflict: 'id' })
     .select()
@@ -1095,8 +1095,8 @@ export const upsertWeeklyRadioSchedule = async (row: Partial<RadioScheduleWeekly
 
 export const deleteWeeklyRadioSchedule = async (id: string): Promise<boolean> => {
   if (!isSupabaseConfigured()) throw new Error('Supabase not configured')
-  const supabaseAdmin = getSupabaseAdminClient()
-  const { error } = await supabaseAdmin
+  const supabase = getSupabaseClient()
+  const { error } = await supabase
     .from('radio_schedule_weekly')
     .delete()
     .eq('id', id)
@@ -1110,10 +1110,10 @@ export const deleteWeeklyRadioSchedule = async (id: string): Promise<boolean> =>
 // Archive old schedules (set is_active to false for schedules from previous weeks)
 export const archiveOldRadioSchedules = async (): Promise<{ success: boolean; count: number }> => {
   if (!isSupabaseConfigured()) throw new Error('Supabase not configured')
-  const supabaseAdmin = getSupabaseAdminClient()
+  const supabase = getSupabaseClient()
   const currentWeekMonday = getCurrentWeekMonday()
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabase
     .from('radio_schedule_weekly')
     .update({ is_active: false })
     .lt('week_start_date', currentWeekMonday)
@@ -1131,7 +1131,7 @@ export const archiveOldRadioSchedules = async (): Promise<{ success: boolean; co
 // Copy current week's schedule to next week
 export const copyScheduleToNextWeek = async (): Promise<{ success: boolean; count: number }> => {
   if (!isSupabaseConfigured()) throw new Error('Supabase not configured')
-  const supabaseAdmin = getSupabaseAdminClient()
+  const supabase = getSupabaseClient()
   const currentWeekMonday = getCurrentWeekMonday()
 
   // Get next week's Monday
@@ -1140,7 +1140,7 @@ export const copyScheduleToNextWeek = async (): Promise<{ success: boolean; coun
   const nextWeekMonday = nextWeekDate.toISOString().split('T')[0]
 
   // Get current week's active schedule
-  const { data: currentSchedule, error: fetchError } = await supabaseAdmin
+  const { data: currentSchedule, error: fetchError } = await supabase
     .from('radio_schedule_weekly')
     .select('*')
     .eq('week_start_date', currentWeekMonday)
@@ -1169,7 +1169,7 @@ export const copyScheduleToNextWeek = async (): Promise<{ success: boolean; coun
     week_start_date: nextWeekMonday,
   }))
 
-  const { data: insertedData, error: insertError } = await supabaseAdmin
+  const { data: insertedData, error: insertError } = await supabase
     .from('radio_schedule_weekly')
     .insert(newScheduleEntries)
     .select()
