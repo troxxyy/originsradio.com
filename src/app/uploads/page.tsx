@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
-import { getSupabaseAdminClient } from '@/lib/supabase';
+import { getSupabaseClient } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -105,7 +105,12 @@ export default function AdminUploadsPage() {
     setIsUploading(true);
 
     try {
-      const supabase = getSupabaseAdminClient();
+      // This page runs in the browser, where the service-role key is deliberately
+      // unavailable. Use the signed-in user's client so Storage policies apply.
+      const supabase = getSupabaseClient();
+      if (!supabase) {
+        throw new Error('Supabase is not configured for uploads');
+      }
       // Ensure waveforms bucket exists and is public
       // Buckets should be provisioned in Supabase; avoid runtime create/update to prevent 400s
 
@@ -113,13 +118,11 @@ export default function AdminUploadsPage() {
         try {
           // Generate a unique filename
           const timestamp = Date.now();
-          const fileExtension = file.name.split('.').pop();
           const fileName = `${timestamp}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
           const filePath = `${fileName}`;
 
           // Try signed upload first; if it fails, fall back to direct upload
           const storageRef = supabase.storage.from('sets');
-          let uploadedOk = false;
           try {
             const { data: signed, error: signErr } = await storageRef.createSignedUploadUrl(filePath);
             if (signErr || !signed?.token) throw signErr || new Error('Failed to create signed upload URL');
@@ -128,7 +131,6 @@ export default function AdminUploadsPage() {
               upsert: false
             });
             if (uploadErr) throw uploadErr;
-            uploadedOk = true;
           } catch (signedErr) {
             // Fallback to standard upload
             const { error: directErr } = await storageRef.upload(filePath, file, {
@@ -139,7 +141,6 @@ export default function AdminUploadsPage() {
             if (directErr) {
               throw directErr;
             }
-            uploadedOk = true;
           }
 
           // Get the public URL
@@ -152,7 +153,7 @@ export default function AdminUploadsPage() {
           const baseName = fileName.replace(/\.[^.]+$/, '');
           const peaksPath = `${baseName}.json`;
           const peaksBlob = new Blob([JSON.stringify({ peaks })], { type: 'application/json' });
-          const { data: peaksData } = await supabase.storage
+          await supabase.storage
             .from('waveforms')
             .upload(peaksPath, peaksBlob, { cacheControl: '3600', upsert: true, contentType: 'application/json' });
 
@@ -223,7 +224,7 @@ export default function AdminUploadsPage() {
       console.error('Supabase admin client error:', error);
       toast({
         title: "Configuration Error",
-        description: "Please set SUPABASE_SERVICE_ROLE_KEY environment variable for admin uploads",
+        description: error instanceof Error ? error.message : 'Supabase is not configured for uploads',
         variant: "destructive"
       });
     }
@@ -520,4 +521,4 @@ export default function AdminUploadsPage() {
       </div>
     </div>
   );
-} 
+}
