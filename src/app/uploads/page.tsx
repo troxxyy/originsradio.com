@@ -111,6 +111,12 @@ export default function AdminUploadsPage() {
       if (!supabase) {
         throw new Error('Supabase is not configured for uploads');
       }
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) throw sessionError;
+      if (!session) {
+        const { error: signInError } = await supabase.auth.signInAnonymously();
+        if (signInError) throw signInError;
+      }
       // Ensure waveforms bucket exists and is public
       // Buckets should be provisioned in Supabase; avoid runtime create/update to prevent 400s
 
@@ -167,7 +173,7 @@ export default function AdminUploadsPage() {
           if (currentUpload?.artistId) {
             // Create set in database using MCP
             try {
-              const { createSetAdmin } = await import('@/lib/supabase-utils');
+              const { createSet } = await import('@/lib/supabase-utils');
               const setData = {
                 title: file === pendingMetaFile && metaTitle ? metaTitle : file.name.replace(/\.[^/.]+$/, ''),
                 artist_id: currentUpload.artistId,
@@ -179,7 +185,7 @@ export default function AdminUploadsPage() {
                 views_count: 0,
               };
 
-              const newSet = await createSetAdmin(setData);
+              const newSet = await createSet(setData);
               if (newSet) {
                 console.log('Set created successfully:', newSet);
               }
