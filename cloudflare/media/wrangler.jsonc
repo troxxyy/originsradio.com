@@ -1,0 +1,8 @@
+{
+  "name": "originsradio-media",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-10-02",
+  "account_id": "b65ef5640d57ae43887e3e191ba83c42",
+  "workers_dev": true,
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "originsradio-media" }]
+}

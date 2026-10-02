@@ -1,11 +1,11 @@
 'use client'
 
 import { useState, useEffect, useRef } from "react";
-import { Helmet } from "react-helmet-async";
 import PageLayout from "@/components/layout/PageLayout";
 import Navigation from "@/components/Navigation";
 import NaturalBackground from "@/components/ui/NaturalBackground";
 import { Clock, Radio, Calendar, Music, Sparkles, Play } from "lucide-react";
+import { resolveMediaUrl } from "@/lib/media-url";
 import ParticlesHeader from "@/components/ui/ParticlesHeader";
 
 interface ArtistSchedule {
@@ -27,168 +27,168 @@ export default function AnniversaryPage() {
       artist: "FURK", 
       setTitle: "Midnight Opening Set", 
       genre: "Electronic", 
-      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//TIDE%20-%20Furk%20-%20SoundLoadMate.com.mp3" // Paste FURK's Google Drive link here (2-hour set: use SAME link for hour 1)
+      streamUrl: resolveMediaUrl("https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//TIDE%20-%20Furk%20-%20SoundLoadMate.com.mp3") // Paste FURK's Google Drive link here (2-hour set: use SAME link for hour 1)
     },
     { 
       hour: 1, 
       artist: "FURK", 
       setTitle: "Deep Night Vibes", 
       genre: "Electronic",
-      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//TIDE%20-%20Furk%20-%20SoundLoadMate.com.mp3" // Use SAME link as hour 0 (FURK's 2-hour set continues)
+      streamUrl: resolveMediaUrl("https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//TIDE%20-%20Furk%20-%20SoundLoadMate.com.mp3") // Use SAME link as hour 0 (FURK's 2-hour set continues)
     },
     { 
       hour: 2, 
       artist: "S.L Jeme", 
       setTitle: "Early Night Mix", 
       genre: "Deep House",
-      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//S.L.%20Jeme.mp3" // Paste S.L Jeme's Google Drive link here (1-hour set)
+      streamUrl: resolveMediaUrl("https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//S.L.%20Jeme.mp3") // Paste S.L Jeme's Google Drive link here (1-hour set)
     },
     { 
       hour: 3, 
       artist: "Ar4t", 
       setTitle: "Deep Dawn Session", 
       genre: "Minimal",
-      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//01%20AR4T,%20ORIGINSRADIO%203RD%20ANNIVERSARY%20SET.mp3" // Paste Ar4t's Google Drive link here (1-hour set)
+      streamUrl: resolveMediaUrl("https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//01%20AR4T,%20ORIGINSRADIO%203RD%20ANNIVERSARY%20SET.mp3") // Paste Ar4t's Google Drive link here (1-hour set)
     },
     { 
       hour: 4, 
       artist: "N1nja", 
       setTitle: "Morning Ambient", 
       genre: "Minimal",
-      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//ninja%20settt%20-%20ninja%20-%20SoundLoadMate.com.mp3" // Paste N1nja's Google Drive link here (1-hour set)
+      streamUrl: resolveMediaUrl("https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//ninja%20settt%20-%20ninja%20-%20SoundLoadMate.com.mp3") // Paste N1nja's Google Drive link here (1-hour set)
     },
     { 
       hour: 5, 
       artist: "SINERGY", 
       setTitle: "Sunrise Energy", 
       genre: "Progressive",
-      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//Fragments%20Podcast.m4a" // Paste SINERGY's Google Drive link here (1-hour set)
+      streamUrl: resolveMediaUrl("https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//Fragments%20Podcast.m4a") // Paste SINERGY's Google Drive link here (1-hour set)
     },
     { 
       hour: 6, 
       artist: "Adens", 
       setTitle: "Daybreak Mix", 
       genre: "House",
-      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//Adens%20(1).mp3" // Paste Adens's Google Drive link here (1-hour set)
+      streamUrl: resolveMediaUrl("https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//Adens%20(1).mp3") // Paste Adens's Google Drive link here (1-hour set)
     },
     { 
       hour: 7, 
       artist: "Görkem Polat", 
       setTitle: "Morning Grooves", 
       genre: "House",
-      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//REC003%20(1).m4a" // Paste Görkem Polat's Google Drive link here (3-hour set: use SAME link for hours 8 & 9)
+      streamUrl: resolveMediaUrl("https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//REC003%20(1).m4a") // Paste Görkem Polat's Google Drive link here (3-hour set: use SAME link for hours 8 & 9)
     },
     { 
       hour: 8, 
       artist: "Görkem Polat", 
       setTitle: "Mid-Morning Session", 
       genre: "House",
-      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//REC003%20(1).m4a" // Use SAME link as hour 7 (Görkem Polat's 3-hour set continues)
+      streamUrl: resolveMediaUrl("https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//REC003%20(1).m4a") // Use SAME link as hour 7 (Görkem Polat's 3-hour set continues)
     },
     { 
       hour: 9, 
       artist: "Görkem Polat", 
       setTitle: "Late Morning Vibes", 
       genre: "House",
-      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//REC003%20(1).m4a" // Use SAME link as hour 7 (Görkem Polat's 3-hour set continues)
+      streamUrl: resolveMediaUrl("https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//REC003%20(1).m4a") // Use SAME link as hour 7 (Görkem Polat's 3-hour set continues)
     },
     { 
       hour: 10, 
       artist: "Fate", 
       setTitle: "Pre-Noon Mix", 
       genre: "Techno",
-      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//Radio%20-%20Fate..%20-%20SoundLoadMate.com.mp3" // Paste Fate's Google Drive link here (1-hour set)
+      streamUrl: resolveMediaUrl("https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//Radio%20-%20Fate..%20-%20SoundLoadMate.com.mp3") // Paste Fate's Google Drive link here (1-hour set)
     },
     { 
       hour: 11, 
       artist: "B Hayri", 
       setTitle: "Noon Special", 
       genre: "Techno",
-      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//B_HAYRI%20HOUSE%20DEEP%20TECH%20SET%20-%20B_HAYRI%20-%20SoundLoadMate.com.mp3" // Paste B Hayri's Google Drive link here (1-hour set)
+      streamUrl: resolveMediaUrl("https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//B_HAYRI%20HOUSE%20DEEP%20TECH%20SET%20-%20B_HAYRI%20-%20SoundLoadMate.com.mp3") // Paste B Hayri's Google Drive link here (1-hour set)
     },
     { 
       hour: 12, 
       artist: "CASTOR", 
       setTitle: "Early Afternoon", 
       genre: "House",
-      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//01%20castor%203rd.m4a" // Paste CASTOR's Google Drive link here (2-hour set: use SAME link for hour 13)
+      streamUrl: resolveMediaUrl("https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//01%20castor%203rd.m4a") // Paste CASTOR's Google Drive link here (2-hour set: use SAME link for hour 13)
     },
     { 
       hour: 13, 
       artist: "CASTOR", 
       setTitle: "Afternoon Energy", 
       genre: "House",
-      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//01%20castor%203rd.m4a" // Use SAME link as hour 12 (CASTOR's 2-hour set continues)
+      streamUrl: resolveMediaUrl("https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//01%20castor%203rd.m4a") // Use SAME link as hour 12 (CASTOR's 2-hour set continues)
     },
     { 
       hour: 14, 
       artist: "MIRAI", 
       setTitle: "Mid-Day Mix", 
       genre: "House",
-      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//B_HAYRI%20HOUSE%20DEEP%20TECH%20SET%20-%20B_HAYRI%20-%20SoundLoadMate.com.mp3" // Paste MIRAI's Google Drive link here (1-hour set)
+      streamUrl: resolveMediaUrl("https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//B_HAYRI%20HOUSE%20DEEP%20TECH%20SET%20-%20B_HAYRI%20-%20SoundLoadMate.com.mp3") // Paste MIRAI's Google Drive link here (1-hour set)
     },
     { 
       hour: 15, 
       artist: "STEREOCATT", 
       setTitle: "Late Afternoon", 
       genre: "House",
-      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//StereoCatt-Origins-01.m4a" // Paste STEREOCATT's Google Drive link here (1-hour set)
+      streamUrl: resolveMediaUrl("https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//StereoCatt-Origins-01.m4a") // Paste STEREOCATT's Google Drive link here (1-hour set)
     },
     { 
       hour: 16, 
       artist: "Karbo", 
       setTitle: "Evening Warm-up", 
       genre: "House",
-      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//Karbo.m4a" // Paste Karbo's Google Drive link here (1-hour set)
+      streamUrl: resolveMediaUrl("https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//Karbo.m4a") // Paste Karbo's Google Drive link here (1-hour set)
     },
     { 
       hour: 17, 
       artist: "MYK", 
       setTitle: "Sunset Session", 
       genre: "House",
-      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//MYK!.m4a" // Paste MYK's Google Drive link here (1-hour set)
+      streamUrl: resolveMediaUrl("https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//MYK!.m4a") // Paste MYK's Google Drive link here (1-hour set)
     },
     { 
       hour: 18, 
       artist: "MYK", 
       setTitle: "Evening Grooves", 
       genre: "House",
-      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//MYK!.m4a" // Use SAME link as hour 17 (MYK's set continues)
+      streamUrl: resolveMediaUrl("https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//MYK!.m4a") // Use SAME link as hour 17 (MYK's set continues)
     },
     { 
       hour: 19, 
       artist: "EGEMEN ALPAY", 
       setTitle: "Prime Time Mix", 
       genre: "Progressive",
-      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//TDJ2-Recording_2025-07-24_2140-2241%202.m4a" // Paste EGEMEN ALPAY's Google Drive link here (1-hour set)
+      streamUrl: resolveMediaUrl("https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//TDJ2-Recording_2025-07-24_2140-2241%202.m4a") // Paste EGEMEN ALPAY's Google Drive link here (1-hour set)
     },
     { 
       hour: 20, 
       artist: "Bitter Mind", 
       setTitle: "Night Begins", 
       genre: "Techno",
-      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//OriginsRadio_Bittermind.mp3" // Paste Bitter Mind's Google Drive link here (1-hour set)
+      streamUrl: resolveMediaUrl("https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//OriginsRadio_Bittermind.mp3") // Paste Bitter Mind's Google Drive link here (1-hour set)
     },
     { 
       hour: 21, 
       artist: "Techno Ballet", 
       setTitle: "Late Night Energy", 
       genre: "Techno",
-      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//IREM%20-%20ORIGINS%20RADIO.mp3" // Direct download URL for Techno Ballet's set
+      streamUrl: resolveMediaUrl("https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//IREM%20-%20ORIGINS%20RADIO.mp3") // Direct download URL for Techno Ballet's set
     },
     { 
       hour: 22, 
       artist: "UMUT SEFILOGLU", 
       setTitle: "Deep Night Session", 
       genre: "Techno",
-      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//uut.m4a" // Paste UMUT SEFILOGLU's Google Drive link here (1-hour set)
+      streamUrl: resolveMediaUrl("https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//uut.m4a") // Paste UMUT SEFILOGLU's Google Drive link here (1-hour set)
     },
     { 
       hour: 23, 
       artist: "LOTS OFF", 
       setTitle: "Final Hour Celebration", 
       genre: "Electronic",
-      streamUrl: "https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//off.m4a" // Paste LOTS OFF's Google Drive link here (1-hour set)
+      streamUrl: resolveMediaUrl("https://azfazwgrfazdaunigqbd.supabase.co/storage/v1/object/public/anniversary//off.m4a") // Paste LOTS OFF's Google Drive link here (1-hour set)
     },
   ];
 
@@ -214,10 +214,7 @@ export default function AnniversaryPage() {
 
   return (
     <>
-      <Helmet>
-        <title>3 Years of Origins - Full Recording | Origins Radio</title>
-        <meta name="description" content="Experience our epic 24-hour anniversary celebration featuring amazing sets from our talented artists." />
-      </Helmet>
+
       
       <PageLayout>
         <NaturalBackground />

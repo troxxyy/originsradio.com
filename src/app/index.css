@@ -605,19 +605,6 @@ body:has(.blog-no-scroll) {
   will-change: transform;
 }
 
-/* Homepage scroll lock */
-body.homepage-locked,
-html.homepage-locked {
-  overflow: hidden !important;
-  height: 100vh !important;
-  position: fixed !important;
-  width: 100% !important;
-  touch-action: none !important;
-  overscroll-behavior: none !important;
-  /* Fallback for older iOS Safari */
-  -webkit-overflow-scrolling: auto !important;
-}
-
 /* Loading screen hidden state */
 .loading-hidden {
   display: none;

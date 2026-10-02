@@ -8,6 +8,8 @@ import { getSupabaseClient, isSupabaseConfigured } from '@/lib/supabase'
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const nextPath = searchParams?.get('next')
+  const redirectTo = nextPath && ['/uploads', '/artistcontrolsecret', '/artistcontrolsecret/artists', '/artistcontrolsecret/schedule'].includes(nextPath) ? nextPath : '/artist/dashboard'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -19,12 +21,12 @@ function LoginForm() {
       if (!isSupabaseConfigured()) return
       const supabase = getSupabaseClient()
       const { data } = await supabase.auth.getSession()
-      if (data.session) {
-        router.replace('/artist/dashboard')
+      if (data.session && !data.session.user.is_anonymous) {
+        router.replace(redirectTo)
       }
     }
     checkSession()
-  }, [router])
+  }, [router, redirectTo])
 
   useEffect(() => {
     if (searchParams?.get('verify') === '1') {
@@ -51,7 +53,7 @@ function LoginForm() {
         setError(signInError.message)
         return
       }
-      router.replace('/artist/dashboard')
+      router.replace(redirectTo)
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unexpected error'
       setError(message)
@@ -168,4 +170,3 @@ export default function ArtistLoginPage() {
     </Suspense>
   )
 }
-

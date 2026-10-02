@@ -7,9 +7,7 @@ import PrivacyPolicyDialog from "./PrivacyPolicyDialog";
 import ConsumerDisclosureDialog from "./ConsumerDisclosureDialog";
 import Link from "next/link";
 
-interface EventFooterProps { }
-
-const EventFooter = ({ }: EventFooterProps) => {
+const EventFooter = () => {
   const { trigger } = useWebHaptics();
   const currentYear = new Date().getFullYear();
 

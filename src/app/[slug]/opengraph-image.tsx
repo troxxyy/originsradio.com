@@ -25,7 +25,6 @@ export default async function Image({ params }: { params: Promise<{ slug: string
         }}
       >
         {photo ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={photo}
             alt=""
@@ -43,5 +42,4 @@ export default async function Image({ params }: { params: Promise<{ slug: string
     { ...size }
   )
 }
-
 

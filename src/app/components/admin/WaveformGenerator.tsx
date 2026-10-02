@@ -1,5 +1,6 @@
+import { uploadPublicMedia } from '@/lib/media-upload';
 import React, { useState } from 'react';
-import { getSupabaseAdminClient } from '@/lib/supabase';
+import { getSupabaseClient } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Zap, CheckCircle, XCircle, Loader2 } from 'lucide-react';
@@ -25,7 +26,7 @@ const WaveformGenerator = () => {
   const loadSetsWithoutPeaks = async () => {
     setIsLoading(true);
     try {
-      const supabase = getSupabaseAdminClient();
+      const supabase = getSupabaseClient();
       const { data, error } = await supabase
         .from('sets')
         .select('id, title, audio_url, peaks_url')
@@ -156,36 +157,23 @@ const WaveformGenerator = () => {
 
   // Upload peaks to waveforms bucket and update database
   const uploadPeaksAndUpdate = async (setId: string, audioUrl: string, peaks: number[]) => {
-    const supabase = getSupabaseAdminClient();
+    const supabase = getSupabaseClient();
     
     // Upload to storage
     const filename = generatePeaksFilename(audioUrl);
     const peaksBlob = new Blob([JSON.stringify({ peaks })], { type: 'application/json' });
     
-    const { data, error: uploadError } = await supabase.storage
-      .from('waveforms')
-      .upload(filename, peaksBlob, {
-        cacheControl: '3600',
-        upsert: true,
-        contentType: 'application/json'
-      });
-
-    if (uploadError) throw uploadError;
-
-    // Get public URL
-    const { data: urlData } = supabase.storage
-      .from('waveforms')
-      .getPublicUrl(filename);
+    const publicUrl = await uploadPublicMedia('waveforms', filename, peaksBlob);
 
     // Update database
     const { error: updateError } = await supabase
       .from('sets')
-      .update({ peaks_url: urlData.publicUrl })
+      .update({ peaks_url: publicUrl })
       .eq('id', setId);
 
     if (updateError) throw updateError;
 
-    return urlData.publicUrl;
+    return publicUrl;
   };
 
   // Process a single set
@@ -234,19 +222,7 @@ const WaveformGenerator = () => {
     setIsProcessing(true);
     
     try {
-      const supabase = getSupabaseAdminClient();
-      
-      // Ensure waveforms bucket exists
-      try {
-        await supabase.storage.createBucket('waveforms', { 
-          public: true, 
-          fileSizeLimit: '5MB', 
-          allowedMimeTypes: ['application/json'] 
-        });
-      } catch (e) {
-        // Bucket might already exist, ignore error
-        console.log('Waveforms bucket already exists or could not be created');
-      }
+      const supabase = getSupabaseClient();
       
       const { data: setsData, error } = await supabase
         .from('sets')
@@ -448,7 +424,7 @@ const WaveformGenerator = () => {
                   {/* Test button for individual sets */}
                   <Button
                     onClick={async () => {
-                      const supabase = getSupabaseAdminClient();
+                      const supabase = getSupabaseClient();
                       const { data: setData } = await supabase
                         .from('sets')
                         .select('id, title, audio_url')

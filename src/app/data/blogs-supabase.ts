@@ -1,3 +1,4 @@
+import { uploadPublicMedia } from '../lib/media-upload';
 import { supabase, supabaseAdmin } from '../lib/supabase';
 import type { Database } from '../lib/supabase';
 
@@ -309,32 +310,9 @@ export const getBlogStats = async (): Promise<BlogStats> => {
 
 // Upload blog cover image (admin access)
 export const uploadBlogImage = async (file: File): Promise<string | null> => {
-  if (!supabaseAdmin) {
-    throw new Error('Supabase admin is not configured');
-  }
-
   const fileExt = file.name.split('.').pop();
-  const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-  const filePath = `blogs/${fileName}`;
-
-  const { data, error } = await supabaseAdmin.storage
-    .from('images')
-    .upload(filePath, file, {
-      cacheControl: '3600',
-      upsert: false,
-    });
-
-  if (error) {
-    console.error('Error uploading blog image:', error);
-    return null;
-  }
-
-  // Get public URL
-  const { data: { publicUrl } } = supabaseAdmin.storage
-    .from('images')
-    .getPublicUrl(data.path);
-
-  return publicUrl;
+  const filePath = `blogs/${Date.now()}-${crypto.randomUUID()}.${fileExt}`;
+  return uploadPublicMedia('images', filePath, file);
 };
 
 // Export blogs data (admin access)

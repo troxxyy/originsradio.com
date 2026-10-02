@@ -4,6 +4,9 @@ import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Providers } from './providers'
 import './index.css'
 import localFont from 'next/font/local'
+import { SITE_URL } from '@/lib/site'
+import JsonLd from '@/components/seo/JsonLd'
+import { ORGANIZATION_ID } from '@/lib/seo'
 
 const newake = localFont({
   src: '../../public/fonts/NewakeFont-Demo.otf',
@@ -12,30 +15,33 @@ const newake = localFont({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://origins.radio'),
-  title: 'OriginsRadio - Interactive Radio Station',
-  description: 'OriginsRadio - Premier interactive radio station featuring live shows, music, events, and cultural experiences.',
+  metadataBase: new URL(SITE_URL),
+  title: { default: 'OriginsRadio — Electronic Music Radio, DJs & Events', template: '%s | OriginsRadio' },
+  description: 'Independent electronic music radio, DJ sets, artists and events from OriginsRadio. Discover techno, house and the underground music scene in Ankara and beyond.',
   icons: {
     icon: '/favicon/favicon.ico',
     apple: '/favicon/apple-touch-icon.png',
   },
   openGraph: {
-    title: 'OriginsRadio - Interactive Radio Station',
-    description: 'OriginsRadio - Premier interactive radio station featuring live shows, music, events, and cultural experiences.',
+    title: 'OriginsRadio — Electronic Music Radio, DJs & Events',
+    description: 'Independent electronic music radio, DJ sets, artists and events from Ankara and beyond.',
     type: 'website',
     siteName: 'OriginsRadio',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'OriginsRadio - Interactive Radio Station',
-    description: 'OriginsRadio - Premier interactive radio station featuring live shows, music, events, and cultural experiences.',
+    title: 'OriginsRadio — Electronic Music Radio, DJs & Events',
+    description: 'Independent electronic music radio, DJ sets, artists and events from Ankara and beyond.',
+    images: ['/opengraph-image'],
   },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1, 'max-video-preview': -1 } },
+  verification: { google: process.env.GOOGLE_SITE_VERIFICATION || undefined },
 }
 
 export const viewport: Viewport = {
   themeColor: '#000000',
   width: 'device-width',
-  initialScale: 0.75,
+  initialScale: 1,
 }
 
 export default function RootLayout({
@@ -45,11 +51,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${newake.variable}`}>
-      <head>
-        {/* IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! */}
-        <script src="https://cdn.gpteng.co/gptengineer.js" type="module" async></script>
-      </head>
       <body>
+        <JsonLd data={[
+          { '@context': 'https://schema.org', '@type': 'Organization', '@id': ORGANIZATION_ID, name: 'OriginsRadio', alternateName: 'Origins Radio', url: SITE_URL, logo: `${SITE_URL}/originslogo.png`, email: 'info@originsradio.com', sameAs: ['https://www.instagram.com/origins.radio/', 'https://www.youtube.com/@originsradiotr'] },
+          { '@context': 'https://schema.org', '@type': 'WebSite', '@id': `${SITE_URL}/#website`, name: 'OriginsRadio', alternateName: 'Origins Radio', url: SITE_URL, publisher: { '@id': ORGANIZATION_ID } },
+        ]} />
         <Providers>{children}</Providers>
         <Analytics />
         <SpeedInsights />

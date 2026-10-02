@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next'
+import { SITE_URL } from '@/lib/site'
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -7,17 +8,17 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: '*',
         allow: '/',
         disallow: [
-          '/artistcontrolsecret/',
+          '/artistcontrolsecret',
           '/originsradio/adminuploads',
           '/artist/',
-          '/_next/',
           '/api/',
-          '/uploads/',
+          '/uploads',
+          '/ticket/',
+          '/invite/',
         ],
       },
     ],
-    sitemap: 'https://origins.radio/sitemap.xml',
+    sitemap: `${SITE_URL}/sitemap.xml`,
   }
 }
-
 

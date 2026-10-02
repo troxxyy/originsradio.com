@@ -16,7 +16,7 @@ interface NavLink {
 }
 
 const navLinks: NavLink[] = [
-  { name: 'About', nameTr: 'Hakkında', href: '/' },
+  { name: 'About', nameTr: 'Hakkında', href: '/snow' },
   { name: 'Line Up', nameTr: 'Line Up', href: '/lineup' },
   { name: 'Hotels', nameTr: 'Oteller', href: '/hotels' },
   { name: 'Prices', nameTr: 'Fiyatlar', href: '/prices' },
@@ -35,8 +35,8 @@ export default function SnowNavigation() {
   }, [])
 
   const isActive = (href: string) => {
-    if (href === '/') {
-      return pathname === '/' || pathname === ''
+    if (href === '/snow') {
+      return pathname === '/' || pathname === '/snow'
     }
     return pathname.startsWith(href)
   }
@@ -51,7 +51,7 @@ export default function SnowNavigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3">
+          <Link href="/snow" className="flex items-center gap-3">
             <div className="relative w-8 h-8 md:w-10 md:h-10">
               <Image
                 src="/originslogo.png"

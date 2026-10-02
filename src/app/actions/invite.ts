@@ -21,16 +21,13 @@ export async function submitInviteForm(formData: FormData) {
     }
 
     // Validate input
-    const validated = inviteSchema.parse(data)
+    inviteSchema.parse(data)
 
-    // TODO: Send to Supabase or email service
-    // For now, just log it
-    console.log('Invite form submission:', validated)
-
-    // Simulate processing
-    await new Promise(resolve => setTimeout(resolve, 500))
-
-    return { success: true, message: 'Invite request submitted successfully!' }
+    // No delivery or persistence is configured for this form yet.
+    return {
+      success: false,
+      error: 'Online invite requests are currently unavailable. Please contact info@originsradio.com.'
+    }
   } catch (error) {
     if (error instanceof z.ZodError) {
       return { 

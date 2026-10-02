@@ -4,18 +4,19 @@ import Link from "next/link";
 import React, { useEffect, useState, useRef } from "react";
 import { useWebHaptics } from "web-haptics/react";
 import dynamic from "next/dynamic";
-import { Ticket, Users, Radio, Navigation, Info, Youtube, Instagram, Cloud, Heart } from "lucide-react";
+import { Ticket, Users, Radio, Navigation, Info, Youtube, Instagram, Cloud, Heart, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCurrentRadioSlot } from "@/hooks/use-radio";
 import { useIsMobile } from "../../hooks/use-mobile";
 import { useOrbActivation } from "@/contexts/OrbActivationContext";
+import { MERCH_ENABLED } from "@/lib/site-features";
 
 const Orb = dynamic(() => import("@/components/three/Orb"), {
   ssr: false,
   loading: () => null,
 });
 
-type RouteKey = "events" | "fm" | "artists" | "blog" | "about" | "thisWeek";
+type RouteKey = "events" | "fm" | "artists" | "merch" | "blog" | "about" | "thisWeek";
 
 type RouteItem = {
   key: RouteKey;
@@ -25,13 +26,14 @@ type RouteItem = {
   isComingSoon?: boolean;
 };
 
-const routes: RouteItem[] = [
+const routes: RouteItem[] = ([
   { key: "events", href: "/events", icon: Ticket, text: "Events" },
   { key: "fm", href: "/radio/schedule", icon: Radio, text: "Radio" },
   { key: "artists", href: "/artists", icon: Users, text: "Artists" },
+  { key: "merch", href: "/merch", icon: ShoppingBag, text: "Merch" },
   { key: "about", href: "/about", icon: Info, text: "About" },
   { key: "thisWeek", href: "/thisweek", icon: Navigation, text: "This Week" },
-];
+] satisfies RouteItem[]).filter((route) => MERCH_ENABLED || route.href !== "/merch");
 
 const socialLinks = [
   { key: 'youtube', icon: Youtube, url: 'https://www.youtube.com/@originsradiotr', label: 'YouTube' },
@@ -52,26 +54,31 @@ const HomeHero: React.FC = () => {
   const { isOrbActive } = useOrbActivation();
 
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.play().catch(() => {
-        // Handle autoplay error or user interaction requirement
-        console.log('Autoplay prevented');
-      });
-    }
-
-    // Optimization: Pause video when tab is completely hidden/inactive to save CPU/Battery
-    const handleVisibilityChange = () => {
-      if (!videoRef.current) return;
-      if (document.hidden) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play().catch(() => { });
+    const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    const syncPlayback = () => {
+      const video = videoRef.current;
+      if (!video) return;
+      if (document.hidden || motionPreference.matches || connection?.saveData || videoOpacity === 0) {
+        video.pause();
+        return;
       }
+      // Choose one rendition before loading so phones never fetch the desktop video.
+      if (!video.getAttribute('src')) {
+        video.src = window.matchMedia('(max-width: 767px)').matches
+          ? '/media/home/background-mobile-v1.mp4'
+          : '/media/home/background-desktop-v1.mp4';
+      }
+      video.play().catch(() => { /* Autoplay can be blocked by the browser. */ });
     };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
-  }, []);
+    syncPlayback();
+    document.addEventListener('visibilitychange', syncPlayback);
+    motionPreference.addEventListener('change', syncPlayback);
+    return () => {
+      document.removeEventListener('visibilitychange', syncPlayback);
+      motionPreference.removeEventListener('change', syncPlayback);
+    };
+  }, [videoOpacity]);
 
   useEffect(() => {
     const timer = setTimeout(() => setMounted(true), 50);
@@ -93,16 +100,19 @@ const HomeHero: React.FC = () => {
   }, [isLive]);
 
   return (
-    <section className="relative w-full h-[100dvh] overflow-hidden bg-black">
+    <section className="relative w-full min-h-[100dvh] overflow-hidden bg-black">
       {/* Video Background */}
       <video
         ref={videoRef}
-        autoPlay
         loop
         muted
         playsInline
         disablePictureInPicture
-        preload="auto"
+        preload="none"
+        poster="/media/home/poster-v1.jpg"
+        width={1280}
+        height={720}
+        aria-hidden="true"
         className="absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-1000 ease-out"
         style={{ opacity: videoOpacity }}
         // Prevent video from claiming audio context
@@ -111,9 +121,7 @@ const HomeHero: React.FC = () => {
           video.muted = true;
           video.volume = 0;
         }}
-      >
-        <source src="/website background compres.mp4" type="video/mp4" />
-      </video>
+      />
 
       {/* Dark overlay for readability */}
       <div className="absolute inset-0 z-[1] bg-black/60 sm:bg-black/40" />
@@ -145,7 +153,7 @@ const HomeHero: React.FC = () => {
 
 
       {/* Main Content */}
-      <div className="absolute inset-0 z-[50] flex flex-col items-center justify-center px-4 sm:px-6">
+      <div className="relative z-[50] flex min-h-[100dvh] flex-col items-center justify-center px-4 pb-32 pt-16 sm:px-6">
         {/* Hero Text */}
         <div className={cn(
           "text-center mb-10 sm:mb-16 transition-all duration-700",
@@ -156,12 +164,12 @@ const HomeHero: React.FC = () => {
             "text-[10px] sm:text-xs tracking-[0.4em] uppercase text-white/40 mb-4 transition-all duration-700 delay-100",
             mounted ? "opacity-100" : "opacity-0"
           )}>
-            live everyday at 9pm istanbul time
+            Independent sounds. Shared frequencies.
           </p>
 
           {/* Main Title */}
           <div className="relative">
-            <h1 className="font-newake text-6xl sm:text-7xl md:text-8xl lg:text-9xl tracking-tight text-white/80 uppercase leading-none relative z-10">
+            <h1 className="font-newake text-[clamp(2.5rem,10vw,3.75rem)] sm:text-7xl md:text-8xl lg:text-9xl tracking-tight text-white/80 uppercase leading-none relative z-10">
               originsradio
             </h1>
             {/* Overlay glow effect */}
@@ -203,7 +211,7 @@ const HomeHero: React.FC = () => {
         )}>
           {/* Big Navigation Panel */}
           <nav className={cn(
-            "flex flex-nowrap overflow-x-auto items-center justify-center pt-[15px] pb-2 px-2 sm:p-2 rounded-[2rem] sm:rounded-full gap-2 sm:gap-2",
+            "flex flex-wrap items-center justify-center pt-[15px] pb-2 px-2 sm:p-2 rounded-[2rem] sm:rounded-full gap-2 sm:gap-2",
             "bg-white/[0.03] backdrop-blur-xl border border-white/[0.08]",
             "shadow-2xl shadow-black/20",
             "max-w-full w-full sm:w-auto",
@@ -217,13 +225,13 @@ const HomeHero: React.FC = () => {
                 <Link
                   key={route.key}
                   href={route.href}
-                  className="group relative outline-none flex-shrink-0 snap-center"
+                  className="group relative rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white flex-shrink-0 snap-center"
                   onMouseEnter={() => setHoveredRoute(route.key)}
                   onMouseLeave={() => setHoveredRoute(null)}
                   onClick={() => trigger('light')}
                 >
                   <div className={cn(
-                    "relative flex items-center justify-center gap-2 sm:gap-3 px-3 sm:px-6 py-2.5 sm:py-4 rounded-full",
+                    "relative flex items-center justify-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-4 rounded-full",
                     "transition-all duration-300 ease-out",
                     "hover:bg-white/[0.08]",
                     "active:scale-95"

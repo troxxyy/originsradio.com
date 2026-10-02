@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   getArtists,
@@ -36,7 +37,6 @@ import {
   deleteThisWeekEvent
 } from '../lib/supabase-utils'
 import type { Database } from '../lib/supabase'
-import { useEffect } from 'react'
 
 type Artist = Database['public']['Tables']['artists']['Row']
 type Track = Database['public']['Tables']['tracks']['Row']
@@ -46,10 +46,11 @@ type ChatMessage = Database['public']['Tables']['chat_messages']['Row']
 type OurWorkProject = Database['public']['Tables']['our_work_projects']['Row']
 
 // Artist hooks
-export const useArtists = () => {
+export const useArtists = (initialData?: Database['public']['Tables']['artists']['Row'][]) => {
   return useQuery({
     queryKey: ['artists'],
     queryFn: getArtists,
+    initialData,
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 }
@@ -63,9 +64,10 @@ export const useArtist = (id: string) => {
   })
 }
 
-export const useArtistBySlug = (slug: string) => {
+export const useArtistBySlug = (slug: string, initialData?: Database['public']['Tables']['artists']['Row']) => {
   return useQuery({
     queryKey: ['artist', 'slug', slug],
+    initialData,
     queryFn: () => getArtistBySlug(slug),
     enabled: !!slug,
     staleTime: 5 * 60 * 1000,
@@ -260,6 +262,13 @@ export const useUploadImage = () => {
   })
 } 
 
+// Initialize browser identity after hydration, never during server rendering.
+function useAnonymousUserId() {
+  const [userId, setUserId] = useState('')
+  useEffect(() => { setUserId(generateUserId()) }, [])
+  return userId
+}
+
 // Artist likes hooks
 export const useArtistLikeCount = (artistId: string) => {
   return useQuery({
@@ -271,22 +280,25 @@ export const useArtistLikeCount = (artistId: string) => {
 }
 
 export const useArtistLikeStatus = (artistId: string) => {
-  const userId = generateUserId()
+  const userId = useAnonymousUserId()
   
   return useQuery({
     queryKey: ['artist-like-status', artistId, userId],
     queryFn: () => isArtistLikedByUser(artistId, userId),
-    enabled: !!artistId,
+    enabled: !!artistId && !!userId,
     staleTime: 30 * 1000, // 30 seconds
   })
 }
 
 export const useToggleArtistLike = () => {
   const queryClient = useQueryClient()
-  const userId = generateUserId()
+  const userId = useAnonymousUserId()
   
   return useMutation({
-    mutationFn: ({ artistId }: { artistId: string }) => toggleArtistLike(artistId, userId),
+    mutationFn: ({ artistId }: { artistId: string }) => {
+      if (!userId) throw new Error('Please wait for the page to finish loading.')
+      return toggleArtistLike(artistId, userId)
+    },
     onSuccess: (isLiked, { artistId }) => {
       // Invalidate and refetch like count and status
       queryClient.invalidateQueries({ queryKey: ['artist-like-count', artistId] })
@@ -351,9 +363,10 @@ export const useChatSubscription = (onNewMessage: (message: ChatMessage) => void
 // Our Work hooks
 import { getOurWorkProjects } from '../lib/supabase-utils'
 
-export const useOurWorkProjects = () => {
+export const useOurWorkProjects = (initialData?: Database['public']['Tables']['our_work_projects']['Row'][]) => {
   return useQuery<OurWorkProject[]>({
     queryKey: ['our_work_projects'],
+    initialData,
     queryFn: getOurWorkProjects,
     staleTime: 5 * 60 * 1000,
   })

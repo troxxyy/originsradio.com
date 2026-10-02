@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import PageLayout from '@/components/layout/PageLayout';
 import BlogManagement from '@/components/admin/BlogManagement';
+import AdminMediaSession from '@/components/admin/AdminMediaSession';
 import { 
   getPaginatedArtists, 
   getArtistStats, 
@@ -415,6 +416,7 @@ export default function AdminArtistsPage() {
         
         {/* Tab Navigation */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="mb-6"><AdminMediaSession /></div>
           <div className="flex gap-4 mb-8">
             <button
               onClick={() => setActiveTab('artists')}
@@ -1260,4 +1262,4 @@ export default function AdminArtistsPage() {
       </div>
     </PageLayout>
   );
-} 
+}

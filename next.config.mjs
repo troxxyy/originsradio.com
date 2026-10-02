@@ -1,6 +1,26 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  poweredByHeader: false,
+  async headers() {
+    return [{
+      source: '/:path*',
+      headers: [
+        { key: 'X-Content-Type-Options', value: 'nosniff' },
+        { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+      ],
+    }, {
+      // Home media uses versioned filenames; bump the version when replacing a file.
+      source: '/media/home/:path*',
+      headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+    }, {
+      source: '/3d/orb-v1/:path*',
+      headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+    }, ...['/artist/:path*', '/artistcontrolsecret/:path*', '/originsradio/adminuploads/:path*', '/uploads/:path*', '/ticket/:path*', '/invite/:path*'].map(source => ({
+      source,
+      headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+    }))]
+  },
   typescript: {
     ignoreBuildErrors: false,
   },
@@ -18,8 +38,13 @@ const nextConfig = {
   // Optimize images for better performance
   images: {
     formats: ['image/webp', 'image/avif'],
+    qualities: [60, 75],
     minimumCacheTTL: 60,
     remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'originsradio-media.sinacetin.workers.dev',
+      },
       {
         protocol: 'https',
         hostname: '**.supabase.co',

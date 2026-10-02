@@ -1,3 +1,4 @@
+import { SITE_URL } from '@/lib/site'
 import { supabase, isSupabaseConfigured } from './supabase'
 
 export type Artist = {
@@ -125,7 +126,7 @@ export async function getArtistSEOData(slug: string): Promise<{
     const artistGenres = artist.genre?.join(', ') || 'Electronic, House, Techno'
     const artistLocation = artist.location || ''
     const artistPhoto = artist.photo_url || '/placeholder.svg'
-    const currentUrl = `https://origins.radio/artists/${slug}`
+    const currentUrl = `${SITE_URL}/artists/${slug}`
 
     // Generate SEO-optimized title and description focusing on "DJ" keywords
     const title = `${artistName} - DJ & Producer | Origins Radio`
@@ -187,13 +188,13 @@ export async function getArtistSEOData(slug: string): Promise<{
             "@type": "ListItem",
             "position": 1,
             "name": "Home",
-            "item": "https://origins.radio"
+            "item": SITE_URL
           },
           {
             "@type": "ListItem",
             "position": 2,
             "name": "Artists",
-            "item": "https://origins.radio/artists"
+            "item": `${SITE_URL}/artists`
           },
           {
             "@type": "ListItem",

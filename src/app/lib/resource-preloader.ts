@@ -197,9 +197,9 @@ export async function preloadCriticalAssets(
   progressCallback?: ProgressCallback
 ): Promise<void> {
   const criticalAssets = [
-    { name: 'Spline 3D Scene', url: '/orbvol2/public/scene.splinecode', type: 'scene' as const },
-    { name: 'WASM Runtime', url: '/orbvol2/public/draco_decoder.wasm', type: 'wasm' as const },
-    { name: 'Draco Script', url: '/orbvol2/public/draco_wasm_wrapper.js', type: 'script' as const },
+    { name: 'Spline 3D Scene', url: '/3d/orb-v1/scene.splinecode', type: 'scene' as const },
+    { name: 'WASM Runtime', url: '/3d/orb-v1/draco_decoder.wasm', type: 'wasm' as const },
+    { name: 'Draco Script', url: '/3d/orb-v1/draco_wasm_wrapper.js', type: 'script' as const },
     { name: 'Avenir Font', url: '/fonts/Avenir.ttc', type: 'font' as const },
     { name: 'Newake Font', url: '/fonts/NewakeFont-Demo.otf', type: 'font' as const },
     { name: 'Origins Logo', url: '/originslogo.png', type: 'image' as const },
@@ -208,4 +208,3 @@ export async function preloadCriticalAssets(
   const preloader = new ResourcePreloader(criticalAssets, progressCallback);
   await preloader.loadAll();
 }
-

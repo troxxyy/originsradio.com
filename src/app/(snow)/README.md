@@ -10,7 +10,7 @@ This is the dedicated microsite for Origins Radio Snow Sessions event at Erciyes
 
 ## Pages
 
-1. **Home/About** (`/`) - Event overview, hero section, stats, and CTAs
+1. **Home/About** (`/snow` locally, `/` on the Snow subdomain) - Event overview, hero section, stats, and CTAs
 2. **Line Up** (`/lineup`) - Artist lineup with cards and filtering
 3. **Hotels** (`/hotels`) - Partner hotels and accommodation information
 4. **Prices** (`/prices`) - Package tiers, pricing, and add-ons
@@ -55,7 +55,7 @@ To configure the subdomain on Vercel:
 4. Configure DNS:
    - Add a CNAME record: `snow` → `cname.vercel-dns.com`
    - Or use Vercel's automatic DNS configuration
-5. The middleware will automatically route `snow.originsradio.com` requests to the `(snow)` route group
+5. The `src/proxy.ts` rewrite maps the Snow subdomain root to `/snow`. Route groups alone do not route by hostname.
 
 ## Development
 

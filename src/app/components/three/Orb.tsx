@@ -187,8 +187,8 @@ const Orb = ({ className = "", rotationSpeed = -0.08 }: OrbProps) => {
         }
       >
         <Spline
-          scene="/orbvol2/public/scene.splinecode"
-          wasmPath="/orbvol2/public/"
+          scene="/3d/orb-v1/scene.splinecode"
+          wasmPath="/3d/orb-v1/"
           className="!w-full !h-full block absolute inset-0"
           onLoad={handleLoad}
         />

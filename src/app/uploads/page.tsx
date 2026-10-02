@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Upload, FileAudio, Loader2, CheckCircle, XCircle, Plus, User } from 'lucide-react';
 import WaveSurfer from 'wavesurfer.js';
 import WaveformGenerator from '@/components/admin/WaveformGenerator';
+import { uploadPublicMedia } from '@/lib/media-upload';
 
 interface UploadStatus {
   file: File;
@@ -113,6 +114,9 @@ export default function AdminUploadsPage() {
       }
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       if (sessionError) throw sessionError;
+      if (process.env.NEXT_PUBLIC_MEDIA_ORIGIN && (!session || session.user.is_anonymous)) {
+        throw new Error('Sign in with your admin account before uploading.');
+      }
       if (!session) {
         const { error: signInError } = await supabase.auth.signInAnonymously();
         if (signInError) throw signInError;
@@ -127,46 +131,14 @@ export default function AdminUploadsPage() {
           const fileName = `${timestamp}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
           const filePath = `${fileName}`;
 
-          // Try signed upload first; if it fails, fall back to direct upload
-          const storageRef = supabase.storage.from('sets');
-          try {
-            const { data: signed, error: signErr } = await storageRef.createSignedUploadUrl(filePath);
-            if (signErr || !signed?.token) throw signErr || new Error('Failed to create signed upload URL');
-            const { error: uploadErr } = await storageRef.uploadToSignedUrl(filePath, signed.token, file, {
-              contentType: file.type || 'application/octet-stream',
-              upsert: false
-            });
-            if (uploadErr) throw uploadErr;
-          } catch (signedErr) {
-            // Fallback to standard upload
-            const { error: directErr } = await storageRef.upload(filePath, file, {
-              cacheControl: '3600',
-              upsert: false,
-              contentType: file.type || 'application/octet-stream'
-            });
-            if (directErr) {
-              throw directErr;
-            }
-          }
-
-          // Get the public URL
-          const { data: urlData } = supabase.storage
-            .from('sets')
-            .getPublicUrl(filePath);
+          const audioUrl = await uploadPublicMedia('sets', filePath, file);
 
           // Compute peaks client-side using WaveSurfer and upload JSON to waveforms bucket
           const peaks = await computePeaksFromFile(file);
           const baseName = fileName.replace(/\.[^.]+$/, '');
           const peaksPath = `${baseName}.json`;
           const peaksBlob = new Blob([JSON.stringify({ peaks })], { type: 'application/json' });
-          await supabase.storage
-            .from('waveforms')
-            .upload(peaksPath, peaksBlob, { cacheControl: '3600', upsert: true, contentType: 'application/json' });
-
-          // Get peaks URL
-          const { data: peaksUrlData } = supabase.storage
-            .from('waveforms')
-            .getPublicUrl(peaksPath);
+          const peaksUrl = await uploadPublicMedia('waveforms', peaksPath, peaksBlob);
 
           // Find the upload to get artist info
           const currentUpload = uploads.find(upload => upload.file === file);
@@ -177,8 +149,8 @@ export default function AdminUploadsPage() {
               const setData = {
                 title: file === pendingMetaFile && metaTitle ? metaTitle : file.name.replace(/\.[^/.]+$/, ''),
                 artist_id: currentUpload.artistId,
-                audio_url: urlData.publicUrl,
-                peaks_url: peaksUrlData.publicUrl,
+                audio_url: audioUrl,
+                peaks_url: peaksUrl,
                 duration: null, // Could be calculated from peaks if needed
                 release_date: file === pendingMetaFile && metaReleaseDate ? metaReleaseDate : new Date().toISOString().split('T')[0],
                 set_number: file === pendingMetaFile && metaSetNumber ? parseInt(metaSetNumber, 10) : currentUpload?.setNumber ?? null,
@@ -326,9 +298,16 @@ export default function AdminUploadsPage() {
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold mb-4">Admin Uploads</h1>
             <p className="text-gray-400 text-lg">
-              Upload audio files directly to the sets storage bucket
+              Upload audio recordings and their waveform previews
             </p>
           </div>
+
+          {process.env.NEXT_PUBLIC_MEDIA_ORIGIN && (
+            <p className="text-center text-sm text-gray-300 mb-6">
+              Admin sign-in is required to upload.{' '}
+              <Link href="/artist/login?next=/uploads" className="text-cyan-300 underline">Sign in</Link>
+            </p>
+          )}
 
           {/* Waveform Generator */}
           <WaveformGenerator />

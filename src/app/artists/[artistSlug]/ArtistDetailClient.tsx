@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Helmet } from 'react-helmet-async'
 import { 
   ArrowLeft, 
   MapPin, 
@@ -24,10 +23,11 @@ import PageLayout from '@/components/layout/PageLayout'
 import { useArtistBySlug, useTracksByArtist, useEventsByArtist, useSetsByArtist, useArtistLikeCount, useArtistLikeStatus, useToggleArtistLike } from '@/hooks/use-supabase'
 import ArtistSetItem, { ArtistSetEvent } from '@/components/music/ArtistSetItem'
 import { getSupabaseClient } from '@/lib/supabase'
+import { publicMediaUrl } from '@/lib/media-url'
 
-type Props = { artistSlug: string }
+type Props = { artistSlug: string; initialArtist: import('@/lib/public-content').PublicArtist }
 
-export default function ArtistDetailClient({ artistSlug }: Props) {
+export default function ArtistDetailClient({ artistSlug, initialArtist }: Props) {
   const router = useRouter()
   const [currentTrack, setCurrentTrack] = useState<string | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -42,7 +42,7 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
   const lastUpdateRefSet = useRef(0)
 
   // Fetch data
-  const { data: artist, isLoading, error } = useArtistBySlug(artistSlug || '')
+  const { data: artist, isLoading, error } = useArtistBySlug(artistSlug || '', initialArtist)
   const { data: tracks } = useTracksByArtist(artist?.id || '')
   const { data: events } = useEventsByArtist(artist?.id || '')
   const { data: sets } = useSetsByArtist(artist?.id || '')
@@ -59,11 +59,8 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
       const parts = url.pathname.split('/')
       const fileName = parts[parts.length - 1]
       if (!fileName) return undefined
-      const base = fileName.replace(/\.[^.]+$/, '')
-      const waveUrl = audioUrl
-        .replace('/object/public/sets/sets/', '/object/public/waveforms/')
-        .replace(fileName, `${base}.json`)
-      return waveUrl
+      const base = decodeURIComponent(fileName).replace(/\.[^.]+$/, '')
+      return publicMediaUrl('waveforms', `${base}.json`)
     } catch {
       return undefined
     }
@@ -118,105 +115,7 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
     awards: ['Best Underground DJ 2023', 'Local Hero Award']
   }
 
-  // SEO Meta Tags and Structured Data
-  const generateSEOData = () => {
-    if (!artist) return null
 
-    const artistName = artist.name
-    const artistBio = artist.bio || `Professional DJ and music producer ${artistName}${artist.location ? ` from ${artist.location}` : ''}.`
-    const artistGenres = artist.genre?.join(', ') || 'Electronic, House, Techno'
-    const artistLocation = artist.location || ''
-    const artistPhoto = artist.photo_url || '/placeholder.svg'
-    const currentUrl = `https://originsradio.com/artists/${artistSlug}`
-    
-    const metaDescription = `${artistName} - Professional DJ and music producer from ${artistLocation}. Specializing in ${artistGenres}. ${artistBio} Listen to ${artistName}'s latest tracks and sets on Origins Radio.`
-
-    const keywords = [
-      artistName,
-      'DJ',
-      'music producer',
-      'electronic music',
-      ...artist.genre || [],
-      ...(artistLocation ? [artistLocation] : []),
-      'Origins Radio',
-      'underground music',
-      'techno',
-      'house music'
-    ].filter(Boolean).join(', ')
-
-    const structuredData = {
-      "@context": "https://schema.org",
-      "@type": "Person",
-      "name": artistName,
-      "description": artistBio,
-      "image": artistPhoto,
-      "url": currentUrl,
-      "sameAs": artist.social_links ? Object.values(artist.social_links) : [],
-      "jobTitle": "DJ & Music Producer",
-      "worksFor": {
-        "@type": "Organization",
-        "name": "Origins Radio"
-      },
-      "address": artistLocation ? {
-        "@type": "PostalAddress",
-        "addressLocality": artistLocation.split(',')[0]?.trim(),
-        "addressCountry": artistLocation.includes('Turkey') ? "Turkey" : undefined
-      } : undefined,
-      "knowsAbout": artist.genre || ["Electronic Music", "DJing", "Music Production"],
-      "hasOccupation": {
-        "@type": "Occupation",
-        "name": "DJ",
-        "description": `Professional DJ specializing in ${artistGenres}`
-      },
-      "alumniOf": {
-        "@type": "Organization",
-        "name": "Origins Radio"
-      }
-    }
-
-    const musicStructuredData = tracks?.map(track => ({
-      "@context": "https://schema.org",
-      "@type": "MusicRecording",
-      "name": track.title,
-      "byArtist": {
-        "@type": "Person",
-        "name": artistName
-      },
-      "inAlbum": {
-        "@type": "MusicAlbum",
-        "name": `${artistName} - ${track.title}`,
-        "byArtist": {
-          "@type": "Person",
-          "name": artistName
-        }
-      },
-      "duration": track.duration ? `PT${Math.floor(track.duration / 60)}M${track.duration % 60}S` : undefined,
-      "datePublished": track.release_date,
-      "url": currentUrl
-    })) || []
-
-    return {
-      title: `${artistName} - DJ & Music Producer | Origins Radio`,
-      description: metaDescription,
-      keywords: keywords,
-      structuredData: [structuredData, ...musicStructuredData],
-      ogData: {
-        title: `${artistName} - DJ & Music Producer`,
-        description: metaDescription,
-        image: artistPhoto,
-        url: currentUrl,
-        type: 'profile'
-      },
-      twitterData: {
-        card: 'summary_large_image',
-        title: `${artistName} - DJ & Music Producer`,
-        description: metaDescription,
-        image: artistPhoto
-      }
-    }
-  }
-
-  const seoData = generateSEOData()
 
   const bookingMailto = (() => {
     const subject = encodeURIComponent(`DJ booking request - ${artist?.name ?? 'artist'}`)
@@ -505,31 +404,7 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
         <div className="absolute inset-0 opacity-[0.025] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNhKSIvPjwvc3ZnPg==')]"></div>
       </div>
       
-      <Helmet>
-        {seoData && (
-          <>
-            <title>{seoData.title}</title>
-            <meta name="description" content={seoData.description} />
-            <meta name="keywords" content={seoData.keywords} />
-            {seoData.structuredData && seoData.structuredData.map((data, index) => (
-              <script
-                key={`structured-data-${index}`}
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
-              />
-            ))}
-            <meta property="og:title" content={seoData.ogData?.title} />
-            <meta property="og:description" content={seoData.ogData?.description} />
-            <meta property="og:image" content={seoData.ogData?.image} />
-            <meta property="og:url" content={seoData.ogData?.url} />
-            <meta property="og:type" content={seoData.ogData?.type} />
-            <meta name="twitter:card" content={seoData.twitterData?.card} />
-            <meta name="twitter:title" content={seoData.twitterData?.title} />
-            <meta name="twitter:description" content={seoData.twitterData?.description} />
-            <meta name="twitter:image" content={seoData.twitterData?.image} />
-          </>
-        )}
-      </Helmet>
+
       <div className="min-h-screen">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Back Button */}
@@ -552,7 +427,7 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
           {/* Hero Section */}
           <div className="pb-16">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.15, ease: "easeOut" }}
               className="relative"
@@ -999,5 +874,3 @@ export default function ArtistDetailClient({ artistSlug }: Props) {
     </PageLayout>
   )
 }
-
-

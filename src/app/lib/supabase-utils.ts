@@ -1,3 +1,4 @@
+import { uploadPublicMedia } from './media-upload'
 import { getSupabaseClient, getSupabaseAdminClient, isSupabaseConfigured } from './supabase'
 import type { Database } from './supabase'
 
@@ -70,7 +71,7 @@ export const getArtistById = async (id: string): Promise<Artist | null> => {
   return data
 }
 
-// Get artist by slug (name-based)
+// Prefer the stored public URL; support older name-based links as aliases.
 export const getArtistBySlug = async (slug: string): Promise<Artist | null> => {
   if (!isSupabaseConfigured()) {
     console.warn('Supabase not configured, returning null for artist by slug')
@@ -78,6 +79,14 @@ export const getArtistBySlug = async (slug: string): Promise<Artist | null> => {
   }
 
   const supabase = getSupabaseClient()
+  const { data: artist, error: slugError } = await supabase
+    .from('artists')
+    .select('*')
+    .eq('slug', slug)
+    .maybeSingle()
+  if (slugError) throw slugError
+  if (artist) return artist
+
   // Get all artists and find the one that matches the slug
   const { data: allArtists, error } = await supabase
     .from('artists')
@@ -85,7 +94,7 @@ export const getArtistBySlug = async (slug: string): Promise<Artist | null> => {
 
   if (error) {
     console.error('Error fetching artists:', error)
-    return null
+    throw error
   }
 
   // Find artist whose name generates the same slug
@@ -533,75 +542,13 @@ export const deleteEvent = async (id: string): Promise<boolean> => {
 
 // File upload utilities
 export const uploadAudioFile = async (file: File, path: string): Promise<string | null> => {
-  if (!isSupabaseConfigured()) {
-    console.warn('Supabase not configured, cannot upload audio file')
-    return null
-  }
-
-  const supabase = getSupabaseClient()
-  // Ensure we have an authenticated session for storage policies
-  try {
-    const { data: sessionData } = await supabase.auth.getSession()
-    if (!sessionData.session) {
-      await supabase.auth.signInAnonymously()
-    }
-  } catch (authErr) {
-    console.error('Auth error before audio upload:', authErr)
-  }
-  const { data, error } = await supabase.storage
-    .from('audio')
-    .upload(path, file, {
-      upsert: true,
-      contentType: file.type || 'application/octet-stream',
-      cacheControl: '3600',
-    })
-
-  if (error) {
-    console.error('Error uploading audio file:', error)
-    return null
-  }
-
-  const { data: urlData } = supabase.storage
-    .from('audio')
-    .getPublicUrl(data.path)
-
-  return urlData.publicUrl
+  try { return await uploadPublicMedia('sets', path, file) }
+  catch (error) { console.error('Audio upload failed:', error); return null }
 }
 
 export const uploadImageFile = async (file: File, path: string): Promise<string | null> => {
-  if (!isSupabaseConfigured()) {
-    console.warn('Supabase not configured, cannot upload image file')
-    return null
-  }
-
-  const supabase = getSupabaseClient()
-  // Ensure we have an authenticated session for storage policies
-  try {
-    const { data: sessionData } = await supabase.auth.getSession()
-    if (!sessionData.session) {
-      await supabase.auth.signInAnonymously()
-    }
-  } catch (authErr) {
-    console.error('Auth error before image upload:', authErr)
-  }
-  const { data, error } = await supabase.storage
-    .from('images')
-    .upload(path, file, {
-      upsert: true,
-      contentType: file.type || 'application/octet-stream',
-      cacheControl: '3600',
-    })
-
-  if (error) {
-    console.error('Error uploading image file:', error)
-    return null
-  }
-
-  const { data: urlData } = supabase.storage
-    .from('images')
-    .getPublicUrl(data.path)
-
-  return urlData.publicUrl
+  try { return await uploadPublicMedia('images', path, file) }
+  catch (error) { console.error('Image upload failed:', error); return null }
 }
 
 // Artist likes functions
@@ -667,35 +614,7 @@ export const isArtistLikedByUser = async (artistId: string, userId: string): Pro
   return data || false
 }
 
-// Generate a unique user identifier for anonymous users
-export const generateUserId = (): string => {
-  // Try to get existing user ID from localStorage
-  let userId = localStorage.getItem('origins_radio_user_id')
-
-  if (!userId) {
-    // Generate a new user ID based on browser fingerprint
-    const fingerprint = [
-      navigator.userAgent,
-      navigator.language,
-      screen.width,
-      screen.height,
-      new Date().getTimezoneOffset()
-    ].join('|')
-
-    // Create a hash of the fingerprint
-    let hash = 0
-    for (let i = 0; i < fingerprint.length; i++) {
-      const char = fingerprint.charCodeAt(i)
-      hash = ((hash << 5) - hash) + char
-      hash = hash & hash // Convert to 32-bit integer
-    }
-
-    userId = `user_${Math.abs(hash)}_${Date.now()}`
-    localStorage.setItem('origins_radio_user_id', userId)
-  }
-
-  return userId
-}
+export { generateUserId } from './browser-identity'
 
 // Chat message functions
 export const getChatMessages = async (limit = 50): Promise<ChatMessage[]> => {

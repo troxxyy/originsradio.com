@@ -45,6 +45,7 @@ export interface Database {
         Row: {
           id: string
           name: string
+          slug: string
           bio: string | null
           photo_url: string | null
           location: string | null
@@ -371,4 +372,4 @@ export interface Database {
       [_ in never]: never
     }
   }
-} 
+}

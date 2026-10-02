@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getOurWorkProjects } from '@/lib/supabase-utils'
+import { isUpcomingEvent } from '@/lib/event-dates'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,7 +13,7 @@ export async function GET(request: NextRequest) {
     
     let filtered = projects
     if (upcomingOnly) {
-      filtered = projects.filter(p => p.upcoming)
+      filtered = projects.filter(p => isUpcomingEvent(p))
     }
 
     return NextResponse.json({ events: filtered })

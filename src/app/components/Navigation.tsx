@@ -1,11 +1,12 @@
 'use client'
 
-import { Home, Info, Users, Ticket, Navigation as NavigationIcon, BookOpen } from "lucide-react";
+import { Home, Info, Users, Ticket, Navigation as NavigationIcon, BookOpen, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { useWebHaptics } from "web-haptics/react";
+import { MERCH_ENABLED } from "@/lib/site-features";
 
 const Navigation = () => {
   const pathname = usePathname();
@@ -22,21 +23,24 @@ const Navigation = () => {
     { name: "", icon: Home, href: "/" },
     { name: "Events", icon: Ticket, href: "/events" },
     { name: "Artists", icon: Users, href: "/artists" },
+    { name: "Merch", icon: ShoppingBag, href: "/merch" },
     { name: "Blog", icon: BookOpen, href: "/blog" },
     { name: "About", icon: Info, href: "/about" },
     { name: "This Week", icon: NavigationIcon, href: "/thisweek" },
-  ];
+  ].filter((link) => MERCH_ENABLED || link.href !== "/merch");
 
   return (
     <nav className={cn(
       "fixed top-4 sm:top-6 left-1/2 -translate-x-1/2 z-[70]",
-      "flex items-center gap-1.5",
+      "flex items-center gap-0.5 sm:gap-1.5",
       "transition-all duration-700",
       mounted ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
     )}>
       {/* Home button */}
       <Link
         href="/"
+        aria-label="Home"
+        aria-current={pathname === '/' ? 'page' : undefined}
         onClick={() => trigger('light')}
         className={cn(
           "flex items-center justify-center w-10 h-10 rounded-full",
@@ -53,7 +57,7 @@ const Navigation = () => {
 
       {/* Other links */}
       <div className={cn(
-        "flex items-center gap-1 px-2 py-1.5 rounded-full",
+        "flex items-center gap-0 sm:gap-1 px-0.5 sm:px-2 py-1.5 rounded-full",
         "bg-white/[0.03] border border-white/[0.05]",
         "backdrop-blur-xl"
       )}>
@@ -64,9 +68,12 @@ const Navigation = () => {
             <Link
               key={link.name}
               href={link.href}
+              aria-label={link.name}
+              title={link.name}
+              aria-current={isActive ? 'page' : undefined}
               onClick={() => trigger('light')}
               className={cn(
-                "flex items-center gap-1.5 px-3 py-2 rounded-full",
+                "flex items-center gap-1.5 px-2 sm:px-3 py-2 rounded-full",
                 "transition-all duration-300",
                 "hover:bg-white/[0.06]",
                 isActive

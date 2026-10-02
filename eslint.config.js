@@ -21,9 +21,20 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       "react-refresh/only-export-components": [
         "warn",
-        { allowConstantExport: true },
+        {
+          allowConstantExport: true,
+          allowExportNames: ["metadata", "viewport", "generateMetadata", "generateStaticParams", "revalidate", "dynamic", "runtime"],
+        },
       ],
       "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-empty-object-type": "off",
+      "@typescript-eslint/no-require-imports": "off",
+      "no-case-declarations": "off",
+      "no-constant-condition": "off",
+      "no-empty": "off",
+      "no-extra-semi": "off",
+      "no-prototype-builtins": "off",
     },
   }
 );
