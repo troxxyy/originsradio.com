@@ -295,6 +295,9 @@ const HomeHero: React.FC = () => {
         )}>
           Ankara • Istanbul • Bali
         </p>
+        <Link href="/ankara-elektronik-muzik" lang="tr" className="mt-5 inline-flex min-h-11 items-center gap-2 text-xs text-white/65 transition-colors hover:text-white">
+          Ankara’da elektronik müziği keşfet <span aria-hidden="true">↗</span>
+        </Link>
       </div>
 
       {/* Bottom gradient fade */}

@@ -14,6 +14,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const pages: MetadataRoute.Sitemap = [
     { url: `${SITE_URL}/` },
     { url: `${SITE_URL}/about` },
+    { url: `${SITE_URL}/ankara-elektronik-muzik`, lastModified: lastUpdated([...artists, ...projects, ...blogs]) },
     { url: `${SITE_URL}/artists`, lastModified: lastUpdated(artists) },
     { url: `${SITE_URL}/events`, lastModified: lastUpdated(projects) },
     { url: `${SITE_URL}/blog`, lastModified: lastUpdated(blogs) },

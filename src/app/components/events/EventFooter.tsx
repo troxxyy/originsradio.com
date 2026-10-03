@@ -25,7 +25,7 @@ const EventFooter = () => {
               <h3 className="text-lg sm:text-xl font-semibold text-white">Origins Radio</h3>
             </div>
             <p className="text-sm sm:text-base text-white/80 leading-relaxed">
-              Premier interactive radio station bringing you the best in electronic music, live shows, and cultural experiences. We connect artists, music lovers, and the creative community.
+              Independent electronic music radio, DJ sets and events from Ankara and beyond. Discover artists, follow the weekly programme and explore the nights in our archive.
             </p>
             <div className="flex items-center gap-2 text-sm sm:text-base text-white/70">
               <MapPin className="h-4 w-4" />
@@ -51,6 +51,15 @@ const EventFooter = () => {
               </Link>
               <Link href="/about" onClick={() => trigger('light')} className="text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 py-1">
                 About Us
+              </Link>
+              <Link href="/radio/schedule" onClick={() => trigger('light')} className="text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 py-1">
+                Radio Programme
+              </Link>
+              <Link href="/blog" onClick={() => trigger('light')} className="text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 py-1">
+                Music Stories
+              </Link>
+              <Link href="/ankara-elektronik-muzik" lang="tr" onClick={() => trigger('light')} className="text-sm sm:text-base text-white/80 hover:text-white transition-colors duration-200 py-1">
+                Ankara’da elektronik müzik
               </Link>
             </div>
           </div>

@@ -75,6 +75,13 @@ assert.ok(pages.get('/artists').hrefs.filter(href => href.startsWith('/artists/'
 assert.ok(pages.get('/blog').hrefs.filter(href => href.startsWith('/blog/')).length > 0, 'Blog must have crawlable article links')
 assert.ok(pages.get('/events').hrefs.filter(href => href.startsWith('/events/')).length > 0, 'Events must have crawlable detail links')
 assert.ok(pages.get('/radio/schedule').body.includes('Full weekly programme'), 'Complete programme is present before hydration')
+const ankara = pages.get('/ankara-elektronik-muzik')
+assert.ok(ankara, 'Turkish Ankara discovery page is included in sitemap')
+assert.ok(ankara.ld.some(item => item['@type'] === 'CollectionPage' && item.inLanguage === 'tr'), 'Ankara page identifies its Turkish content')
+assert.ok(ankara.hrefs.some(href => href.startsWith('/artists/')), 'Ankara page links to real artist profiles')
+assert.ok(ankara.hrefs.some(href => href.startsWith('/events/')), 'Ankara page links to real event archives')
+assert.ok(pages.get('/').hrefs.includes('/ankara-elektronik-muzik'), 'Home links to Ankara discovery page')
+assert.ok(pages.get('/artists').hrefs.includes('/ankara-elektronik-muzik'), 'Roster links back to Ankara discovery page')
 
 const artistPath = [...pages.keys()].find(path => path.startsWith('/artists/'))
 for (const [from, to] of [['/blog-server', '/blog'], ['/events-server', '/events'], [artistPath.replace('/artists', ''), artistPath]]) {
