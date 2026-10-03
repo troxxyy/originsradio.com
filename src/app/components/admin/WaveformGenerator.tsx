@@ -92,7 +92,7 @@ const WaveformGenerator = () => {
       console.log(`📊 Raw audio data: ${channelData.length} samples`);
       
       // Calculate target peaks for 1-hour sets
-      const targetPeaks = 60000;
+      const targetPeaks = 1200;
       const peaks = downsampleAudioData(channelData, targetPeaks);
       
       console.log(`✅ Generated ${peaks.length} peaks using Web Audio API`);
@@ -131,7 +131,7 @@ const WaveformGenerator = () => {
           maxVal = val;
         }
       }
-      result.push(maxVal);
+      result.push(Math.round(maxVal * 10000) / 10000);
     }
     
     console.log(`✅ Downsampling complete: ${result.length} peaks, sample: [${result.slice(0, 10).map(v => v.toFixed(3)).join(', ')}...]`);

@@ -727,7 +727,7 @@ export default function ArtistDetailClient({ artistSlug, initialArtist }: Props)
                       isPlaying={isPlayingSet && currentSetIndex === index}
                       progress={trackProgressSet[index] || 0}
                       elapsedSeconds={currentSetIndex === index && audioRefSet ? audioRefSet.currentTime : undefined}
-                      durationSeconds={currentSetIndex === index && audioRefSet && audioRefSet.duration && !isNaN(audioRefSet.duration) ? audioRefSet.duration : undefined}
+                      durationSeconds={currentSetIndex === index && audioRefSet && audioRefSet.duration && !isNaN(audioRefSet.duration) ? audioRefSet.duration : sets?.[index]?.duration || undefined}
                     />
                   ))}
                 </div>
