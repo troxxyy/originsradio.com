@@ -8,6 +8,7 @@ const nextConfig = {
       headers: [
         { key: 'X-Content-Type-Options', value: 'nosniff' },
         { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+        { key: 'Link', value: '</llms.txt>; rel="describedby"' },
       ],
     }, {
       // Home media uses versioned filenames; bump the version when replacing a file.
