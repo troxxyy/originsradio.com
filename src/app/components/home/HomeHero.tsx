@@ -164,7 +164,7 @@ const HomeHero: React.FC = () => {
             "text-[10px] sm:text-xs tracking-[0.4em] uppercase text-white/40 mb-4 transition-all duration-700 delay-100",
             mounted ? "opacity-100" : "opacity-0"
           )}>
-            Independent sounds. Shared frequencies.
+            live everyday at 9pm istanbul time
           </p>
 
           {/* Main Title */}
