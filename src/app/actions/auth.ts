@@ -38,7 +38,7 @@ export async function loginArtist(formData: FormData) {
     return { success: true, redirect: '/artist/dashboard' }
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false, error: error.errors[0].message }
+      return { success: false, error: error.issues[0].message }
     }
     return { success: false, error: 'Login failed' }
   }
@@ -74,7 +74,7 @@ export async function signupArtist(formData: FormData) {
     }
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false, error: error.errors[0].message }
+      return { success: false, error: error.issues[0].message }
     }
     return { success: false, error: 'Signup failed' }
   }
